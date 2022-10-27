@@ -1,3 +1,6 @@
+let shapeTracingEnabled = false;
+let blockChasingEnabaled = false;
+
 window.onload = async function () {
   //start the webgazer tracker
   await webgazer
@@ -7,7 +10,7 @@ window.onload = async function () {
       //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
       //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
     })
-    .saveDataAcrossSessions(true)
+    .saveDataAcrossSessions(false)
     .begin();
   webgazer
     .showVideoPreview(true) /* shows all video previews */
@@ -30,7 +33,7 @@ window.onload = async function () {
 };
 
 // Set to true if you want to save the data even if you reload the page.
-window.saveDataAcrossSessions = true;
+window.saveDataAcrossSessions = false;
 
 window.onbeforeunload = function () {
   webgazer.end();
@@ -76,6 +79,8 @@ function Restart() {
  */
 function RestartBlock() {
   document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
+  document.getElementById("xError").innerHTML = "<a>N.A.</a>";
+  document.getElementById("yError").innerHTML = "<a>N.A.</a>";
   clearCanvas();
   webgazer.clearData();
   ClearCalibration();

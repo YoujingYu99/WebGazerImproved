@@ -32,6 +32,7 @@ function calibrationInstruction() {
  * Show the instruction of using chasing the red block.
  */
 function chaseRedBlockInstruction() {
+  if (blockChasingEnabaled) return
   clearCanvas();
   swal({
     title: "Chase Red Block",
@@ -117,6 +118,7 @@ function traceShapeInstruction() {
 }
 
 function showTraceShape() {
+  if (shapeTracingEnabled) return
   // // Clear previous canvas
   // ClearCanvas();
   // Render frame first
