@@ -15,7 +15,7 @@ const numClickPerPoint = 5;
  * Show the instruction of using calibration at the start up screen.
  */
 function calibrationInstruction() {
-  clearCanvas();
+  // clearCanvas();
   swal({
     title: "Calibration",
     text: "Please click on each of the 16 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",

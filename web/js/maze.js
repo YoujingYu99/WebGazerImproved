@@ -47,7 +47,7 @@ var rowIndex = 0;
 function renderBlockRed() {
   // Re-render frame
   renderFrame();
-  console.log("New block rendered");
+  console.log("Frame rendered");
   // Randomly choose column/row index of the block
   columnIndex = Math.floor(Math.random() * 4);
   rowIndex = Math.floor(Math.random() * 4);

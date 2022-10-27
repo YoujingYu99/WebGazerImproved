@@ -68,7 +68,18 @@ function Restart() {
   webgazer.clearData();
   ClearCalibration();
   PopUpInstruction();
-  // calibrationInstruction();
+
+}
+
+/**
+ * Restart the calibration process for block
+ */
+function RestartBlock() {
+  document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
+  clearCanvas();
+  webgazer.clearData();
+  ClearCalibration();
+  calibrationInstruction();
 }
 
 /**
