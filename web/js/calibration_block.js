@@ -104,6 +104,7 @@ function showFlickeringMaze() {
  * Show the instruction of using calibration at the start up screen.
  */
 function traceShapeInstruction() {
+  if (shapeTracingEnabled) return
   clearCanvas();
   swal({
     title: "Trace Shape",
@@ -118,7 +119,6 @@ function traceShapeInstruction() {
 }
 
 function showTraceShape() {
-  if (shapeTracingEnabled) return
   // // Clear previous canvas
   // ClearCanvas();
   // Render frame first
