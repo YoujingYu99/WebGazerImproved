@@ -1,0 +1,230 @@
+body {
+    min-width: 600px !important;
+}
+
+button {
+    border-radius: 4px;
+}
+
+/* Video Feed Styling */
+#overlay {
+    /* Video Feed Styling:
+     * Include the !important keyword to override default styles applied by JS.
+     * webgazer.js sets defaults for: display, position, top, left, width, height
+     */
+}
+
+#webgazerVideoContainer {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 320px !important;
+    height: 240px !important;
+    z-index: 1;
+}
+
+/* Navbar styling */
+#webgazerNavbar {
+    left: 320px;
+    z-index: 0;
+    box-shadow: 0 3px 5px #ddd;
+    border: 0;
+    background-color: #fff;
+}
+
+#Accuracy a {
+    background-color: #222;
+    color: #eee;
+    left: -15px;
+    padding-left: 80px;
+    padding-right: 40px;
+}
+
+#Accuracy {
+    background-color: #222;
+    padding-left: inherit;
+}
+
+li {
+    padding-left: 50px;
+}
+
+.navbar-right li {
+    padding-right: 20px;
+}
+
+.helpBtn {
+    /*padding: 15px;*/
+    border: none;
+    background: none;
+    color: #777;
+}
+
+.helpBtn a {
+    background: none;
+    color: #777;
+}
+
+.helpBtn a:hover {
+    color: black !important;
+    text-decoration: none;
+}
+
+.modal-header {
+    border-bottom: none !important;
+}
+
+/* Calibration button styling */
+.Calibration {
+    width: 20px;
+    height: 20px;
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 25px;
+    background-color: red;
+    opacity: 0.2;
+    border-color: black;
+    border-style: solid;
+    position: fixed;
+}
+
+/* Calibration point position */
+#Pt1 {
+    top: 70px;
+    left: 340px;
+    /*top: 100px;*/
+    /*left:100px;*/
+
+}
+
+#Pt2 {
+    top: 70px;
+    left: 30vw;
+    margin-left: 340px;
+    /*margin-left: 500px;*/
+}
+
+#Pt3 {
+    top: 70px;
+    right: 2vw;
+}
+
+#Pt4 {
+    top: 50vh;
+    left: 2vw;
+}
+
+#Pt5 {
+    top: 50vh;
+    left: 50vw;
+}
+
+#Pt6 {
+    top: 50vh;
+    right: 2vw;
+}
+
+#Pt7 {
+    bottom: 2vw;
+    left: 2vw;
+}
+
+#Pt8 {
+    bottom: 2vw;
+    left: 50vw;
+}
+
+#Pt9 {
+    bottom: 2vw;
+    right: 2vw;
+}
+
+/* Calibration point position for block*/
+/*-2 to account for the strokewidth*/
+#Pt1_block {
+    top: calc(50vh - 100px - 5px);
+    left: calc(50vw - 150px - 5px);
+
+}
+
+#Pt2_block {
+    top: calc(50vh - 100px - 5px);
+    left: calc(50vw - 50px - 5px);
+}
+
+#Pt3_block {
+    top: calc(50vh - 100px - 5px);
+    left: calc(50vw + 50px - 5px);
+}
+
+#Pt4_block {
+    top: calc(50vh - 100px - 5px);
+    left: calc(50vw + 150px - 5px);
+}
+
+#Pt5_block {
+    top: calc(50vh - 5px);
+    left: calc(50vw - 150px - 5px);
+}
+
+#Pt6_block {
+    top: calc(50vh - 5px);
+    left: calc(50vw - 50px - 5px);
+}
+
+#Pt7_block {
+    top: calc(50vh - 5px);
+    left: calc(50vw + 50px - 5px);
+}
+
+#Pt8_block {
+    top: calc(50vh - 5px);
+    left: calc(50vw + 150px - 5px);
+}
+
+#Pt9_block {
+    top: calc(50vh + 100px - 5px);
+    left: calc(50vw - 150px - 5px);
+}
+
+#Pt10_block {
+    top: calc(50vh + 100px - 5px);
+    left: calc(50vw - 50px - 5px);
+}
+
+#Pt11_block {
+    top: calc(50vh + 100px - 5px);
+    left: calc(50vw + 50px - 5px);
+}
+
+#Pt12_block {
+    top: calc(50vh + 100px - 5px);
+    left: calc(50vw + 150px - 5px);
+}
+
+#Pt13_block {
+    top: calc(50vh + 200px - 5px);
+    left: calc(50vw - 150px - 5px);
+}
+
+#Pt14_block {
+    top: calc(50vh + 200px - 5px);
+    left: calc(50vw - 50px - 5px);
+}
+
+#Pt15_block {
+    top: calc(50vh + 200px - 5px);
+    left: calc(50vw + 50px - 5px);
+}
+
+#Pt16_block {
+    top: calc(50vh + 200px - 5px);
+    left: calc(50vw + 150px - 5px);
+}
+
+/*The last dot to be shown*/
+#Pt17_block {
+    top: 50vh;
+    left: 50vw;
+}
