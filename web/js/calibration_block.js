@@ -32,7 +32,7 @@ function calibrationInstruction() {
  * Show the instruction of using chasing the red block.
  */
 function chaseRedBlockInstruction() {
-  if (blockChasingEnabaled) return
+  if (blockChasingEnabled) return;
   clearCanvas();
   swal({
     title: "Chase Red Block",
@@ -104,7 +104,7 @@ function showFlickeringMaze() {
  * Show the instruction of using calibration at the start up screen.
  */
 function traceShapeInstruction() {
-  if (shapeTracingEnabled) return
+  if (shapeTracingEnabled) return;
   clearCanvas();
   swal({
     title: "Trace Shape",
@@ -307,6 +307,7 @@ function drawGridLines() {
     }
   }
 }
+
 /**
  * This function clears the calibration buttons memory
  */

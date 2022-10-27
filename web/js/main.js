@@ -1,5 +1,5 @@
 let shapeTracingEnabled = false;
-let blockChasingEnabaled = false;
+let blockChasingEnabled = false;
 
 window.onload = async function () {
   //start the webgazer tracker
@@ -71,7 +71,6 @@ function Restart() {
   webgazer.clearData();
   ClearCalibration();
   PopUpInstruction();
-
 }
 
 /**
