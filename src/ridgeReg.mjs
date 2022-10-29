@@ -9,8 +9,8 @@ const reg = {};
  * this object allow to perform ridge regression
  * @constructor
  */
-reg.RidgeReg = function() {
-  this.init();
+reg.RidgeReg = function () {
+    this.init();
 };
 
 /**
@@ -32,57 +32,66 @@ reg.RidgeReg.prototype.addData = util_regression.addData
  * @param {Object} eyesObj - The current user eyes object
  * @returns {Object}
  */
-reg.RidgeReg.prototype.predict = function(eyesObj) {
-  if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
-    return null;
-  }
-  var acceptTime = performance.now() - this.trailTime;
-  var trailX = [];
-  var trailY = [];
-  var trailFeat = [];
-  for (var i = 0; i < this.trailDataWindow; i++) {
-    if (this.trailTimes.get(i) > acceptTime) {
-      trailX.push(this.screenXTrailArray.get(i));
-      trailY.push(this.screenYTrailArray.get(i));
-      trailFeat.push(this.eyeFeaturesTrail.get(i));
+reg.RidgeReg.prototype.predict = function (eyesObj) {
+    if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
+        return null;
     }
-  }
+    var acceptTime = performance.now() - this.trailTime;
+    var trailX = [];
+    var trailY = [];
+    var trailFeat = [];
+    for (var i = 0; i < this.trailDataWindow; i++) {
+        if (this.trailTimes.get(i) > acceptTime) {
+            trailX.push(this.screenXTrailArray.get(i));
+            trailY.push(this.screenYTrailArray.get(i));
+            trailFeat.push(this.eyeFeaturesTrail.get(i));
+        }
+    }
+    // eyeFeaturesTrail contains eye size as grey histogram
 
-  var screenXArray = this.screenXClicksArray.data.concat(trailX);
-  var screenYArray = this.screenYClicksArray.data.concat(trailY);
-  var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
+    var screenXArray = this.screenXClicksArray.data.concat(trailX);
+    var screenYArray = this.screenYClicksArray.data.concat(trailY);
 
-  var coefficientsX = util_regression.ridge(screenXArray, eyeFeatures, this.ridgeParameter);
-  var coefficientsY = util_regression.ridge(screenYArray, eyeFeatures, this.ridgeParameter);
+    // [Array(120), Array(120), Array(120), Array(120), Array(120), Array(120), Array(120), Array(120)]
+    // size 8 * 120
+    var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
 
-  var eyeFeats = util.getEyeFeats(eyesObj);
-  var predictedX = 0;
-  for(var i=0; i< eyeFeats.length; i++){
-    predictedX += eyeFeats[i] * coefficientsX[i];
-  }
-  var predictedY = 0;
-  for(var i=0; i< eyeFeats.length; i++){
-    predictedY += eyeFeats[i] * coefficientsY[i];
-  }
+    // eyeFeatures needs to be the 120 pixel eye features;
+    var coefficientsX = util_regression.ridge(screenXArray, eyeFeatures, this.ridgeParameter);
+    var coefficientsY = util_regression.ridge(screenYArray, eyeFeatures, this.ridgeParameter);
 
-  predictedX = Math.floor(predictedX);
-  predictedY = Math.floor(predictedY);
+    // Eye grey histogram for both left and right eyes
+    // length 120
+    var eyeFeats = util.getEyeFeats(eyesObj);
 
-  if (params.applyKalmanFilter) {
-    // Update Kalman model, and get prediction
-    var newGaze = [predictedX, predictedY]; // [20200607 xk] Should we use a 1x4 vector?
-    newGaze = this.kalman.update(newGaze);
 
-    return {
-      x: newGaze[0],
-      y: newGaze[1]
-    };
-  } else {
-    return {
-      x: predictedX,
-      y: predictedY
-    };
-  }
+    var predictedX = 0;
+    for (var i = 0; i < eyeFeats.length; i++) {
+        predictedX += eyeFeats[i] * coefficientsX[i];
+    }
+    var predictedY = 0;
+    for (var i = 0; i < eyeFeats.length; i++) {
+        predictedY += eyeFeats[i] * coefficientsY[i];
+    }
+
+    predictedX = Math.floor(predictedX);
+    predictedY = Math.floor(predictedY);
+
+    if (params.applyKalmanFilter) {
+        // Update Kalman model, and get prediction
+        var newGaze = [predictedX, predictedY]; // [20200607 xk] Should we use a 1x4 vector?
+        newGaze = this.kalman.update(newGaze);
+
+        return {
+            x: newGaze[0],
+            y: newGaze[1]
+        };
+    } else {
+        return {
+            x: predictedX,
+            y: predictedY
+        };
+    }
 };
 
 reg.RidgeReg.prototype.setData = util_regression.setData;
@@ -91,8 +100,8 @@ reg.RidgeReg.prototype.setData = util_regression.setData;
  * Return the data
  * @returns {Array.<Object>|*}
  */
-reg.RidgeReg.prototype.getData = function() {
-  return this.dataClicks.data;
+reg.RidgeReg.prototype.getData = function () {
+    return this.dataClicks.data;
 }
 
 /**
