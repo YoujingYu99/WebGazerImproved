@@ -140,7 +140,7 @@ function showTraceShape() {
       var xPrediction = data.x; //these x coordinates are relative to the viewport
       var yPrediction = data.y; //these y coordinates are relative to the viewport
 
-      determineBlockPosition(xPrediction, yPrediction);
+      determineBlockPositionPaint(xPrediction, yPrediction);
 
       // Record timings and positions in arrays
       gazePositionInfo.timings.push(elapsedTime);

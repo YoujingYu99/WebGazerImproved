@@ -102,7 +102,10 @@ function calculateAverage(dataArray) {
   return data;
 }
 
-function determineBlockPosition(xPrediction, yPrediction) {
+/**
+ * Determine the block where the current gaze falls into and paint the block grey-green.
+ */
+function determineBlockPositionPaint(xPrediction, yPrediction) {
   // For loop to determine the boundaries of each block.
   for (let columnCount = 0; columnCount < numSquares; columnCount += 1) {
     for (let rowCount = 0; rowCount < numSquares; rowCount += 1) {
@@ -129,6 +132,32 @@ function determineBlockPosition(xPrediction, yPrediction) {
           square.h
         );
       }
+      // If the bottom right block is detected
+      if (
+        xMargin + (numSquares - 1) * squareWidth <= xPrediction &&
+        xPrediction <= xMargin + numSquares * squareWidth &&
+        yMargin + (numSquares - 1) * squareWidth <= yPrediction &&
+        yPrediction <= yMargin + numSquares * squareWidth
+      ) {
+        stopShapeTracing();
+      }
     }
   }
+}
+
+/**
+ * Show the instruction of using calibration at the start up screen.
+ */
+function stopShapeTracing() {
+  // clearCanvas();
+  swal({
+    title: "Shaped Traced",
+    text: "You have completed the shape tracing task!",
+    buttons: {
+      cancel: false,
+      confirm: true,
+    },
+  }).then((isConfirm) => {
+    clearCanvas();
+  });
 }
