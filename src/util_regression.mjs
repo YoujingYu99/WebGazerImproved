@@ -30,6 +30,7 @@ util_regression.InitRegression = function () {
     this.eyeFeaturesTrail = new util.DataWindow(trailDataWindow);
     this.trailTimes = new util.DataWindow(trailDataWindow);
 
+    // dataClicks contains items which has the structure {'eyes': eyes, 'screenPos': screenPos, 'type': type}
     this.dataClicks = new util.DataWindow(dataWindow);
     this.dataTrail = new util.DataWindow(trailDataWindow);
 
@@ -147,6 +148,7 @@ util_regression.ridge = function (y, X, k) {
             m_Coefficients[i] = bb[i][0];
         }
         try {
+            // Optional Chaining
             var n = (m_Coefficients.length !== 0 ? m_Coefficients.length / m_Coefficients.length : 0);
             if (m_Coefficients.length * n !== m_Coefficients.length) {
                 console.log('Array length must be a multiple of m')

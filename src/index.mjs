@@ -439,6 +439,8 @@ async function loadGlobalData() {
     // Load data into regression model(s)
     for (var reg in regs) {
         regs[reg].setData(loadData);
+        console.log("setting data from local storatge")
+        console.log(loadData)
     }
 
     console.log("loaded stored data into regression model");

@@ -36,24 +36,29 @@ reg.RidgeReg.prototype.predict = function (eyesObj) {
     if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
         return null;
     }
+    // accept times is how long it has been after the trailtime, which is 1000ms
     var acceptTime = performance.now() - this.trailTime;
     var trailX = [];
     var trailY = [];
     var trailFeat = [];
+    // trailDataWindow is 1000/50=20.
     for (var i = 0; i < this.trailDataWindow; i++) {
+        // What is happening here?
         if (this.trailTimes.get(i) > acceptTime) {
             trailX.push(this.screenXTrailArray.get(i));
             trailY.push(this.screenYTrailArray.get(i));
             trailFeat.push(this.eyeFeaturesTrail.get(i));
+            // console.log(i);
+            // console.log(this.trailTimes.get(i));
+            // console.log(acceptTime);
         }
     }
-    // eyeFeaturesTrail contains eye size as grey histogram
-
+    // eyeFeaturesTrail contains eye size as grey histogram;
+    // screenX/YTrailArray contains the cursor movements;
     var screenXArray = this.screenXClicksArray.data.concat(trailX);
     var screenYArray = this.screenYClicksArray.data.concat(trailY);
 
-    // [Array(120), Array(120), Array(120), Array(120), Array(120), Array(120), Array(120), Array(120)]
-    // size 8 * 120
+    // size n * 120, n varies depending on how many datapoints are accepted
     var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
 
     // eyeFeatures needs to be the 120 pixel eye features;
