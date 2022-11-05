@@ -1,4 +1,5 @@
 import '@tensorflow/tfjs';
+import "jspsych";
 //import(/* webpackPreload: true */ '@tensorflow/tfjs');
 //import(/* webpackChunkName: 'pageA' */ './vendors~main.js')
 import 'regression';
@@ -10,6 +11,7 @@ import Reg from './ridgeReg';
 import ridgeRegWeighted from './ridgeWeightedReg';
 import ridgeRegThreaded from './ridgeRegThreaded';
 import util from './util';
+import trial from './chinrest'
 
 const webgazer = {};
 webgazer.tracker = {};
@@ -19,6 +21,7 @@ webgazer.reg.RidgeWeightedReg = ridgeRegWeighted.RidgeWeightedReg;
 webgazer.reg.RidgeRegThreaded = ridgeRegThreaded.RidgeRegThreaded;
 webgazer.util = util;
 webgazer.params = params;
+
 
 //PRIVATE VARIABLES
 
@@ -288,6 +291,8 @@ async function loop() {
         // Count time
         var elapsedTime = performance.now() - clockStart;
 
+
+        jsPsych.run([trial]);
         // Draw face overlay
         if (webgazer.params.showFaceOverlay) {
             // Get tracker object
