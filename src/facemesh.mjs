@@ -129,9 +129,6 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         height: rightHeight
     };
 
-    eyeObjs = pupil.getPupils(eyeObjs);
-    console.log(eyeObjs)
-
     this.predictionReady = true;
 
     return eyeObjs;

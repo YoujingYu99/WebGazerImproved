@@ -1,4 +1,6 @@
 import '@tensorflow/tfjs';
+import {initJsPsych} from "jspsych";
+import virtualChinrest from "@jspsych/plugin-virtual-chinrest";
 //import(/* webpackPreload: true */ '@tensorflow/tfjs');
 //import(/* webpackChunkName: 'pageA' */ './vendors~main.js')
 import 'regression';
@@ -592,7 +594,7 @@ async function init(stream) {
 }
 
 
-async function getLPDViewingDistance() {
+webgazer.getLPD = async function getLPDViewingDistance() {
     const jsPsych = initJsPsych();
 
     var trial = {
@@ -662,6 +664,7 @@ webgazer.begin = function (onFail) {
     onFail = onFail || function () {
         console.log('No stream')
     };
+
 
     if (debugVideoLoc) {
         init(debugVideoLoc);
