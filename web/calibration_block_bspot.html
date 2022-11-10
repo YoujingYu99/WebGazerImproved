@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--
+This is an example HTML that shows how WebGazer can be used on a website.
+This file provides the additional features:
+  * An integrated, intuitive and sleek action bar with an informative "help" module accessible at all times
+  * Structured 9-point calibration system
+  * Accuracy measure of predictions based on calibration process
+  * Video feedback regarding face positioning
+  * Improved eye predictions visible to the user
+Instructions on use can be found in the README repository.
+-->
+<html>
+<head>
+    <META CONTENT="text/html; charset=utf-8" HTTP-EQUIV="CONTENT-TYPE">
+    <TITLE>WebGazer Demo</TITLE>
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <script src="./tensorflow.js"></script> -->
+    <script src="../www/webgazer.js"></script>
+</head>
+<body DIR="LTR" LANG="en-US" LINK="#0000ff">
+<canvas height="500" id="plotting_canvas" style="cursor:crosshair;" width="500"></canvas>
+
+<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../node_modules/sweetalert/dist/sweetalert.min.js"></script>
+
+<script crossorigin="anonymous"
+        integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
+        referrerpolicy="no-referrer"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css">
+
+<!-- SVG.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.3/svg.min.js"></script>
+
+<script src="js/main.js"></script>
+<script src="js/calibration_block.js"></script>
+<script src="js/maze.js"></script>
+<script src="js/precision_calculation.js"></script>
+<script src="js/precision_store_points.js"></script>
+<script src="js/virtual_chinrest.js"></script>
+
+
+<nav class="navbar navbar-default navbar-fixed-top" id="webgazerNavbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <!-- The hamburger menu button -->
+            <button class="navbar-toggle" data-target="#myNavbar" data-toggle="collapse" type="button">
+                <span class="icon-bar">Menu</span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <!-- Accuracy -->
+                <li id="Accuracy"><a>Not yet Calibrated</a></li>
+                <li id="xError"><a>N.A.</a></li>
+                <li id="yError"><a>N.A.</a></li>
+                <li><a href="#" onclick="RestartBlock()">Recalibrate</a></li>
+                <li><a href="#" onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)">Toggle Kalman
+                    Filter</a></li>
+                <li class="helpBtn" data-target="#helpModal" data-toggle="modal"><a data-toggle="modal"><span
+                        class="glyphicon glyphicon-cog"></span> Help</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div id="lpd_content">
+    <div id="page-size">
+        <h2> Let us find out what your monitor size is (click to go into
+            <div onclick='fullScreen(); registerClick();' style='display:inline; cursor:pointer; color: red'><em><u>full
+                screen mode</u></em></div>
+            ).
+        </h2>
+
+        <p>Please use any credit card that you have available (it can also be a grocery store membership card, your
+            driving license, or anything that is of the same format), hold it onto the screen, and adjust the slider
+            below to its size.</p>
+
+        <p>(If you don't have access to a real card, you can use a ruler to measure image width to 3.37inch or 85.6mm,
+            or make your best guess!)</p>
+        <b style="font-style: italic">Make sure you put the card onto your screen.</b>
+        <br>
+
+        <div id="container">
+            <div id="slider"></div>
+            <br>
+            <img id="card" src="media/card.png" style="width: 50%">
+            <br><br>
+            <button class="btn btn-primary" onclick="chaseFlickeringMaze()">Done!</button>
+        </div>
+    </div>
+
+
+    <div id="blind-spot" style="visibility: hidden">
+        <!-- <h2 class="bolded-blue">Task 2: Where’s your blind spot?</h2> -->
+        <h3>Now, let us quickly test how far away you are sitting.</h3>
+
+        <h3>Instructions</h3>
+        <p>1. Put your finger on <b>space bar</b> on the keyboard.</p>
+        <p>2. Close your right eye. <em>(Tips: it might be easier to cover your right eye by hand!)</em></p>
+        <p>3. Using your left eye, focus on the black square.</p>
+        <p>4. Click the button below to start the animation of the red ball. The <b style="color: red">red ball</b> will
+            disappear as it moves from right to left. Press the Space key as soon as the ball disappears from your eye
+            sight.</p>
+        <br>
+        <p>Please do it <b>five</b> times. Keep your right eye closed and hit the Space key fast!</p>
+        <br>
+        <button class="btn btn-primary" id="start" onclick="animateBall()">Start</button>
+
+        <div id="svgDiv" style="width:1000px;height:200px;"></div>
+        Hit 'space'
+        <div id="click" style='display:inline; color: red; font-weight: bold'>5</div>
+        more times!
+    </div>
+
+    <div id="info" style='visibility:hidden'>
+        <h3 id="info-h">Estimated viewing distance (cm): </h3>
+        <p id="info-p">View more output data in the Console in your browser's developer/inspector view.</p>
+    </div>
+</div>
+
+<!-- Calibration points -->
+<div class="calibrationDiv">
+    <input class="Calibration" id="Pt1_block" type="button"></input>
+    <input class="Calibration" id="Pt2_block" type="button"></input>
+    <input class="Calibration" id="Pt3_block" type="button"></input>
+    <input class="Calibration" id="Pt4_block" type="button"></input>
+    <input class="Calibration" id="Pt5_block" type="button"></input>
+    <input class="Calibration" id="Pt6_block" type="button"></input>
+    <input class="Calibration" id="Pt7_block" type="button"></input>
+    <input class="Calibration" id="Pt8_block" type="button"></input>
+    <input class="Calibration" id="Pt9_block" type="button"></input>
+    <input class="Calibration" id="Pt10_block" type="button"></input>
+    <input class="Calibration" id="Pt11_block" type="button"></input>
+    <input class="Calibration" id="Pt12_block" type="button"></input>
+    <input class="Calibration" id="Pt13_block" type="button"></input>
+    <input class="Calibration" id="Pt14_block" type="button"></input>
+    <input class="Calibration" id="Pt15_block" type="button"></input>
+    <input class="Calibration" id="Pt16_block" type="button"></input>
+    <input class="Calibration" id="Pt17_block" type="button"></input>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="helpModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <img alt="webgazer demo instructions" height="100%" src="media/example/calibration.png"
+                     width="100%"></img>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal" id="getLPD"
+                        onclick="configureLPD()"
+                        type="button">
+                    Get LPD
+                </button>
+                <button class="btn btn-primary" data-dismiss="modal" id="getBSpot"
+                        onclick="configureBlindSpot()"
+                        type="button">
+                    Get Blind Spot
+                </button>
+                <button class="btn btn-primary" data-dismiss="modal" id="load_maze" onclick="chaseFlickeringMaze()"
+                        type="button">
+                    Catch the red
+                </button>
+                <button class="btn btn-primary" data-dismiss="modal" id="trace_shape" onclick="traceShapeMaze()"
+                        type="button">
+                    Shape tracing
+                </button>
+                <button class="btn btn-primary" data-dismiss="modal" id="start_calibration" onclick="RestartBlock()"
+                        type="button">Calibrate
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Latest compiled JavaScript -->
+<script src="js/resize_canvas.js"></script>
+<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+</body>
+</html>

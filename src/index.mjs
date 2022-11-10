@@ -1,6 +1,7 @@
 import '@tensorflow/tfjs';
 import {initJsPsych} from "jspsych";
-import virtualChinrest from "@jspsych/plugin-virtual-chinrest";
+import virtualChinrest from "./chinrest"
+// import virtualChinrest from "@jspsych/plugin-virtual-chinrest";
 //import(/* webpackPreload: true */ '@tensorflow/tfjs');
 //import(/* webpackChunkName: 'pageA' */ './vendors~main.js')
 import 'regression';

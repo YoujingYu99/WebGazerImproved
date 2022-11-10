@@ -2,6 +2,22 @@ body {
     min-width: 600px !important;
 }
 
+#lpd_content {
+    width: 700px;
+    margin-left: 400px;
+    margin-top: 120px;
+    padding: 0;
+    font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 22px;
+    color: #222;
+}
+
+#wrapper, #content {
+    width: 900px;
+    margin: 0 auto;
+}
+
 button {
     border-radius: 4px;
 }

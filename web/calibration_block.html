@@ -29,6 +29,7 @@ Instructions on use can be found in the README repository.
 <script src="js/maze.js"></script>
 <script src="js/precision_calculation.js"></script>
 <script src="js/precision_store_points.js"></script>
+<script src="js/virtual_chinrest.js"></script>
 
 
 <nav class="navbar navbar-default navbar-fixed-top" id="webgazerNavbar">
@@ -54,6 +55,7 @@ Instructions on use can be found in the README repository.
         </div>
     </div>
 </nav>
+
 <!-- Calibration points -->
 <div class="calibrationDiv">
     <input class="Calibration" id="Pt1_block" type="button"></input>
@@ -86,7 +88,8 @@ Instructions on use can be found in the README repository.
                      width="100%"></img>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" data-dismiss="modal" id="getParameters" onclick="webgazer.getLPD()"
+                <button class="btn btn-primary" data-dismiss="modal" id="getParameters"
+                        onclick="location.href='LPD.html'"
                         type="button">
                     Get LPD
                 </button>
