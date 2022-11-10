@@ -1,5 +1,4 @@
 import '@tensorflow/tfjs';
-import "jspsych";
 //import(/* webpackPreload: true */ '@tensorflow/tfjs');
 //import(/* webpackChunkName: 'pageA' */ './vendors~main.js')
 import 'regression';
@@ -11,7 +10,6 @@ import Reg from './ridgeReg';
 import ridgeRegWeighted from './ridgeWeightedReg';
 import ridgeRegThreaded from './ridgeRegThreaded';
 import util from './util';
-import trial from './chinrest'
 
 const webgazer = {};
 webgazer.tracker = {};
@@ -21,7 +19,6 @@ webgazer.reg.RidgeWeightedReg = ridgeRegWeighted.RidgeWeightedReg;
 webgazer.reg.RidgeRegThreaded = ridgeRegThreaded.RidgeRegThreaded;
 webgazer.util = util;
 webgazer.params = params;
-
 
 //PRIVATE VARIABLES
 
@@ -291,8 +288,6 @@ async function loop() {
         // Count time
         var elapsedTime = performance.now() - clockStart;
 
-
-        jsPsych.run([trial]);
         // Draw face overlay
         if (webgazer.params.showFaceOverlay) {
             // Get tracker object
@@ -595,6 +590,25 @@ async function init(stream) {
     await videoPreviewSetup;
     await loop();
 }
+
+
+async function getLPDViewingDistance() {
+    const jsPsych = initJsPsych();
+
+    var trial = {
+        type: virtualChinrest,
+        blindspot_reps: 3,
+        resize_units: "none",
+    };
+
+    await jsPsych.run([trial]);
+    var all_data = jsPsych.data.get();
+    webgazer.LPD = all_data.trials[0].px2mm;
+    webgazer.initialViewingDistance = all_data.trials[0].view_dist_mm
+    console.log("LPD", webgazer.LPD);
+    console.log("Viewing Distance", webgazer.initialViewingDistance);
+}
+
 
 /**
  * Initializes navigator.mediaDevices.getUserMedia
