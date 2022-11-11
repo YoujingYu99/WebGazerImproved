@@ -68,6 +68,7 @@ function ClearCalibration() {
 function Restart() {
   document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
   clearCanvas();
+  $(".lpd_bspot").hide();
   webgazer.clearData();
   ClearCalibration();
   PopUpInstruction();
@@ -81,6 +82,7 @@ function RestartBlock() {
   document.getElementById("xError").innerHTML = "<a>N.A.</a>";
   document.getElementById("yError").innerHTML = "<a>N.A.</a>";
   clearCanvas();
+  $(".lpd_bspot").hide();
   webgazer.clearData();
   ClearCalibration();
   calibrationInstruction();
@@ -91,6 +93,7 @@ function RestartBlock() {
  */
 function chaseFlickeringMaze() {
   clearCanvas();
+  $(".lpd_bspot").hide();
   chaseRedBlockInstruction();
 }
 
@@ -99,5 +102,6 @@ function chaseFlickeringMaze() {
  */
 function traceShapeMaze() {
   clearCanvas();
+  $(".lpd_bspot").hide();
   traceShapeInstruction();
 }
