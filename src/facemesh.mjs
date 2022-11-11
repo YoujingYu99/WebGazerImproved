@@ -129,6 +129,8 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         height: rightHeight
     };
 
+    // TODO: Implement method to find x_dist and y_dist
+
     this.predictionReady = true;
 
     return eyeObjs;

@@ -23,6 +23,12 @@ webgazer.reg.RidgeRegThreaded = ridgeRegThreaded.RidgeRegThreaded;
 webgazer.util = util;
 webgazer.params = params;
 
+// Initialise parameters
+webgazer.LPD = 0;
+webgazer.initialViewingDistance = 0;
+webgazer.initialEyeWidths = 0;
+webgazer.latestEyeFeatures = 0;
+
 //PRIVATE VARIABLES
 
 //video elements
@@ -237,6 +243,18 @@ function paintCurrentFrame(canvas, width, height) {
 }
 
 /**
+ * calculates the current viewing distance
+ * @param {Number|undefined} latestEyeFeatures - The current eye features.
+ * @returns current viewing distance.
+ */
+async function assignNewViewingDistance(latestEyeFeatures) {
+    webgazer.latestEyeFeatures = latestEyeFeatures
+    let leftEyeLength = latestEyeFeatures.left["width"];
+    let rightEyeLength = latestEyeFeatures.right["width"];
+    return webgazer.initialViewingDistance * webgazer.initialEyeWidths / ((leftEyeLength + rightEyeLength) / 2)
+}
+
+/**
  * Paints the video to a canvas and runs the prediction pipeline to get a prediction
  * @param {Number|undefined} regModelIndex - The prediction index we're looking for
  * @returns {*}
@@ -244,7 +262,11 @@ function paintCurrentFrame(canvas, width, height) {
 async function getPrediction(regModelIndex) {
     var predictions = [];
     // [20200617 xk] TODO: this call should be made async somehow. will take some work.
+    // latestEyeFeatures is the eyeObjs in the defining function
     latestEyeFeatures = await getPupilFeatures(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
+    let newViewingDistance = await assignNewViewingDistance(latestEyeFeatures)
+    console.log("new viewing distance", newViewingDistance)
+
     if (regs.length === 0) {
         console.log('regression not set, call setRegression()');
         return null;

@@ -133,6 +133,18 @@ function recordPosition(event, angle = 13.5) {
       $("#info").css("visibility", "visible");
       $("#info-h").append(data["viewDistance_mm"] / 10);
 
+      console.log("LPD", data["px2mm"]);
+      console.log("viewing distance", data["viewDistance_mm"] / 10);
+
+      let initialLeftEyeLength = webgazer.latestEyeFeatures.left["width"];
+      let initialRightEyeLength = webgazer.latestEyeFeatures.right["width"];
+
+      // Pass the data into webgazer
+      webgazer.LPD = data["px2mm"];
+      webgazer.initialViewingDistance = data["viewDistance_mm"];
+      webgazer.initialEyeWidths =
+        (initialLeftEyeLength + initialRightEyeLength) / 2;
+      // console.log("Initial Eye widths", webgazer.initialEyeWidths);
       // You can then DO SOMETHING HERE TO PROCEED TO YOUR NEXT STEPS OF THE EXPERIMENT. For example, add a button to go to the next page.
       return;
     }
