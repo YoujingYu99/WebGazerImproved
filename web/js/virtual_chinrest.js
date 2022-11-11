@@ -28,23 +28,20 @@ function getCardWidth() {
 }
 
 function configureLPD() {
-  $("#page-size").css({ visibility: "visible" });
-  $("#slider").on("slide", function (event, ui) {
-    var cardWidth = ui.value + "%";
-    $("#card").css({ width: cardWidth });
-  });
-
-  $("#slider").on("slidechange", function (event, ui) {
-    data["sliderClicked"] = true;
-  });
-  console.log("Now we configure the LPD");
-  $("#blind-spot").css({ visibility: "hidden" });
-  console.log("Make invisible the blind spot test");
-  $(document).on("keydown", recordPosition);
+  // $("#slider").on("slide", function (event, ui) {
+  //   var cardWidth = ui.value + "%";
+  //   $("#card").css({width: cardWidth});
+  // });
+  //
+  // $("#slider").on("slidechange", function (event, ui) {
+  //   data["sliderClicked"] = true;
+  // });
+  //
+  // $("#blind-spot").css({visibility: "hidden"});
+  // $("#page-size").css({visibility: "visible"});
 }
 
 function configureBlindSpot() {
-  console.log("Now we configure the blind spot");
   drawBall();
   $("#page-size").remove();
   $("#blind-spot").css({ visibility: "visible" });
@@ -74,7 +71,6 @@ function drawBall(pos = 180) {
   var mySVG = SVG("svgDiv");
   const cardWidthPx = getCardWidth();
   const rectX = distanceSetup.px2mm(cardWidthPx) * pos;
-  console.log("LPD", data["px2mm"]);
 
   const ballX = rectX * 0.6; // define where the ball is
   var ball = mySVG.circle(30).move(ballX, 50).fill("#f00");
@@ -116,7 +112,7 @@ function recordPosition(event, angle = 13.5) {
     var ball_sqr_distance =
       (data["squarePosition"] - data["avgBallPos"]) / data["px2mm"];
     var viewDistance = ball_sqr_distance / Math.tan(Math.radians(angle));
-
+    console.log(Math.radians(angle));
     data["viewDistance_mm"] = distanceSetup.round(viewDistance, 2);
 
     //counter and stop
@@ -136,11 +132,6 @@ function recordPosition(event, angle = 13.5) {
       // Display data
       $("#info").css("visibility", "visible");
       $("#info-h").append(data["viewDistance_mm"] / 10);
-      // viewingDistance = (data["viewDistance_mm"] / 10).toPrecision(3);
-      // document.getElementById("info-h").innerHTML = viewingDistance;
-      // // $("#info-h").append(viewingDistance);
-      //
-      // console.log("viewing distance", viewingDistance);
 
       // You can then DO SOMETHING HERE TO PROCEED TO YOUR NEXT STEPS OF THE EXPERIMENT. For example, add a button to go to the next page.
       return;
