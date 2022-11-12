@@ -9,6 +9,7 @@ import params from './params';
 import './dom_util';
 import localforage from 'localforage';
 import TFFaceMesh from './facemesh';
+import pupil from './pupil.mjs'
 import Reg from './ridgeReg';
 import ridgeRegWeighted from './ridgeWeightedReg';
 import ridgeRegThreaded from './ridgeRegThreaded';
@@ -249,9 +250,36 @@ function paintCurrentFrame(canvas, width, height) {
  */
 async function assignNewViewingDistance(latestEyeFeatures) {
     webgazer.latestEyeFeatures = latestEyeFeatures
-    let leftEyeLength = latestEyeFeatures.left["width"];
-    let rightEyeLength = latestEyeFeatures.right["width"];
+    let leftEyeLength = 0;
+    let rightEyeLength = 0;
+
+    if (latestEyeFeatures !== null) {
+        leftEyeLength = latestEyeFeatures.left["width"];
+        rightEyeLength = latestEyeFeatures.right["width"];
+    }
     return webgazer.initialViewingDistance * webgazer.initialEyeWidths / ((leftEyeLength + rightEyeLength) / 2)
+}
+
+/**
+ * calculates the x distance and y distance from screen.
+ * @param {Number|undefined} latestEyeFeatures - The current eye features.
+ * @returns [x distance, y distance]
+ */
+async function getXDistYDist(latestEyeFeatures) {
+    let latestEyeFeaturesWithPupils = pupil.getPupils(latestEyeFeatures);
+    let xDist = 0;
+    let yDist = 0;
+    if (latestEyeFeaturesWithPupils.left != null) {
+        xDist = (latestEyeFeaturesWithPupils.left.pupilXCoordinate + latestEyeFeaturesWithPupils.right.pupilXCoordinate) / 2
+        yDist = (latestEyeFeaturesWithPupils.left.pupilYCoordinate + latestEyeFeaturesWithPupils.right.pupilYCoordinate) / 2
+    }
+    // let leftPupilX = latestEyeFeaturesWithPupils.left["pupil"][0][0];
+    // let leftPupilY = latestEyeFeaturesWithPupils.left["pupil"][0][1];
+    // let rightPupilX = latestEyeFeaturesWithPupils.right["pupil"][0][0];
+    // let rightPupilY = latestEyeFeaturesWithPupils.right["pupil"][0][1];
+    // let xDist = (leftPupilX + rightPupilX) / 2
+    // let yDist = (leftPupilY + rightPupilY) / 2
+    return [xDist, yDist]
 }
 
 /**
@@ -265,7 +293,12 @@ async function getPrediction(regModelIndex) {
     // latestEyeFeatures is the eyeObjs in the defining function
     latestEyeFeatures = await getPupilFeatures(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
     let newViewingDistance = await assignNewViewingDistance(latestEyeFeatures)
-    console.log("new viewing distance", newViewingDistance)
+
+    let distVector = await getXDistYDist(latestEyeFeatures);
+    let xDist = distVector[0];
+    console.log("xdist", xDist);
+    let yDist = distVector[1];
+    console.log("ydist", yDist);
 
     if (regs.length === 0) {
         console.log('regression not set, call setRegression()');
@@ -334,6 +367,7 @@ async function loop() {
         if (latestGazeData) {
             // [20200608 XK] Smoothing across the most recent 4 predictions, do we need this with Kalman filter?
             smoothingVals.push(latestGazeData);
+            console.log("smoothing vals", smoothingVals)
             var x = 0;
             var y = 0;
             var len = smoothingVals.length;
