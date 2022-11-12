@@ -27,8 +27,11 @@ webgazer.params = params;
 // Initialise parameters
 webgazer.LPD = 0;
 webgazer.initialViewingDistance = 0;
+webgazer.currentViewingDistance = 0;
 webgazer.initialEyeWidths = 0;
 webgazer.latestEyeFeatures = 0;
+webgazer.xDist = 0;
+webgazer.yDist = 0;
 
 //PRIVATE VARIABLES
 
@@ -269,7 +272,7 @@ async function getXDistYDist(latestEyeFeatures) {
     let latestEyeFeaturesWithPupils = pupil.getPupils(latestEyeFeatures);
     let xDist = 0;
     let yDist = 0;
-    if (latestEyeFeaturesWithPupils.left != null) {
+    if (latestEyeFeaturesWithPupils != null) {
         xDist = (latestEyeFeaturesWithPupils.left.pupilXCoordinate + latestEyeFeaturesWithPupils.right.pupilXCoordinate) / 2
         yDist = (latestEyeFeaturesWithPupils.left.pupilYCoordinate + latestEyeFeaturesWithPupils.right.pupilYCoordinate) / 2
     }
@@ -293,11 +296,14 @@ async function getPrediction(regModelIndex) {
     // latestEyeFeatures is the eyeObjs in the defining function
     latestEyeFeatures = await getPupilFeatures(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
     let newViewingDistance = await assignNewViewingDistance(latestEyeFeatures)
+    webgazer.currentViewingDistance = newViewingDistance
 
     let distVector = await getXDistYDist(latestEyeFeatures);
     let xDist = distVector[0];
+    webgazer.xDist = xDist;
     console.log("xdist", xDist);
     let yDist = distVector[1];
+    webgazer.yDist = yDist;
     console.log("ydist", yDist);
 
     if (regs.length === 0) {
@@ -306,6 +312,7 @@ async function getPrediction(regModelIndex) {
     }
     for (var reg in regs) {
         predictions.push(regs[reg].predict(latestEyeFeatures));
+        // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {
@@ -665,7 +672,7 @@ webgazer.getLPD = async function getLPDViewingDistance() {
     webgazer.LPD = all_data.trials[0].px2mm;
     webgazer.initialViewingDistance = all_data.trials[0].view_dist_mm
     console.log("LPD", webgazer.LPD);
-    console.log("Viewing Distance", webgazer.initialViewingDistance);
+    console.log("Initial Viewing Distance", webgazer.initialViewingDistance);
 }
 
 
