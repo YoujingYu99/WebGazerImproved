@@ -275,6 +275,9 @@ async function getXDistYDist(latestEyeFeatures) {
     if (latestEyeFeaturesWithPupils != null) {
         xDist = (latestEyeFeaturesWithPupils.left.pupilXCoordinate + latestEyeFeaturesWithPupils.right.pupilXCoordinate) / 2
         yDist = (latestEyeFeaturesWithPupils.left.pupilYCoordinate + latestEyeFeaturesWithPupils.right.pupilYCoordinate) / 2
+        // console.log("Left eye origin location", latestEyeFeaturesWithPupils.left.imagex, latestEyeFeaturesWithPupils.left.imagey);
+        // console.log("lefy eye pupil location", latestEyeFeaturesWithPupils.left.pupilXCoordinate, latestEyeFeaturesWithPupils.left.pupilYCoordinate);
+        // console.log("left eye width and height", latestEyeFeaturesWithPupils.left.width, latestEyeFeaturesWithPupils.left.height);
     }
     // let leftPupilX = latestEyeFeaturesWithPupils.left["pupil"][0][0];
     // let leftPupilY = latestEyeFeaturesWithPupils.left["pupil"][0][1];
