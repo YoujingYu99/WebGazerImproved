@@ -56,7 +56,6 @@ Instructions on use can be found in the README repository.
                 <!--                <li id="xError"><a>N.A.</a></li>-->
                 <!--                <li id="yError"><a>N.A.</a></li>-->
                 <li><a href="#" onclick="RestartBlock()">Recalibrate</a></li>
-                <li><a href="#" id="start" onclick="animateBall()">Start Blind Spot</a></li>
                 <li><a href="#" onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)">Toggle Kalman
                     Filter</a></li>
                 <li class="helpBtn" data-target="#helpModal" data-toggle="modal"><a data-toggle="modal"><span
@@ -88,11 +87,11 @@ Instructions on use can be found in the README repository.
             <br>
             <img id="card" src="media/card.png" style="width: 50%">
             <br><br>
-            <!--            <button class="btn btn-primary" onclick="configureBlindSpot()">Done!</button>-->
+            <p>Press <span style="color: red; font-size: 25px">G</span> on the keyboard when you are finished.
+            </p>
         </div>
     </div>
 
-    <button class="btn btn-primary" onclick="configureBlindSpot()">Done!</button>
 
     <div id="blind-spot" style="visibility: hidden">
         <!-- <h2 class="bolded-blue">Task 2: Where’s your blind spot?</h2> -->
@@ -102,8 +101,11 @@ Instructions on use can be found in the README repository.
         <p>1. Put your finger on <b>space bar</b> on the keyboard.</p>
         <p>2. Close your right eye. <em>(Tips: it might be easier to cover your right eye by hand!)</em></p>
         <p>3. Using your left eye, focus on the black square.</p>
-        <p>4. Click the button below to start the animation of the red ball. The <b style="color: red">red ball</b> will
-            disappear as it moves from right to left. Press the Space key as soon as the ball disappears from your eye
+        <p>4. Press <span style="color: red; font-size: 25px">S</span> on the keyboard to start the animation of the red
+            ball. The <b style="color: red">red
+                ball</b> will
+            disappear as it moves from right to left. Press the <span style="color: red; font-size: 25px">Space</span>
+            key as soon as the ball disappears from your eye
             sight.</p>
         <br>
         <p>Please do it <b>five</b> times. Keep your right eye closed and hit the Space key fast!</p>
@@ -169,7 +171,7 @@ Instructions on use can be found in the README repository.
                 </button>
                 <button class="btn btn-primary" data-dismiss="modal" id="trace_shape" onclick="traceShapeMaze()"
                         type="button">
-                    Shape tracing
+                    Trace the Shape
                 </button>
                 <button class="btn btn-primary" data-dismiss="modal" id="start_calibration" onclick="RestartBlock()"
                         type="button">Calibrate

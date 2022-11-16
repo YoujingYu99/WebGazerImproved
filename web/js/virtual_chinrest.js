@@ -39,13 +39,40 @@ function configureLPD() {
   //
   // $("#blind-spot").css({visibility: "hidden"});
   // $("#page-size").css({visibility: "visible"});
+  $(document).on("keydown", goBlindSpot);
+}
+
+/**
+ * Go to configure blindspot if key "G" is pressed.
+ */
+function goBlindSpot(event) {
+  if (event.keyCode == "71") {
+    configureBlindSpot();
+  }
 }
 
 function configureBlindSpot() {
+  // Disable G key
+  $("html").bind("keydown", function (e) {
+    if (e.keyCode == 71) {
+      return false;
+    }
+  });
+
   drawBall();
   $("#page-size").remove();
   $("#blind-spot").css({ visibility: "visible" });
+  $(document).on("keydown", goAnimateBall);
   $(document).on("keydown", recordPosition);
+}
+
+/**
+ * Go to configure blindspot if key "G" is pressed.
+ */
+function goAnimateBall(event) {
+  if (event.keyCode == "83") {
+    animateBall();
+  }
 }
 
 $(function () {
@@ -83,6 +110,13 @@ function drawBall(pos = 180) {
 
 function animateBall() {
   document.activeElement.blur();
+  // Disable S key
+  $("html").bind("keydown", function (e) {
+    if (e.keyCode == 83) {
+      return false;
+    }
+  });
+
   ball
     .animate(7000)
     .during(function (pos) {
