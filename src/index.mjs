@@ -304,10 +304,10 @@ async function getPrediction(regModelIndex) {
     let distVector = await getXDistYDist(latestEyeFeatures);
     let xDist = distVector[0];
     webgazer.xDist = xDist;
-    console.log("xdist", xDist);
+    // console.log("xdist", xDist);
     let yDist = distVector[1];
     webgazer.yDist = yDist;
-    console.log("ydist", yDist);
+    // console.log("ydist", yDist);
 
     if (regs.length === 0) {
         console.log('regression not set, call setRegression()');
@@ -377,7 +377,6 @@ async function loop() {
         if (latestGazeData) {
             // [20200608 XK] Smoothing across the most recent 4 predictions, do we need this with Kalman filter?
             smoothingVals.push(latestGazeData);
-            console.log("smoothing vals", smoothingVals)
             var x = 0;
             var y = 0;
             var len = smoothingVals.length;
