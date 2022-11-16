@@ -32,7 +32,7 @@ function calibrationInstruction() {
  * Show the instruction of using chasing the red block.
  */
 function chaseRedBlockInstruction() {
-  if (blockChasingEnabled) return;
+  if (blockChasingDisabled) return;
   clearCanvas();
   swal({
     title: "Chase Red Block",
@@ -52,6 +52,7 @@ function chaseRedBlockInstruction() {
  * Clear the calibration points and show maze
  */
 function showFlickeringMaze() {
+  if (blockChasingDisabled) return;
   // // Clear previous canvas
   // ClearCanvas();
   // Render frame first
@@ -104,7 +105,7 @@ function showFlickeringMaze() {
  * Show the instruction of using calibration at the start up screen.
  */
 function traceShapeInstruction() {
-  if (shapeTracingEnabled) return;
+  if (shapeTracingDisabled) return;
   clearCanvas();
   swal({
     title: "Trace Shape",
@@ -119,6 +120,7 @@ function traceShapeInstruction() {
 }
 
 function showTraceShape() {
+  if (shapeTracingDisabled) return;
   // // Clear previous canvas
   // ClearCanvas();
   // Render frame first
@@ -230,10 +232,10 @@ $(document).ready(function () {
             var yAverageError = calculatePrecisionErrors(past50)[2];
             document.getElementById("Accuracy").innerHTML =
               "<a>Accuracy | " + accuracyMeasurement.toPrecision(3) + "%</a>"; // Show the accuracy in the nav bar.
-            document.getElementById("xError").innerHTML =
-              "<a>X Error | " + xAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
-            document.getElementById("yError").innerHTML =
-              "<a>Y Error | " + yAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
+            // document.getElementById("xError").innerHTML =
+            //   "<a>X Error | " + xAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
+            // document.getElementById("yError").innerHTML =
+            //   "<a>Y Error | " + yAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
             swal({
               title:
                 "Your accuracy and x/y errors are " +
@@ -255,8 +257,8 @@ $(document).ready(function () {
               } else {
                 //use restart function to restart the calibration
                 document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
-                document.getElementById("xError").innerHTML = "<a>N.A.</a>";
-                document.getElementById("yError").innerHTML = "<a>N.A.</a>";
+                // document.getElementById("xError").innerHTML = "<a>N.A.</a>";
+                // document.getElementById("yError").innerHTML = "<a>N.A.</a>";
                 webgazer.clearData();
                 clearCalibration();
                 clearCanvas();

@@ -106,6 +106,7 @@ function calculateAverage(dataArray) {
  * Determine the block where the current gaze falls into and paint the block grey-green.
  */
 function determineBlockPositionPaint(xPrediction, yPrediction) {
+  if (shapeTracingEnabled) return;
   // For loop to determine the boundaries of each block.
   for (let columnCount = 0; columnCount < numSquares; columnCount += 1) {
     for (let rowCount = 0; rowCount < numSquares; rowCount += 1) {
@@ -146,9 +147,10 @@ function determineBlockPositionPaint(xPrediction, yPrediction) {
 }
 
 /**
- * Show the instruction of using calibration at the start up screen.
+ * Stop tracing the L shape.
  */
 function stopShapeTracing() {
+  if (shapeTracingEnabled) return;
   // clearCanvas();
   swal({
     title: "Shaped Traced",
@@ -159,5 +161,7 @@ function stopShapeTracing() {
     },
   }).then((isConfirm) => {
     clearCanvas();
+    shapeTracingEnabled = true;
+    console.log(shapeTracingEnabled);
   });
 }

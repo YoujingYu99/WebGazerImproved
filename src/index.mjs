@@ -314,8 +314,8 @@ async function getPrediction(regModelIndex) {
         return null;
     }
     for (var reg in regs) {
-        predictions.push(regs[reg].predict(latestEyeFeatures));
-        // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
+        // predictions.push(regs[reg].predict(latestEyeFeatures));
+        predictions.push(regs[reg].predictRotation(latestEyeFeatures));
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {

@@ -53,10 +53,10 @@ Instructions on use can be found in the README repository.
             <ul class="nav navbar-nav">
                 <!-- Accuracy -->
                 <li id="Accuracy"><a>Not yet Calibrated</a></li>
-                <li id="xError"><a>N.A.</a></li>
-                <li id="yError"><a>N.A.</a></li>
+                <!--                <li id="xError"><a>N.A.</a></li>-->
+                <!--                <li id="yError"><a>N.A.</a></li>-->
                 <li><a href="#" onclick="RestartBlock()">Recalibrate</a></li>
-                <li><a href="#" onclick="animateBall()">Start Blind Spot</a></li>
+                <li><a href="#" id="start" onclick="animateBall()">Start Blind Spot</a></li>
                 <li><a href="#" onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)">Toggle Kalman
                     Filter</a></li>
                 <li class="helpBtn" data-target="#helpModal" data-toggle="modal"><a data-toggle="modal"><span
@@ -88,10 +88,11 @@ Instructions on use can be found in the README repository.
             <br>
             <img id="card" src="media/card.png" style="width: 50%">
             <br><br>
-            <button class="btn btn-primary" onclick="configureBlindSpot()">Done!</button>
+            <!--            <button class="btn btn-primary" onclick="configureBlindSpot()">Done!</button>-->
         </div>
     </div>
 
+    <button class="btn btn-primary" onclick="configureBlindSpot()">Done!</button>
 
     <div id="blind-spot" style="visibility: hidden">
         <!-- <h2 class="bolded-blue">Task 2: Where’s your blind spot?</h2> -->

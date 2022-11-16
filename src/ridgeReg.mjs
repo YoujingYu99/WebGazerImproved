@@ -136,7 +136,7 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
         let horizontalAngle = Math.atan(((screenXArray[i] - webgazer.xDist) / webgazer.LPD) / webgazer.currentViewingDistance);
         xAngleArray.push([horizontalAngle]);
     }
-    console.log("x angle array", xAngleArray);
+    // console.log("x angle array", xAngleArray);
 
     // Calculate y rotation angles
     var screenYArray = this.screenYClicksArray.data.concat(trailY);
@@ -145,13 +145,13 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
         let verticalAngle = Math.atan(((webgazer.yDist - screenYArray[i]) / webgazer.LPD) / webgazer.currentViewingDistance);
         yAngleArray.push([verticalAngle]);
     }
-    console.log("y angle array", yAngleArray);
+    // console.log("y angle array", yAngleArray);
 
     // size n * 120, n varies depending on how many datapoints are accepted
     var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
 
     // eyeFeatures needs to be the 120 pixel eye features;
-    console.log(eyeFeatures)
+    // console.log(eyeFeatures)
     var coefficientsX = util_regression.ridge(xAngleArray, eyeFeatures, this.ridgeParameter);
     var coefficientsY = util_regression.ridge(yAngleArray, eyeFeatures, this.ridgeParameter);
 

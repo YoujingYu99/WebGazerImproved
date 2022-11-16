@@ -1,5 +1,5 @@
-let shapeTracingEnabled = false;
-let blockChasingEnabled = false;
+let shapeTracingDisabled = false;
+let blockChasingDisabled = false;
 
 window.onload = async function () {
   //start the webgazer tracker
@@ -79,8 +79,8 @@ function Restart() {
  */
 function RestartBlock() {
   document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
-  document.getElementById("xError").innerHTML = "<a>N.A.</a>";
-  document.getElementById("yError").innerHTML = "<a>N.A.</a>";
+  // document.getElementById("xError").innerHTML = "<a>N.A.</a>";
+  // document.getElementById("yError").innerHTML = "<a>N.A.</a>";
   clearCanvas();
   $(".lpd_bspot").hide();
   webgazer.clearData();
@@ -98,7 +98,7 @@ function chaseFlickeringMaze() {
 }
 
 /**
- * Clear the calibration points and trace shape
+ * Clear the calibration points and trace shape.
  */
 function traceShapeMaze() {
   clearCanvas();
