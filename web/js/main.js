@@ -44,6 +44,7 @@ window.onbeforeunload = function () {
  */
 function clearCanvas() {
   $(".Calibration").hide();
+  $(".CalibrationBlock").hide();
   var canvas = document.getElementById("plotting_canvas");
   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -58,8 +59,14 @@ function ClearCalibration() {
   $(".Calibration").css("opacity", 0.2);
   $(".Calibration").prop("disabled", false);
 
+  $(".CalibrationBlock").css("background-color", "red");
+  $(".CalibrationBlock").css("opacity", 0.2);
+  $(".CalibrationBlock").prop("disabled", false);
+
   CalibrationPoints = {};
+  CalibrationBlockPoints = {};
   PointCalibrate = 0;
+  PointBlockCalibrate = 0;
 }
 
 /**
@@ -71,7 +78,7 @@ function Restart() {
   $(".lpd_bspot").hide();
   webgazer.clearData();
   ClearCalibration();
-  PopUpInstruction();
+  calibrationInstructionNine();
 }
 
 /**
@@ -83,9 +90,9 @@ function RestartBlock() {
   // document.getElementById("yError").innerHTML = "<a>N.A.</a>";
   clearCanvas();
   $(".lpd_bspot").hide();
-  webgazer.clearData();
+  // webgazer.clearData();
   ClearCalibration();
-  calibrationInstruction();
+  calibrationInstructionBlock();
 }
 
 /**

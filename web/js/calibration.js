@@ -13,7 +13,7 @@ function ClearCanvas() {
 /**
  * Show the instruction of using calibration at the start up screen.
  */
-function PopUpInstruction() {
+function CalibrationInstruction() {
   ClearCanvas();
   swal({
     title: "Calibration",

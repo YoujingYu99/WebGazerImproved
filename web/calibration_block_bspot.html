@@ -35,6 +35,7 @@ Instructions on use can be found in the README repository.
 
 <script src="js/main.js"></script>
 <script src="js/calibration.js"></script>
+<script src="js/calibration_both_block.js"></script>
 <script src="js/maze.js"></script>
 <script src="js/precision_calculation.js"></script>
 <script src="js/precision_store_points.js"></script>
@@ -55,7 +56,7 @@ Instructions on use can be found in the README repository.
                 <li id="Accuracy"><a>Not yet Calibrated</a></li>
                 <!--                <li id="xError"><a>N.A.</a></li>-->
                 <!--                <li id="yError"><a>N.A.</a></li>-->
-                <li><a href="#" onclick="RestartBlock()">Recalibrate</a></li>
+                <li><a href="#" onclick="Restart()">Recalibrate</a></li>
                 <li><a href="#" onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)">Toggle Kalman
                     Filter</a></li>
                 <li class="helpBtn" data-target="#helpModal" data-toggle="modal"><a data-toggle="modal"><span
@@ -136,6 +137,26 @@ Instructions on use can be found in the README repository.
     <input class="Calibration" id="Pt9" type="button"></input>
 </div>
 
+<!-- Calibration points -->
+<div class="calibrationDivBlock">
+    <input class="CalibrationBlock" id="Pt1_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt2_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt3_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt4_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt5_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt6_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt7_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt8_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt9_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt10_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt11_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt12_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt13_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt14_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt15_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt16_block" type="button"></input>
+    <input class="CalibrationBlock" id="Pt17_block" type="button"></input>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="helpModal" role="dialog">
@@ -153,21 +174,25 @@ Instructions on use can be found in the README repository.
                         type="button">
                     Get LPD
                 </button>
-                <button class="btn btn-primary" data-dismiss="modal" id="getBSpot"
-                        onclick="configureBlindSpot()"
-                        type="button">
-                    Get Blind Spot
-                </button>
+                <!--                <button class="btn btn-primary" data-dismiss="modal" id="getBSpot"-->
+                <!--                        onclick="configureBlindSpot()"-->
+                <!--                        type="button">-->
+                <!--                    Get Blind Spot-->
+                <!--                </button>-->
                 <button class="btn btn-primary" data-dismiss="modal" id="load_maze" onclick="chaseFlickeringMaze()"
                         type="button">
-                    Catch the red
+                    Catch the Red
                 </button>
                 <button class="btn btn-primary" data-dismiss="modal" id="trace_shape" onclick="traceShapeMaze()"
                         type="button">
                     Trace the Shape
                 </button>
                 <button class="btn btn-primary" data-dismiss="modal" id="start_calibration" onclick="Restart()"
-                        type="button">Calibrate
+                        type="button">Calibrate A
+                </button>
+                <button class="btn btn-primary" data-dismiss="modal" id="start_calibration_block"
+                        onclick="RestartBlock()"
+                        type="button">Calibrate B
                 </button>
             </div>
         </div>

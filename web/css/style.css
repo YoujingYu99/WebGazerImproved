@@ -105,6 +105,20 @@ li {
     position: fixed;
 }
 
+/* Calibration button styling */
+.CalibrationBlock {
+    width: 20px;
+    height: 20px;
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 25px;
+    background-color: red;
+    opacity: 0.2;
+    border-color: black;
+    border-style: solid;
+    position: fixed;
+}
+
 /* Calibration point position */
 #Pt1 {
     top: 70px;
