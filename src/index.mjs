@@ -444,6 +444,8 @@ var recordScreenPosition = function (x, y, eventType) {
  * @returns {null}
  */
 var recordRotationAngles = function (x, y, eventType) {
+    let horizontalAngle = Math.atan(((x - webgazer.xDist) / webgazer.LPD) / webgazer.currentViewingDistance);
+    let verticalAngle = Math.atan(((webgazer.yDist - y) / webgazer.LPD) / webgazer.currentViewingDistance);
     if (paused) {
         return;
     }
@@ -453,7 +455,7 @@ var recordRotationAngles = function (x, y, eventType) {
     }
     for (var reg in regs) {
         if (latestEyeFeatures)
-            regs[reg].addRotationData(latestEyeFeatures, [x, y], eventType);
+            regs[reg].addRotationData(latestEyeFeatures, [horizontalAngle, verticalAngle], eventType);
     }
 };
 
@@ -464,7 +466,6 @@ var recordRotationAngles = function (x, y, eventType) {
 var clickListener = async function (event) {
     // recordScreenPosition(event.clientX, event.clientY, eventTypes[0]); // eventType[0] === 'click'
     recordRotationAngles(event.clientX, event.clientY, eventTypes[0]);
-    console.log("clicked, rotation angles recorded");
     if (webgazer.params.saveDataAcrossSessions) {
         // Each click stores the next data point into localforage.
         // await setGlobalData();
@@ -530,10 +531,13 @@ async function loadGlobalData() {
     // Set global var data to newly loaded data
     data = loadData;
 
+    // console.log("setting data from local storage")
+    // console.log(loadData)
+
     // Load data into regression model(s)
     for (var reg in regs) {
-        regs[reg].setData(loadData);
-        console.log("setting data from local storage")
+        regs[reg].setRotationData(loadData);
+        console.log("setting data from local storage here into regression model")
         console.log(loadData)
     }
 
@@ -1179,9 +1183,9 @@ webgazer.setRegression = function (name) {
         }
         return webgazer;
     }
-    data = regs[0].getData();
+    data = regs[0].getRotationData();
     regs = [regressionMap[name]()];
-    regs[0].setData(data);
+    regs[0].setRotationData(data);
     return webgazer;
 };
 
@@ -1215,8 +1219,8 @@ webgazer.addRegressionModule = function (name, constructor) {
  */
 webgazer.addRegression = function (name) {
     var newReg = regressionMap[name]();
-    data = regs[0].getData();
-    newReg.setData(data);
+    data = regs[0].getRotationData();
+    newReg.setRotationData(data);
     regs.push(newReg);
     return webgazer;
 };

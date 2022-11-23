@@ -39,7 +39,7 @@ util_regression.InitRegression = function () {
     this.dataClicks = new util.DataWindow(dataWindow);
     this.dataTrail = new util.DataWindow(trailDataWindow);
 
-    // dataRotationClicks contains items which has the structure {'eyes': eyes, 'screenPos': screenPos, 'type': type}
+    // dataRotationClicks contains items which has the structure {'eyes': eyes, 'rotationAngles': x/y angles, 'type': type}
     this.dataRotationClicks = new util.DataWindow(dataWindow);
     this.dataRotationTrail = new util.DataWindow(trailDataWindow);
     // Initialize Kalman filter [20200608 xk] what do we do about parameters?
@@ -210,7 +210,7 @@ util_regression.setRotationData = function (data) {
         data[i].eyes.right.patch = new ImageData(rightData, data[i].eyes.right.width, data[i].eyes.right.height);
 
         // Add those data objects to model
-        this.addRotationData(data[i].eyes, data[i].screenPos, data[i].type);
+        this.addRotationData(data[i].eyes, data[i].rotationAngles, data[i].type);
     }
 };
 
@@ -267,9 +267,11 @@ util_regression.addData = function (eyes, screenPos, type) {
 };
 
 
-util_regression.addRotationData = function (eyes, screenPos, type) {
-    let horizontalAngle = Math.atan(((screenPos[0] - webgazer.xDist) / webgazer.LPD) / webgazer.currentViewingDistance);
-    let verticalAngle = Math.atan(((webgazer.yDist - screenPos[1]) / webgazer.LPD) / webgazer.currentViewingDistance);
+util_regression.addRotationData = function (eyes, rotationAngles, type) {
+    let screenX = webgazer.xDist + webgazer.currentViewingDistance * Math.tan(rotationAngles[0]) * webgazer.LPD
+    let screenY = webgazer.yDist - webgazer.currentViewingDistance * Math.tan(rotationAngles[1]) * webgazer.LPD
+    // let horizontalAngle = Math.atan(((screenPos[0] - webgazer.xDist) / webgazer.LPD) / webgazer.currentViewingDistance);
+    // let verticalAngle = Math.atan(((webgazer.yDist - screenPos[1]) / webgazer.LPD) / webgazer.currentViewingDistance);
 
     if (!eyes) {
         return;
@@ -279,22 +281,30 @@ util_regression.addRotationData = function (eyes, screenPos, type) {
     //     return;
     // }
     if (type === 'click') {
-        this.screenXClicksArray.push([screenPos[0]]);
-        this.screenYClicksArray.push([screenPos[1]]);
+        this.screenXClicksArray.push([screenX]);
+        this.screenYClicksArray.push([screenY]);
 
-        this.screenXAngleArray.push([horizontalAngle]);
-        this.screenYAngleArray.push([verticalAngle]);
+        this.screenXAngleArray.push([rotationAngles[0]]);
+        this.screenYAngleArray.push([rotationAngles[1]]);
         this.eyeFeaturesClicks.push(util.getEyeFeats(eyes));
-        this.dataRotationClicks.push({'eyes': eyes, 'RotationAngles': [horizontalAngle, verticalAngle], 'type': type});
+        this.dataRotationClicks.push({
+            'eyes': eyes,
+            'rotationAngles': [rotationAngles[0], rotationAngles[1]],
+            'type': type
+        });
     } else if (type === 'move') {
-        this.screenXTrailArray.push([screenPos[0]]);
-        this.screenYTrailArray.push([screenPos[1]]);
-        this.screenXAngleTrailArray.push([horizontalAngle]);
-        this.screenYAngleTrailArray.push([verticalAngle]);
+        this.screenXTrailArray.push([screenX]);
+        this.screenYTrailArray.push([screenY]);
+        this.screenXAngleTrailArray.push([rotationAngles[0]]);
+        this.screenYAngleTrailArray.push([rotationAngles[1]]);
 
         this.eyeFeaturesTrail.push(util.getEyeFeats(eyes));
         this.trailTimes.push(performance.now());
-        this.dataRotationTrail.push({'eyes': eyes, 'screenPos': screenPos, 'type': type});
+        this.dataRotationTrail.push({
+            'eyes': eyes,
+            'rotationAngles': [rotationAngles[0], rotationAngles[1]],
+            'type': type
+        });
     }
 
     // [20180730 JT] Why do we do this? It doesn't return anything...
