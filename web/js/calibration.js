@@ -26,6 +26,7 @@ function PopUpInstruction() {
     ShowCalibrationPoint();
   });
 }
+
 /**
  * Show the help instructions right at the start.
  */
@@ -98,10 +99,10 @@ $(document).ready(function () {
             var yAverageError = calculatePrecisionErrors(past50)[2];
             document.getElementById("Accuracy").innerHTML =
               "<a>Accuracy | " + accuracyMeasurement.toPrecision(3) + "%</a>"; // Show the accuracy in the nav bar.
-            document.getElementById("xError").innerHTML =
-              "<a>X Error | " + xAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
-            document.getElementById("yError").innerHTML =
-              "<a>Y Error | " + yAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
+            // document.getElementById("xError").innerHTML =
+            //   "<a>X Error | " + xAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
+            // document.getElementById("yError").innerHTML =
+            //   "<a>Y Error | " + yAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
             swal({
               title:
                 "Your accuracy and x/y errors are " +
@@ -123,8 +124,8 @@ $(document).ready(function () {
               } else {
                 //use restart function to restart the calibration
                 document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
-                document.getElementById("xError").innerHTML = "<a>N.A.</a>";
-                document.getElementById("yError").innerHTML = "<a>N.A.</a>";
+                // document.getElementById("xError").innerHTML = "<a>N.A.</a>";
+                // document.getElementById("yError").innerHTML = "<a>N.A.</a>";
                 webgazer.clearData();
                 ClearCalibration();
                 ClearCanvas();
@@ -158,6 +159,135 @@ function ClearCalibration() {
 
   CalibrationPoints = {};
   PointCalibrate = 0;
+}
+
+/**
+ * Show the instruction of using chasing the red block.
+ */
+function chaseRedBlockInstruction() {
+  if (blockChasingDisabled) return;
+  clearCanvas();
+  swal({
+    title: "Chase Red Block",
+    text: "Please look at the middle of the square that has turned red. When a new red square appears immediately look at the new red square.",
+    buttons: {
+      cancel: false,
+      confirm: true,
+    },
+  }).then((isConfirm) => {
+    // // Clear previous canvas
+    // ClearCanvas();
+    showFlickeringMaze();
+  });
+}
+
+/**
+ * Clear the calibration points and show maze
+ */
+function showFlickeringMaze() {
+  if (blockChasingDisabled) return;
+  // // Clear previous canvas
+  // ClearCanvas();
+  // Render frame first
+  renderFrame();
+  let gazePositionInfo = {
+    timings: [],
+    xPos: [],
+    yPos: [],
+  };
+
+  // Render block
+  renderBlockRed();
+
+  // Record
+  webgazer
+    .setGazeListener(function (data, elapsedTime) {
+      if (data == null) {
+        console.log("No data here");
+        return;
+      }
+
+      var xPrediction = data.x; //these x coordinates are relative to the viewport
+      var yPrediction = data.y; //these y coordinates are relative to the viewport
+      if (
+        determineCorrectPosition(
+          xPrediction,
+          yPrediction,
+          columnIndex,
+          rowIndex
+        )
+      ) {
+        console.log("Criteria met");
+        // If gaze met the criteria, render new block
+        renderBlockRed();
+        // Record timings and positions in arrays
+        gazePositionInfo.timings.push(elapsedTime);
+        gazePositionInfo.xPos.push(xPrediction);
+        gazePositionInfo.yPos.push(yPrediction);
+
+        // Save json object
+        let gazePositionInfoJSON = JSON.stringify(gazePositionInfo);
+        localStorage.setItem("gazePositionInfo", gazePositionInfoJSON);
+        console.log("Item saved");
+      }
+    })
+    .begin();
+}
+
+/**
+ * Show the instruction of using calibration at the start up screen.
+ */
+function traceShapeInstruction() {
+  if (shapeTracingDisabled) return;
+  clearCanvas();
+  swal({
+    title: "Trace Shape",
+    text: "Please trace the shape of L, starting at the upper left square and ending at the lower right square.",
+    buttons: {
+      cancel: false,
+      confirm: true,
+    },
+  }).then((isConfirm) => {
+    showTraceShape();
+  });
+}
+
+function showTraceShape() {
+  if (shapeTracingDisabled) return;
+  // // Clear previous canvas
+  // ClearCanvas();
+  // Render frame first
+  renderFrame();
+  let gazePositionInfo = {
+    timings: [],
+    xPos: [],
+    yPos: [],
+  };
+
+  // Record
+  webgazer
+    .setGazeListener(function (data, elapsedTime) {
+      if (data == null) {
+        console.log("No data here");
+        return;
+      }
+
+      var xPrediction = data.x; //these x coordinates are relative to the viewport
+      var yPrediction = data.y; //these y coordinates are relative to the viewport
+
+      determineBlockPositionPaint(xPrediction, yPrediction);
+
+      // Record timings and positions in arrays
+      gazePositionInfo.timings.push(elapsedTime);
+      gazePositionInfo.xPos.push(xPrediction);
+      gazePositionInfo.yPos.push(yPrediction);
+
+      // Save json object
+      let gazePositionInfoJSON = JSON.stringify(gazePositionInfo);
+      localStorage.setItem("gazePositionInfo", gazePositionInfoJSON);
+      console.log("Item saved");
+    })
+    .begin();
 }
 
 // sleep function because java doesn't have one, sourced from http://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep

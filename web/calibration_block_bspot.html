@@ -34,7 +34,7 @@ Instructions on use can be found in the README repository.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.3/svg.min.js"></script>
 
 <script src="js/main.js"></script>
-<script src="js/calibration_block.js"></script>
+<script src="js/calibration.js"></script>
 <script src="js/maze.js"></script>
 <script src="js/precision_calculation.js"></script>
 <script src="js/precision_store_points.js"></script>
@@ -125,24 +125,17 @@ Instructions on use can be found in the README repository.
 
 <!-- Calibration points -->
 <div class="calibrationDiv">
-    <input class="Calibration" id="Pt1_block" type="button"></input>
-    <input class="Calibration" id="Pt2_block" type="button"></input>
-    <input class="Calibration" id="Pt3_block" type="button"></input>
-    <input class="Calibration" id="Pt4_block" type="button"></input>
-    <input class="Calibration" id="Pt5_block" type="button"></input>
-    <input class="Calibration" id="Pt6_block" type="button"></input>
-    <input class="Calibration" id="Pt7_block" type="button"></input>
-    <input class="Calibration" id="Pt8_block" type="button"></input>
-    <input class="Calibration" id="Pt9_block" type="button"></input>
-    <input class="Calibration" id="Pt10_block" type="button"></input>
-    <input class="Calibration" id="Pt11_block" type="button"></input>
-    <input class="Calibration" id="Pt12_block" type="button"></input>
-    <input class="Calibration" id="Pt13_block" type="button"></input>
-    <input class="Calibration" id="Pt14_block" type="button"></input>
-    <input class="Calibration" id="Pt15_block" type="button"></input>
-    <input class="Calibration" id="Pt16_block" type="button"></input>
-    <input class="Calibration" id="Pt17_block" type="button"></input>
+    <input class="Calibration" id="Pt1" type="button"></input>
+    <input class="Calibration" id="Pt2" type="button"></input>
+    <input class="Calibration" id="Pt3" type="button"></input>
+    <input class="Calibration" id="Pt4" type="button"></input>
+    <input class="Calibration" id="Pt5" type="button"></input>
+    <input class="Calibration" id="Pt6" type="button"></input>
+    <input class="Calibration" id="Pt7" type="button"></input>
+    <input class="Calibration" id="Pt8" type="button"></input>
+    <input class="Calibration" id="Pt9" type="button"></input>
 </div>
+
 
 <!-- Modal -->
 <div class="modal fade" id="helpModal" role="dialog">
@@ -173,7 +166,7 @@ Instructions on use can be found in the README repository.
                         type="button">
                     Trace the Shape
                 </button>
-                <button class="btn btn-primary" data-dismiss="modal" id="start_calibration" onclick="RestartBlock()"
+                <button class="btn btn-primary" data-dismiss="modal" id="start_calibration" onclick="Restart()"
                         type="button">Calibrate
                 </button>
             </div>
