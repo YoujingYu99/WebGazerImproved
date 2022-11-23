@@ -53,6 +53,7 @@ reg.RidgeReg.prototype.predict = function (eyesObj) {
     for (var i = 0; i < this.trailDataWindow; i++) {
         // What is happening here?
         if (this.trailTimes.get(i) > acceptTime) {
+            // Cursor trail positions
             trailX.push(this.screenXTrailArray.get(i));
             trailY.push(this.screenYTrailArray.get(i));
             trailFeat.push(this.eyeFeaturesTrail.get(i));
@@ -75,16 +76,16 @@ reg.RidgeReg.prototype.predict = function (eyesObj) {
 
     // Eye grey histogram for both left and right eyes
     // length 120
-    var eyeFeats = util.getEyeFeats(eyesObj);
+    var eyeFeatsCurrent = util.getEyeFeats(eyesObj);
 
 
     var predictedX = 0;
-    for (var i = 0; i < eyeFeats.length; i++) {
-        predictedX += eyeFeats[i] * coefficientsX[i];
+    for (var i = 0; i < eyeFeatsCurrent.length; i++) {
+        predictedX += eyeFeatsCurrent[i] * coefficientsX[i];
     }
     var predictedY = 0;
-    for (var i = 0; i < eyeFeats.length; i++) {
-        predictedY += eyeFeats[i] * coefficientsY[i];
+    for (var i = 0; i < eyeFeatsCurrent.length; i++) {
+        predictedY += eyeFeatsCurrent[i] * coefficientsY[i];
     }
 
     predictedX = Math.floor(predictedX);
@@ -121,42 +122,30 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
     var acceptTime = performance.now() - this.trailTime;
     var trailX = [];
     var trailY = [];
+    var trailXAngle = [];
+    var trailYAngle = [];
     var trailFeat = [];
     // trailDataWindow is 1000/50=20.
     for (var i = 0; i < this.trailDataWindow; i++) {
         // What is happening here?
         if (this.trailTimes.get(i) > acceptTime) {
-            trailX.push(this.screenXTrailArray.get(i));
-            trailY.push(this.screenYTrailArray.get(i));
             trailFeat.push(this.eyeFeaturesTrail.get(i));
+            trailXAngle.push(this.screenXAngleTrailArray.get(i));
+            trailYAngle.push(this.screenYAngleTrailArray.get(i));
             // console.log(i);
             // console.log(this.trailTimes.get(i));
             // console.log(acceptTime);
         }
     }
     // eyeFeaturesTrail contains eye size as grey histogram;
-    // screenX/YTrailArray contains the cursor movements;
-    var screenXArray = this.screenXClicksArray.data.concat(trailX);
-    // Now we need to convert the cursor movements to rotation
-    // calculate x rotation angles
-    let xAngleArray = [];
-    for (let i = 0; i < screenXArray.length; i++) {
-        let horizontalAngle = Math.atan(((screenXArray[i] - webgazer.xDist) / webgazer.LPD) / webgazer.currentViewingDistance);
-        xAngleArray.push([horizontalAngle]);
-    }
-    // console.log("x angle array", xAngleArray);
+    // screenX/YAngleArray contains the angles;
+    var xAngleArray = this.screenXAngleArray.data.concat(trailXAngle);
+    var yAngleArray = this.screenYAngleArray.data.concat(trailYAngle);
 
-    // Calculate y rotation angles
-    var screenYArray = this.screenYClicksArray.data.concat(trailY);
-    let yAngleArray = [];
-    for (let i = 0; i < screenYArray.length; i++) {
-        let verticalAngle = Math.atan(((webgazer.yDist - screenYArray[i]) / webgazer.LPD) / webgazer.currentViewingDistance);
-        yAngleArray.push([verticalAngle]);
-    }
-    // console.log("y angle array", yAngleArray);
 
     // size n * 120, n varies depending on how many datapoints are accepted
     var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
+    console.log("eye feature length", eyeFeatures.length)
 
     // eyeFeatures needs to be the 120 pixel eye features;
     // console.log(eyeFeatures)
@@ -165,16 +154,16 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
 
     // Eye grey histogram for both left and right eyes
     // length 120
-    var eyeFeats = util.getEyeFeats(eyesObj);
+    var eyeFeatsCurrent = util.getEyeFeats(eyesObj);
 
 
     var predictedXAngle = 0;
-    for (var i = 0; i < eyeFeats.length; i++) {
-        predictedXAngle += eyeFeats[i] * coefficientsX[i];
+    for (var i = 0; i < eyeFeatsCurrent.length; i++) {
+        predictedXAngle += eyeFeatsCurrent[i] * coefficientsX[i];
     }
     var predictedYAngle = 0;
-    for (var i = 0; i < eyeFeats.length; i++) {
-        predictedYAngle += eyeFeats[i] * coefficientsY[i];
+    for (var i = 0; i < eyeFeatsCurrent.length; i++) {
+        predictedYAngle += eyeFeatsCurrent[i] * coefficientsY[i];
     }
 
     // Convert the predicted angles (in radians) to position
@@ -209,6 +198,14 @@ reg.RidgeReg.prototype.setRotationData = util_regression.setRotationData;
  */
 reg.RidgeReg.prototype.getData = function () {
     return this.dataClicks.data;
+}
+
+/**
+ * Return the rotation data
+ * @returns {Array.<Object>|*}
+ */
+reg.RidgeReg.prototype.getRotationData = function () {
+    return this.dataRotationClicks.data;
 }
 
 /**

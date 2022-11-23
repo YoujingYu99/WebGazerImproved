@@ -467,7 +467,8 @@ var clickListener = async function (event) {
     console.log("clicked, rotation angles recorded");
     if (webgazer.params.saveDataAcrossSessions) {
         // Each click stores the next data point into localforage.
-        await setGlobalData();
+        // await setGlobalData();
+        await setGlobalRotationData();
 
         // // Debug line
         // console.log('Model size: ' + JSON.stringify(await localforage.getItem(localstorageDataLabel)).length / 1000000 + 'MB');
@@ -532,7 +533,7 @@ async function loadGlobalData() {
     // Load data into regression model(s)
     for (var reg in regs) {
         regs[reg].setData(loadData);
-        console.log("setting data from local storatge")
+        console.log("setting data from local storage")
         console.log(loadData)
     }
 
@@ -552,6 +553,21 @@ async function setGlobalData() {
     //TODO data should probably be stored in webgazer object instead of each regression model
     //     -> requires duplication of data, but is likely easier on regression model implementors
 }
+
+/**
+ * Adds data to localforage
+ */
+async function setGlobalRotationData() {
+    // Grab data from regression model
+    var storeData = regs[0].getRotationData() || data; // Array
+
+    // Store data into localforage
+    localforage.setItem(localstorageSettingsLabel, settings) // [20200605 XK] is 'settings' ever being used?
+    localforage.setItem(localstorageDataLabel, storeData);
+    //TODO data should probably be stored in webgazer object instead of each regression model
+    //     -> requires duplication of data, but is likely easier on regression model implementors
+}
+
 
 /**
  * Clears data from model and global storage

@@ -30,6 +30,8 @@ util_regression.InitRegression = function () {
     this.trailDataWindow = this.trailTime / params.moveTickSize;
     this.screenXTrailArray = new util.DataWindow(trailDataWindow);
     this.screenYTrailArray = new util.DataWindow(trailDataWindow);
+    this.screenXAngleTrailArray = new util.DataWindow(trailDataWindow);
+    this.screenYAngleTrailArray = new util.DataWindow(trailDataWindow);
     this.eyeFeaturesTrail = new util.DataWindow(trailDataWindow);
     this.trailTimes = new util.DataWindow(trailDataWindow);
 
@@ -287,6 +289,8 @@ util_regression.addRotationData = function (eyes, screenPos, type) {
     } else if (type === 'move') {
         this.screenXTrailArray.push([screenPos[0]]);
         this.screenYTrailArray.push([screenPos[1]]);
+        this.screenXAngleTrailArray.push([horizontalAngle]);
+        this.screenYAngleTrailArray.push([verticalAngle]);
 
         this.eyeFeaturesTrail.push(util.getEyeFeats(eyes));
         this.trailTimes.push(performance.now());
