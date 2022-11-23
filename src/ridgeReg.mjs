@@ -27,6 +27,14 @@ reg.RidgeReg.prototype.init = util_regression.InitRegression
 reg.RidgeReg.prototype.addData = util_regression.addData
 
 /**
+ * Add given data from eyes image and rotational angles
+ * @param {Object} eyes - eyes where extract data to add
+ * @param {Object} rotationAngles - The current rotational angles
+ * @param {Object} type - The type of performed action
+ */
+reg.RidgeReg.prototype.addRotationData = util_regression.addRotationData
+
+/**
  * Try to predict coordinates from pupil data
  * after apply linear regression on data set
  * @param {Object} eyesObj - The current user eyes object
@@ -192,6 +200,8 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
 };
 
 reg.RidgeReg.prototype.setData = util_regression.setData;
+
+reg.RidgeReg.prototype.setRotationData = util_regression.setRotationData;
 
 /**
  * Return the data

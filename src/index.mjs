@@ -412,6 +412,7 @@ async function loop() {
 //is problematic to test
 //because latestEyeFeatures is not set in many cases
 
+
 /**
  * Records screen position data based on current pupil feature and passes it
  * to the regression model.
@@ -435,12 +436,35 @@ var recordScreenPosition = function (x, y, eventType) {
 };
 
 /**
+ * Records rotation angles calculated and current pupil feature and passes it
+ * to the regression model.
+ * @param {Number} x - The x screen position
+ * @param {Number} y - The y screen position
+ * @param {String} eventType - The event type to store
+ * @returns {null}
+ */
+var recordRotationAngles = function (x, y, eventType) {
+    if (paused) {
+        return;
+    }
+    if (regs.length === 0) {
+        console.log('regression not set, call setRegression()');
+        return null;
+    }
+    for (var reg in regs) {
+        if (latestEyeFeatures)
+            regs[reg].addRotationData(latestEyeFeatures, [x, y], eventType);
+    }
+};
+
+/**
  * Records click data and passes it to the regression model
  * @param {Event} event - The listened event
  */
 var clickListener = async function (event) {
-    recordScreenPosition(event.clientX, event.clientY, eventTypes[0]); // eventType[0] === 'click'
-
+    // recordScreenPosition(event.clientX, event.clientY, eventTypes[0]); // eventType[0] === 'click'
+    recordRotationAngles(event.clientX, event.clientY, eventTypes[0]);
+    console.log("clicked, rotation angles recorded");
     if (webgazer.params.saveDataAcrossSessions) {
         // Each click stores the next data point into localforage.
         await setGlobalData();
@@ -465,7 +489,8 @@ var moveListener = function (event) {
     } else {
         moveClock = now;
     }
-    recordScreenPosition(event.clientX, event.clientY, eventTypes[1]); //eventType[1] === 'move'
+    // recordScreenPosition(event.clientX, event.clientY, eventTypes[1]);
+    recordRotationAngles(event.clientX, event.clientY, eventTypes[1]); //eventType[1] === 'move'
 };
 
 /**
@@ -1082,6 +1107,20 @@ webgazer.recordScreenPosition = function (x, y, eventType) {
     recordScreenPosition(x, y, eventType || eventTypes[0]);
     return webgazer;
 };
+
+/**
+ *  Records current rotation angles for current pupil features.
+ *  @param {String} x - position on screen in the x axis
+ *  @param {String} y - position on screen in the y axis
+ *  @param {String} eventType - "click" or "move", as per eventTypes
+ *  @return {webgazer} this
+ */
+webgazer.recordRotationAngles = function (x, y, eventType) {
+    // give this the same weight that a click gets.
+    recordRotationAngles(x, y, eventType || eventTypes[0]);
+    return webgazer;
+};
+
 
 /*
  * Stores the position of the fifty most recent tracker preditions

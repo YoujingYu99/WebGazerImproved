@@ -2,6 +2,7 @@ import util from './util';
 import numeric from 'numeric';
 import mat from './mat';
 import params from './params';
+import webgazer from "./index.mjs";
 
 const util_regression = {};
 
@@ -19,6 +20,8 @@ util_regression.InitRegression = function () {
 
     this.screenXClicksArray = new util.DataWindow(dataWindow);
     this.screenYClicksArray = new util.DataWindow(dataWindow);
+    this.screenXAngleArray = new util.DataWindow(dataWindow);
+    this.screenYAngleArray = new util.DataWindow(dataWindow);
     this.eyeFeaturesClicks = new util.DataWindow(dataWindow);
 
     //sets to one second worth of cursor trail
@@ -34,6 +37,9 @@ util_regression.InitRegression = function () {
     this.dataClicks = new util.DataWindow(dataWindow);
     this.dataTrail = new util.DataWindow(trailDataWindow);
 
+    // dataRotationClicks contains items which has the structure {'eyes': eyes, 'screenPos': screenPos, 'type': type}
+    this.dataRotationClicks = new util.DataWindow(dataWindow);
+    this.dataRotationTrail = new util.DataWindow(trailDataWindow);
     // Initialize Kalman filter [20200608 xk] what do we do about parameters?
     // [20200611 xk] unsure what to do w.r.t. dimensionality of these matrices. So far at least
     //               by my own anecdotal observation a 4x1 x vector seems to work alright
@@ -187,6 +193,25 @@ util_regression.setData = function (data) {
     }
 };
 
+/**
+ * Add given data to current data set then,
+ * replace current data member with given data
+ * @param {Array.<Object>} data - The data to set
+ */
+util_regression.setRotationData = function (data) {
+    for (var i = 0; i < data.length; i++) {
+        // Clone data array
+        var leftData = new Uint8ClampedArray(data[i].eyes.left.patch.data);
+        var rightData = new Uint8ClampedArray(data[i].eyes.right.patch.data);
+        // Duplicate ImageData object
+        data[i].eyes.left.patch = new ImageData(leftData, data[i].eyes.left.width, data[i].eyes.left.height);
+        data[i].eyes.right.patch = new ImageData(rightData, data[i].eyes.right.width, data[i].eyes.right.height);
+
+        // Add those data objects to model
+        this.addRotationData(data[i].eyes, data[i].screenPos, data[i].type);
+    }
+};
+
 
 //not used ?!
 //TODO: still usefull ???
@@ -229,6 +254,43 @@ util_regression.addData = function (eyes, screenPos, type) {
         this.eyeFeaturesTrail.push(util.getEyeFeats(eyes));
         this.trailTimes.push(performance.now());
         this.dataTrail.push({'eyes': eyes, 'screenPos': screenPos, 'type': type});
+    }
+
+    // [20180730 JT] Why do we do this? It doesn't return anything...
+    // But as JS is pass by reference, it still affects it.
+    //
+    // Causes problems for when we want to call 'addData' twice in a row on the same object, but perhaps with different screenPos or types (think multiple interactions within one video frame)
+    //eyes.left.patch = Array.from(eyes.left.patch.data);
+    //eyes.right.patch = Array.from(eyes.right.patch.data);
+};
+
+
+util_regression.addRotationData = function (eyes, screenPos, type) {
+    let horizontalAngle = Math.atan(((screenPos[0] - webgazer.xDist) / webgazer.LPD) / webgazer.currentViewingDistance);
+    let verticalAngle = Math.atan(((webgazer.yDist - screenPos[1]) / webgazer.LPD) / webgazer.currentViewingDistance);
+
+    if (!eyes) {
+        return;
+    }
+    //not doing anything with blink at present
+    // if (eyes.left.blink || eyes.right.blink) {
+    //     return;
+    // }
+    if (type === 'click') {
+        this.screenXClicksArray.push([screenPos[0]]);
+        this.screenYClicksArray.push([screenPos[1]]);
+
+        this.screenXAngleArray.push([horizontalAngle]);
+        this.screenYAngleArray.push([verticalAngle]);
+        this.eyeFeaturesClicks.push(util.getEyeFeats(eyes));
+        this.dataRotationClicks.push({'eyes': eyes, 'RotationAngles': [horizontalAngle, verticalAngle], 'type': type});
+    } else if (type === 'move') {
+        this.screenXTrailArray.push([screenPos[0]]);
+        this.screenYTrailArray.push([screenPos[1]]);
+
+        this.eyeFeaturesTrail.push(util.getEyeFeats(eyes));
+        this.trailTimes.push(performance.now());
+        this.dataRotationTrail.push({'eyes': eyes, 'screenPos': screenPos, 'type': type});
     }
 
     // [20180730 JT] Why do we do this? It doesn't return anything...

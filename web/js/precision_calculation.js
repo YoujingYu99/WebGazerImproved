@@ -71,8 +71,8 @@ function calculatePrecisionPercentages(
     // New accuracy measure for the square box detection
     let allowedError = 50;
     if (xDiff <= allowedError && yDiff <= allowedError) {
-      console.log("x diff", xDiff);
-      console.log("y diff", yDiff);
+      // console.log("x diff", xDiff);
+      // console.log("y diff", yDiff);
       precision = 100;
     } else {
       precision = 0;
