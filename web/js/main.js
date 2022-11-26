@@ -126,6 +126,6 @@ function saveData() {
   var fileToSave = new Blob([JSON.stringify(downloadData)], {
     type: "application/json",
   });
-  saveAs(fileToSave, "eye_rotation.json");
+  saveAs(fileToSave, "eye_rotation_data.json");
   console.log("JSON data is saved.");
 }
