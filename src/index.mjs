@@ -14,6 +14,7 @@ import Reg from './ridgeReg';
 import ridgeRegWeighted from './ridgeWeightedReg';
 import ridgeRegThreaded from './ridgeRegThreaded';
 import util from './util';
+import fileSaver from 'file-saver'
 
 const webgazer = {};
 webgazer.tracker = {};
@@ -559,7 +560,7 @@ async function setGlobalData() {
 }
 
 /**
- * Adds data to localforage
+ * Adds rotation data to localforage
  */
 async function setGlobalRotationData() {
     // Grab data from regression model
@@ -568,6 +569,25 @@ async function setGlobalRotationData() {
     // Store data into localforage
     localforage.setItem(localstorageSettingsLabel, settings) // [20200605 XK] is 'settings' ever being used?
     localforage.setItem(localstorageDataLabel, storeData);
+
+    // let storeDataJson = JSON.stringify(storeData);
+    // // write JSON string to a file
+    // fs.writeFile('eye_rotation.json', storeDataJson, err => {
+    //     if (err) {
+    //         throw err
+    //     }
+    //     console.log('JSON data is saved.')
+    // })
+
+    // Create a blob of the data
+    var fileToSave = new Blob([JSON.stringify(storeData)], {
+        type: 'application/json'
+    });
+
+// Save the file
+    saveAs(fileToSave, 'eye_rotation.json');
+    console.log('JSON data is saved.')
+
     //TODO data should probably be stored in webgazer object instead of each regression model
     //     -> requires duplication of data, but is likely easier on regression model implementors
 }
