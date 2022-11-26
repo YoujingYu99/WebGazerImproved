@@ -112,3 +112,20 @@ function traceShapeMaze() {
   $(".lpd_bspot").hide();
   traceShapeInstruction();
 }
+
+/**
+ * Save User Eye Rotation Data
+ */
+function saveData() {
+  clearCanvas();
+  $(".lpd_bspot").hide();
+
+  // retrieve data from webgazer
+  let downloadData = webgazer.storeData;
+  // Create a blob of the data
+  var fileToSave = new Blob([JSON.stringify(downloadData)], {
+    type: "application/json",
+  });
+  saveAs(fileToSave, "eye_rotation.json");
+  console.log("JSON data is saved.");
+}

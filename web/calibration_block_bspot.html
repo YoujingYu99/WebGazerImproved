@@ -23,6 +23,7 @@ Instructions on use can be found in the README repository.
 
 <script src="../node_modules/jquery/dist/jquery.min.js"></script>
 <script src="../node_modules/sweetalert/dist/sweetalert.min.js"></script>
+<script src="../node_modules/file-saver/dist/FileSaver.js"></script>
 
 <script crossorigin="anonymous"
         integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
@@ -193,6 +194,10 @@ Instructions on use can be found in the README repository.
                 <button class="btn btn-primary" data-dismiss="modal" id="start_calibration_block"
                         onclick="RestartBlock()"
                         type="button">Calibrate B
+                </button>
+                <button class="btn btn-primary" data-dismiss="modal" id="save_user_data"
+                        onclick="saveData()"
+                        type="button">Save Data
                 </button>
             </div>
         </div>

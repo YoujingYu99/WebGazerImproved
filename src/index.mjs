@@ -33,6 +33,7 @@ webgazer.initialEyeWidths = 0;
 webgazer.latestEyeFeatures = 0;
 webgazer.xDist = 0;
 webgazer.yDist = 0;
+webgazer.storeData = null;
 
 //PRIVATE VARIABLES
 
@@ -570,26 +571,8 @@ async function setGlobalRotationData() {
     localforage.setItem(localstorageSettingsLabel, settings) // [20200605 XK] is 'settings' ever being used?
     localforage.setItem(localstorageDataLabel, storeData);
 
-    // let storeDataJson = JSON.stringify(storeData);
-    // // write JSON string to a file
-    // fs.writeFile('eye_rotation.json', storeDataJson, err => {
-    //     if (err) {
-    //         throw err
-    //     }
-    //     console.log('JSON data is saved.')
-    // })
-
-    // Create a blob of the data
-    var fileToSave = new Blob([JSON.stringify(storeData)], {
-        type: 'application/json'
-    });
-
-// Save the file
-    saveAs(fileToSave, 'eye_rotation.json');
-    console.log('JSON data is saved.')
-
-    //TODO data should probably be stored in webgazer object instead of each regression model
-    //     -> requires duplication of data, but is likely easier on regression model implementors
+    // Add the data to webgazer object
+    webgazer.storeData = storeData
 }
 
 
