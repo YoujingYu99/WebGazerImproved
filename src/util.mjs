@@ -41,8 +41,11 @@ util.getEyeFeats = function (eyes) {
     var leftGrayArray = Array.prototype.slice.call(histLeft);
     var rightGrayArray = Array.prototype.slice.call(histRight);
 
+    console.log("histogram dimension", histLeft.concat(histRight))
     return histLeft.concat(histRight);
 }
+
+
 //Data Window class
 //operates like an array but 'wraps' data around to keep the array at a fixed windowSize
 /**

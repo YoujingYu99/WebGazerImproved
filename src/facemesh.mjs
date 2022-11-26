@@ -1,4 +1,5 @@
 import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
+import util from "./util.mjs";
 
 /**
  * Constructor of TFFaceMesh object
@@ -110,6 +111,7 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
 
     // Start building object to be returned
     var eyeObjs = {};
+    var eyeObjsFeatures = {}
 
     var leftImageData = imageCanvas.getContext('2d').getImageData(leftOriginX, leftOriginY, leftWidth, leftHeight);
     eyeObjs.left = {
@@ -117,7 +119,7 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         imagex: leftOriginX,
         imagey: leftOriginY,
         width: leftWidth,
-        height: leftHeight
+        height: leftHeight,
     };
 
     var rightImageData = imageCanvas.getContext('2d').getImageData(rightOriginX, rightOriginY, rightWidth, rightHeight);
@@ -126,14 +128,34 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         imagex: rightOriginX,
         imagey: rightOriginY,
         width: rightWidth,
-        height: rightHeight
+        height: rightHeight,
+    };
+
+    let eyeFeatures = util.getEyeFeats(eyeObjs)
+
+    eyeObjsFeatures.left = {
+        patch: leftImageData,
+        imagex: leftOriginX,
+        imagey: leftOriginY,
+        width: leftWidth,
+        height: leftHeight,
+        equalisedFeatures: eyeFeatures
+    };
+
+    eyeObjsFeatures.right = {
+        patch: rightImageData,
+        imagex: rightOriginX,
+        imagey: rightOriginY,
+        width: rightWidth,
+        height: rightHeight,
+        equalisedFeatures: eyeFeatures
     };
 
     // TODO: Implement method to find x_dist and y_dist
 
     this.predictionReady = true;
 
-    return eyeObjs;
+    return eyeObjsFeatures;
 };
 
 /**
