@@ -76,7 +76,7 @@ reg.RidgeReg.prototype.predict = function (eyesObj) {
 
     // Eye grey histogram for both left and right eyes
     // length 120
-    var eyeFeatsCurrent = util.getEyeFeats(eyesObj);
+    var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
 
     var predictedX = 0;
@@ -154,7 +154,7 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
 
     // Eye grey histogram for both left and right eyes
     // length 120
-    var eyeFeatsCurrent = util.getEyeFeats(eyesObj);
+    var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
 
     var predictedXAngle = 0;

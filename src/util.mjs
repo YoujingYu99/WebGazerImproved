@@ -38,11 +38,11 @@ util.getEyeFeats = function (eyes) {
     var histRight = [];
     this.equalizeHistogram(rightGray, 5, histRight);
 
-    var leftGrayArray = Array.prototype.slice.call(histLeft);
-    var rightGrayArray = Array.prototype.slice.call(histRight);
+    var leftGrayArray = Array.prototype.slice.call(leftGray);
+    var rightGrayArray = Array.prototype.slice.call(rightGray);
 
     // console.log("histogram dimension", histLeft.concat(histRight))
-    return histLeft.concat(histRight);
+    return [leftGrayArray.concat(rightGrayArray), histLeft.concat(histRight)];
 }
 
 

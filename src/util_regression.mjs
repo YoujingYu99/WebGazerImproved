@@ -247,13 +247,13 @@ util_regression.addData = function (eyes, screenPos, type) {
     if (type === 'click') {
         this.screenXClicksArray.push([screenPos[0]]);
         this.screenYClicksArray.push([screenPos[1]]);
-        this.eyeFeaturesClicks.push(util.getEyeFeats(eyes));
+        this.eyeFeaturesClicks.push(util.getEyeFeats(eyes)[1]);
         this.dataClicks.push({'eyes': eyes, 'screenPos': screenPos, 'type': type});
     } else if (type === 'move') {
         this.screenXTrailArray.push([screenPos[0]]);
         this.screenYTrailArray.push([screenPos[1]]);
 
-        this.eyeFeaturesTrail.push(util.getEyeFeats(eyes));
+        this.eyeFeaturesTrail.push(util.getEyeFeats(eyes)[1]);
         this.trailTimes.push(performance.now());
         this.dataTrail.push({'eyes': eyes, 'screenPos': screenPos, 'type': type});
     }
@@ -286,7 +286,7 @@ util_regression.addRotationData = function (eyes, rotationAngles, type) {
 
         this.screenXAngleArray.push([rotationAngles[0]]);
         this.screenYAngleArray.push([rotationAngles[1]]);
-        this.eyeFeaturesClicks.push(util.getEyeFeats(eyes));
+        this.eyeFeaturesClicks.push(util.getEyeFeats(eyes)[1]);
         this.dataRotationClicks.push({
             'eyes': eyes,
             'rotationAngles': [rotationAngles[0], rotationAngles[1]],
@@ -298,7 +298,7 @@ util_regression.addRotationData = function (eyes, rotationAngles, type) {
         this.screenXAngleTrailArray.push([rotationAngles[0]]);
         this.screenYAngleTrailArray.push([rotationAngles[1]]);
 
-        this.eyeFeaturesTrail.push(util.getEyeFeats(eyes));
+        this.eyeFeaturesTrail.push(util.getEyeFeats(eyes)[1]);
         this.trailTimes.push(performance.now());
         this.dataRotationTrail.push({
             'eyes': eyes,

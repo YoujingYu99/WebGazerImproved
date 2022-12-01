@@ -131,7 +131,7 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         height: rightHeight,
     };
 
-    let eyeFeatures = util.getEyeFeats(eyeObjs)
+    let [eyeGrays, eyeFeatures] = util.getEyeFeats(eyeObjs)
 
     eyeObjsFeatures.left = {
         patch: leftImageData,
@@ -139,6 +139,7 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         imagey: leftOriginY,
         width: leftWidth,
         height: leftHeight,
+        grayImage: eyeGrays,
         equalisedFeatures: eyeFeatures
     };
 
@@ -148,15 +149,15 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         imagey: rightOriginY,
         width: rightWidth,
         height: rightHeight,
+        grayImage: eyeGrays,
         equalisedFeatures: eyeFeatures
     };
-
-    // TODO: Implement method to find x_dist and y_dist
 
     this.predictionReady = true;
 
     return eyeObjsFeatures;
 };
+
 
 /**
  * Returns the positions array corresponding to the last call to getEyePatches.

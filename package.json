@@ -43,15 +43,15 @@
     "bootstrap": "^3.3.7",
     "browser-sync": "^2.26.12",
     "d3": "^5.16.0",
+    "file-saver": "^2.0.5",
+    "file-system": "^2.2.2",
     "jquery": "^3.6.1",
     "jspsych": "^7.3.1",
     "localforage": "1.7.3",
     "numeric": "1.2.6",
     "popper.js": "^1.16.1",
     "regression": "2.0.1",
-    "sweetalert": "^2.1.2",
-    "file-system": "^2.2.2",
-    "file-saver": "^2.0.5"
+    "sweetalert": "^2.1.2"
   },
   "devDependencies": {
     "browser-sync": "^2.26.14",
