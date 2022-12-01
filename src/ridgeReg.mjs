@@ -145,7 +145,7 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
 
     // size n * 120, n varies depending on how many datapoints are accepted
     var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
-    console.log("eye feature length", eyeFeatures.length)
+    // console.log("eye feature length", eyeFeatures.length)
 
     // eyeFeatures needs to be the 120 pixel eye features;
     // console.log(eyeFeatures)

@@ -1,8 +1,12 @@
 var PointCalibrate = 0;
 var PointBlockCalibrate = 0;
+var PointDataCollection = 0;
 var CalibrationPoints = {};
 var CalibrationBlockPoints = {};
+var DataCollectionPoints = {};
 const numClickPerPoint = 5;
+var buttonCount = 1;
+const numDataPointsToCollect = 5;
 
 // /**
 //  * Clear the canvas and the calibration button.
@@ -48,6 +52,23 @@ function calibrationInstructionBlock() {
 }
 
 /**
+ * Show the instruction of using calibration at the start up screen.
+ */
+function dataCollectionRandomInstruction() {
+  ClearCanvas();
+  swal({
+    title: "Data Collection: Random Points",
+    text: "Please click five times on the red point on the screen. You must click on each point 5 times till it goes yellow.",
+    buttons: {
+      cancel: false,
+      confirm: true,
+    },
+  }).then((isConfirm) => {
+    dataCollectionRandomPoint(buttonCount);
+  });
+}
+
+/**
  * Show the instruction of using chasing the red block.
  */
 function chaseRedBlockInstruction() {
@@ -87,37 +108,37 @@ function showFlickeringMaze() {
 
   // Record
   webgazer
-    .setGazeListener(function (data, elapsedTime) {
-      if (data == null) {
-        console.log("No data here");
-        return;
-      }
+      .setGazeListener(function (data, elapsedTime) {
+        if (data == null) {
+          console.log("No data here");
+          return;
+        }
 
-      var xPrediction = data.x; //these x coordinates are relative to the viewport
-      var yPrediction = data.y; //these y coordinates are relative to the viewport
-      if (
-        determineCorrectPosition(
-          xPrediction,
-          yPrediction,
-          columnIndex,
-          rowIndex
-        )
-      ) {
-        console.log("Criteria met");
-        // If gaze met the criteria, render new block
-        renderBlockRed();
-        // Record timings and positions in arrays
-        gazePositionInfo.timings.push(elapsedTime);
-        gazePositionInfo.xPos.push(xPrediction);
-        gazePositionInfo.yPos.push(yPrediction);
+        var xPrediction = data.x; //these x coordinates are relative to the viewport
+        var yPrediction = data.y; //these y coordinates are relative to the viewport
+        if (
+            determineCorrectPosition(
+                xPrediction,
+                yPrediction,
+                columnIndex,
+                rowIndex
+            )
+        ) {
+          console.log("Criteria met");
+          // If gaze met the criteria, render new block
+          renderBlockRed();
+          // Record timings and positions in arrays
+          gazePositionInfo.timings.push(elapsedTime);
+          gazePositionInfo.xPos.push(xPrediction);
+          gazePositionInfo.yPos.push(yPrediction);
 
-        // Save json object
-        let gazePositionInfoJSON = JSON.stringify(gazePositionInfo);
-        localStorage.setItem("gazePositionInfo", gazePositionInfoJSON);
-        console.log("Item saved");
-      }
-    })
-    .begin();
+          // Save json object
+          let gazePositionInfoJSON = JSON.stringify(gazePositionInfo);
+          localStorage.setItem("gazePositionInfo", gazePositionInfoJSON);
+          console.log("Item saved");
+        }
+      })
+      .begin();
 }
 
 /**
@@ -152,28 +173,28 @@ function showTraceShape() {
 
   // Record
   webgazer
-    .setGazeListener(function (data, elapsedTime) {
-      if (data == null) {
-        console.log("No data here");
-        return;
-      }
+      .setGazeListener(function (data, elapsedTime) {
+        if (data == null) {
+          console.log("No data here");
+          return;
+        }
 
-      var xPrediction = data.x; //these x coordinates are relative to the viewport
-      var yPrediction = data.y; //these y coordinates are relative to the viewport
+        var xPrediction = data.x; //these x coordinates are relative to the viewport
+        var yPrediction = data.y; //these y coordinates are relative to the viewport
 
-      determineBlockPositionPaint(xPrediction, yPrediction);
+        determineBlockPositionPaint(xPrediction, yPrediction);
 
-      // Record timings and positions in arrays
-      gazePositionInfo.timings.push(elapsedTime);
-      gazePositionInfo.xPos.push(xPrediction);
-      gazePositionInfo.yPos.push(yPrediction);
+        // Record timings and positions in arrays
+        gazePositionInfo.timings.push(elapsedTime);
+        gazePositionInfo.xPos.push(xPrediction);
+        gazePositionInfo.yPos.push(yPrediction);
 
-      // Save json object
-      let gazePositionInfoJSON = JSON.stringify(gazePositionInfo);
-      localStorage.setItem("gazePositionInfo", gazePositionInfoJSON);
-      console.log("Item saved");
-    })
-    .begin();
+        // Save json object
+        let gazePositionInfoJSON = JSON.stringify(gazePositionInfo);
+        localStorage.setItem("gazePositionInfo", gazePositionInfoJSON);
+        console.log("Item saved");
+      })
+      .begin();
 }
 
 /**
@@ -252,20 +273,20 @@ $(document).ready(function () {
             var xAverageError = calculatePrecisionErrors(past50)[1];
             var yAverageError = calculatePrecisionErrors(past50)[2];
             document.getElementById("Accuracy").innerHTML =
-              "<a>Accuracy | " + accuracyMeasurement.toPrecision(3) + "%</a>"; // Show the accuracy in the nav bar.
+                "<a>Accuracy | " + accuracyMeasurement.toPrecision(3) + "%</a>"; // Show the accuracy in the nav bar.
             // document.getElementById("xError").innerHTML =
             //   "<a>X Error | " + xAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
             // document.getElementById("yError").innerHTML =
             //   "<a>Y Error | " + yAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
             swal({
               title:
-                "Your accuracy and x/y errors are " +
-                accuracyMeasurement +
-                "%, " +
-                xAverageError +
-                "px, " +
-                yAverageError +
-                "px.",
+                  "Your accuracy and x/y errors are " +
+                  accuracyMeasurement +
+                  "%, " +
+                  xAverageError +
+                  "px, " +
+                  yAverageError +
+                  "px.",
               allowOutsideClick: false,
               buttons: {
                 cancel: "Recalibrate",
@@ -353,20 +374,20 @@ $(document).ready(function () {
             var xAverageError = calculatePrecisionErrors(past50)[1];
             var yAverageError = calculatePrecisionErrors(past50)[2];
             document.getElementById("Accuracy").innerHTML =
-              "<a>Accuracy | " + accuracyMeasurement.toPrecision(3) + "%</a>"; // Show the accuracy in the nav bar.
+                "<a>Accuracy | " + accuracyMeasurement.toPrecision(3) + "%</a>"; // Show the accuracy in the nav bar.
             // document.getElementById("xError").innerHTML =
             //   "<a>X Error | " + xAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
             // document.getElementById("yError").innerHTML =
             //   "<a>Y Error | " + yAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
             swal({
               title:
-                "Your accuracy and x/y errors are " +
-                accuracyMeasurement +
-                "%, " +
-                xAverageError +
-                "px, " +
-                yAverageError +
-                "px.",
+                  "Your accuracy and x/y errors are " +
+                  accuracyMeasurement +
+                  "%, " +
+                  xAverageError +
+                  "px, " +
+                  yAverageError +
+                  "px.",
               allowOutsideClick: false,
               buttons: {
                 cancel: "Recalibrate",
@@ -392,6 +413,38 @@ $(document).ready(function () {
       });
     }
   });
+
+  // When clicking on the randomly appearing data points.
+  $(".dataCollection").click(function () {
+    // click event on the calibration buttons
+    var id = $(this).attr("id");
+    console.log("point clicked");
+    if (!DataCollectionPoints[id]) {
+      // initialises if not done
+      DataCollectionPoints[id] = 0;
+    }
+    DataCollectionPoints[id]++; // increments values
+
+    if (DataCollectionPoints[id] === 5) {
+      // Disable after 5 clicks
+      $(this).prop("disabled", true); //disables the button
+      PointDataCollection++;
+      // Increase the count of a button.
+      buttonCount++;
+      clearCanvas();
+      // If still need to collect more data
+      if (buttonCount < numDataPointsToCollect) {
+        // Generate new button
+        generateRandomButton(buttonCount);
+      } else {
+
+      }
+    } else if (DataCollectionPoints[id] < 5) {
+      // Gradually increase the opacity of calibration points when click to give some indication to user.
+      var opacity = 0.2 * DataCollectionPoints[id] + 0.2;
+      $(this).css("opacity", opacity);
+    }
+  });
 });
 
 /**
@@ -411,6 +464,130 @@ function ShowCalibrationPointBlock() {
   $(".CalibrationBlock").show();
   console.log("red dots should show");
   $("#Pt17_block").hide(); // initially hides the middle button
+}
+
+/**
+ * Generate Random Integer.
+ */
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+}
+
+/**
+ * Generate Random button.
+ */
+function generateRandomButton(buttonCount) {
+  // Get canvas element
+  let canvas = document.getElementById("plotting_canvas");
+
+  let buttonDataCollection = document.createElement("input");
+  // Set attributes
+  buttonDataCollection.setAttribute("type", "button");
+  // buttonDataCollection.setAttribute(
+  //   "class",
+  //   "dataCollection" + buttonCount.toString()
+  // );
+  buttonDataCollection.setAttribute("class", "dataCollection");
+  buttonDataCollection.setAttribute(
+      "id",
+      "Pt" + buttonCount.toString() + "_datacollection"
+  );
+
+  // Set CSS
+  buttonDataCollection.style.width = "20px";
+  buttonDataCollection.style.height = "20px";
+  buttonDataCollection.style.opacity = "0.2";
+  buttonDataCollection.style.position = "fixed";
+  buttonDataCollection.style["-webkit-border-radius"] = "25px";
+  buttonDataCollection.style["-moz-border-radius"] = "25px";
+  buttonDataCollection.style["border-radius"] = "25px";
+  buttonDataCollection.style["background-color"] = "red";
+  buttonDataCollection.style["border-color"] = "black";
+  buttonDataCollection.style["border-style"] = "solid";
+
+  // Set position
+  let randomTop = getRandomInt(0, canvas.height);
+  let randomLeft = getRandomInt(0, canvas.width);
+  // If randomTop/Left in the video range
+  if (0 <= randomTop <= 250) {
+    randomLeft = getRandomInt(340, canvas.width);
+  }
+  if (0 <= randomLeft <= 340) {
+    randomTop = getRandomInt(250, canvas.height);
+  }
+
+  buttonDataCollection.style.top = randomTop + "px";
+  buttonDataCollection.style.left = randomLeft + "px";
+  // buttonDataCollection.style.top = "50vh";
+  // buttonDataCollection.style.left = "50vw";
+  document.body.appendChild(buttonDataCollection);
+}
+
+/**
+ * Show the randomly appearing data points.
+ */
+function dataCollectionRandomPoint(buttonCount) {
+  // Generate the first button
+  generateRandomButton(buttonCount);
+
+  // let buttonPresentClass = "dataCollection" + buttonCount.toString();
+  let buttonPresentID = "Pt" + buttonCount.toString() + "_datacollection";
+  // var buttonPresent = document.getElementsByClassName(buttonPresentClass)[0];
+  var buttonPresent = document.getElementById(buttonPresentID);
+  console.log("got the button");
+  buttonPresent.addEventListener(
+      "click",
+      function (e) {
+        {
+          // click event on the calibration buttons
+          var id = buttonPresentID;
+          console.log("point clicked here");
+          if (!DataCollectionPoints[id]) {
+            // initialises if not done
+            DataCollectionPoints[id] = 0;
+          }
+          DataCollectionPoints[id]++; // increments values
+
+          if (DataCollectionPoints[id] === 5) {
+            // Disable after 5 clicks
+            $(buttonPresent).prop("disabled", true); //disables the button
+            PointDataCollection++;
+            // Increase the count of a button.
+            buttonCount++;
+            clearCanvas();
+            // If still need to collect more data
+            if (buttonCount < numDataPointsToCollect) {
+              // Generate new button
+              // generateRandomButton(buttonCount);
+              dataCollectionRandomPoint(buttonCount);
+            } else {
+              stopDataCollection()
+            }
+          } else if (DataCollectionPoints[id] < 5) {
+            // Gradually increase the opacity of calibration points when click to give some indication to user.
+            var opacity = 0.2 * DataCollectionPoints[id] + 0.2;
+            $(buttonPresent).css("opacity", opacity);
+          }
+        }
+      },
+      false
+  );
+}
+
+function stopDataCollection() {
+  // clearCanvas();
+  swal({
+    title: "Finished Data Collection",
+    text: "You have completed the data collection task!",
+    buttons: {
+      cancel: false,
+      confirm: true,
+    },
+  }).then((isConfirm) => {
+    clearCanvas();
+  });
 }
 
 function drawGridLines() {

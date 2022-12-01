@@ -45,6 +45,7 @@ window.onbeforeunload = function () {
 function clearCanvas() {
   $(".Calibration").hide();
   $(".CalibrationBlock").hide();
+  $(".dataCollection").hide();
   var canvas = document.getElementById("plotting_canvas");
   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -70,7 +71,8 @@ function ClearCalibration() {
 }
 
 /**
- * Restart the calibration process by clearing the local storage and reseting the calibration point
+ * Restart the calibration process for nine points by clearing the local storage
+ *  and resetting the calibration point
  */
 function Restart() {
   document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
@@ -128,4 +130,15 @@ function saveData() {
   });
   saveAs(fileToSave, "eye_rotation_data.json");
   console.log("JSON data is saved.");
+}
+
+/**
+ * Restart the calibration process for nine points by clearing the local storage
+ *  and resetting the calibration point
+ */
+function dataCollection() {
+  document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
+  clearCanvas();
+  $(".lpd_bspot").hide();
+  dataCollectionRandomInstruction();
 }
