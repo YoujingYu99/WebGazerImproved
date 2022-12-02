@@ -30,4 +30,6 @@ function imageDataToImage(imageData, imageNumber) {
 console.log(eyeData[0].eyes.left.patch);
 console.log(eyeData[0].eyes.left.width);
 console.log(eyeData[0].eyes.left.height);
+console.log(eyeData[0].eyes.left.grayImage);
+console.log(eyeData[0].eyes.left.equalisedFeatures);
 
