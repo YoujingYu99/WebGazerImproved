@@ -139,6 +139,7 @@ function saveData() {
 function dataCollection() {
   document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
   clearCanvas();
+  webgazer.clearData();
   $(".lpd_bspot").hide();
   dataCollectionRandomInstruction();
 }
