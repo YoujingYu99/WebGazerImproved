@@ -28,6 +28,13 @@ const params = {
     saveDataAcrossSessions: true,
     // Whether or not to store accuracy eigenValues, used by the calibration example file
     storingPoints: false,
+    sigma_one_x: 0.105 ** 2,
+    length_scale_x: 609,
+    sigma_two_x: 0.000285,
+    sigma_one_y: 0.0542 ** 2,
+    length_scale_y: 277,
+    sigma_two_y: 0.00005,
+
 };
 
 export default params;

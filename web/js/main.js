@@ -10,7 +10,7 @@ window.onload = async function () {
       //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
       //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
     })
-    .saveDataAcrossSessions(true)
+    .saveDataAcrossSessions(false)
     .begin();
   webgazer
     .showVideoPreview(true) /* shows all video previews */

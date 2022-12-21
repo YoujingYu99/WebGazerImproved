@@ -1,3 +1,4 @@
+import math from 'mathjs';
 import util from './util';
 import numeric from 'numeric';
 import mat from './mat';
@@ -174,6 +175,59 @@ util_regression.ridge = function (y, X, k) {
         }
     } while (!success);
     return m_Coefficients;
+}
+
+function eucDistance(a, b) {
+    return a
+            .map((x, i) => Math.abs(x - b[i]) ** 2) // square the difference
+            .reduce((sum, now) => sum + now) // sum
+        ** (1 / 2)
+}
+
+/**
+ * Performs GP regression with a RBF kernel plus a white kernel.
+ * @param {Array} eyeFeatures - Eye features for training.
+ * @param {Array} AngleArray - Array of Angles for training.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number}  sigma_one - variance of RBF.
+ * @param {Number} length_scale - length scale of RBF.
+ * @param {Number} sigma_two - variance of noise.
+ * @return{Number} predicted angle.
+ */
+util_regression.GPRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, sigma_two) {
+    let train_length = eyeFeatures[0].length
+    let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
+    let K_xxstar = new Array(train_length)
+
+    // Calculate K_xx
+    for (var i = 0; i < train_length; i++) {
+        for (var j = 0; j < train_length; j++) {
+            let x = eyeFeatures[i];
+            let x_prime = eyeFeatures[j];
+            let dist = eucDistance(x, x_prime);
+            let k_value = 0;
+            if (i === j) {
+                k_value = sigma_one * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2))) + sigma_two
+            } else {
+                k_value = sigma_one * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
+            }
+            K_xx[i][j] = k_value
+        }
+    }
+
+    let Kxx_inv = math.inv(Kxx)
+
+    // Calculate K_xxstar
+    for (var p = 0; p < train_length; p++) {
+        let x = eyeFeatsCurrent;
+        let x_prime = eyeFeatures[p];
+        let dist = eucDistance(x, x_prime);
+        let k_value = 0;
+        k_value = sigma_one * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
+        K_xxstar[p] = k_value
+    }
+
+    return math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
 }
 
 /**

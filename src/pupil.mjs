@@ -92,6 +92,7 @@ const getPupils = function (eyesObj) {
         return eyesObj;
     }
     if (!eyesObj.left.blink) {
+        // Add pupil data into the js object which is to be saved as json
         eyesObj.left.pupil = getSinglePupil(Array.prototype.slice.call(webgazer.util.grayscale(eyesObj.left.patch.data, eyesObj.left.width, eyesObj.left.height)), eyesObj.left.width, eyesObj.left.height);
         eyesObj.left.pupil[0][0] -= eyesObj.left.pupil[1];
         eyesObj.left.pupil[0][1] -= eyesObj.left.pupil[1];

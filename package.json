@@ -48,6 +48,7 @@
     "jquery": "^3.6.1",
     "jspsych": "^7.3.1",
     "localforage": "1.7.3",
+    "mathjs": "^11.5.0",
     "numeric": "1.2.6",
     "popper.js": "^1.16.1",
     "regression": "2.0.1",
