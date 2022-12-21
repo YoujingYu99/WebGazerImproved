@@ -236,8 +236,8 @@ reg.RidgeReg.prototype.predictRotationGP = function (eyesObj) {
     // length 120
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
-    let predictedXAngle = util_regression.GPRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x)
-    let predictedYAngle = util_regression.GPRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y)
+    let [predictedXAngle, predictedXVariance] = util_regression.GPRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x)
+    let [predictedYAngle, predictedYVariance] = util_regression.GPRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y)[0]
 
 
     // Convert the predicted angles (in radians) to position

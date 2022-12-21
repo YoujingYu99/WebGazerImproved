@@ -227,7 +227,10 @@ util_regression.GPRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent
         K_xxstar[p] = k_value
     }
 
-    return math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
+    let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
+    let variance = sigma_two - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+
+    return [pred, variance]
 }
 
 /**
