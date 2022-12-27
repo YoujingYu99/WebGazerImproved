@@ -92,7 +92,6 @@ $(document).ready(function () {
 
 //=============================
 //Ball Animation
-// 180
 function drawBall(pos = 180) {
   // pos: define where the fixation square should be.
   var mySVG = SVG("svgDiv");
@@ -101,7 +100,6 @@ function drawBall(pos = 180) {
 
   // const ballX = rectX * 0.6; // define where the ball is
   const ballX = rectX * 0.3; // define where the ball is
-  // var ball = mySVG.circle(30).move(ballX, 50).fill("#f00");
   var ball = mySVG.circle(30).move(ballX, 50).fill("#f00");
   window.ball = ball;
   // var square = mySVG.rect(30, 30).move(Math.min(rectX - 50, 950), 50); //square position
@@ -149,6 +147,7 @@ function recordPosition(event, angle = 13.5) {
     data["avgBallPos"] = distanceSetup.round(sum / ballPosLen, 2);
     var ball_sqr_distance =
       (data["squarePosition"] - data["avgBallPos"]) / data["px2mm"];
+    console.log("ball square dist", ball_sqr_distance);
     var viewDistance = ball_sqr_distance / Math.tan(Math.radians(angle));
     console.log(Math.radians(angle));
     data["viewDistance_mm"] = distanceSetup.round(viewDistance, 2);
