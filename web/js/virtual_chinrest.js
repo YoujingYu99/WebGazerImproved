@@ -76,7 +76,7 @@ function goAnimateBall(event) {
 }
 
 $(function () {
-  $("#slider").slider({ value: "50" });
+  $("#slider").slider({ value: "50", step: 0.1 });
 });
 
 $(document).ready(function () {
@@ -118,8 +118,9 @@ function animateBall() {
   });
 
   ball
-    .animate(7000)
+    .animate({ duration: 14000 })
     .during(function (pos) {
+      // moveX = -pos * data["ballX"];
       moveX = -pos * data["ballX"];
       window.moveX = moveX;
       moveY = 0;
@@ -136,8 +137,8 @@ function animateBall() {
 
 function recordPosition(event, angle = 13.5) {
   // angle: define horizontal blind spot entry point position in degrees.
-  if (event.keyCode == "32") {
-    //Press "Space"
+  if (event.keyCode == "65") {
+    //Press "A"
 
     data["ballPosition"].push(distanceSetup.round(ball.cx() + moveX, 2));
     var sum = data["ballPosition"].reduce((a, b) => a + b, 0);
@@ -156,9 +157,9 @@ function recordPosition(event, angle = 13.5) {
     if (counter <= 0) {
       ball.stop();
 
-      // Disable space key
+      // Disable A key
       $("html").bind("keydown", function (e) {
-        if (e.keyCode == 32) {
+        if (e.keyCode == 65) {
           return false;
         }
       });
