@@ -207,9 +207,9 @@ util_regression.GPRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent
             let dist = eucDistance(x, x_prime);
             let k_value = 0;
             if (i === j) {
-                k_value = sigma_one * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2))) + sigma_two
+                k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2))) + sigma_two ** 2
             } else {
-                k_value = sigma_one * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
+                k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
             }
             K_xx[i][j] = k_value
         }
@@ -223,7 +223,76 @@ util_regression.GPRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent
         let x_prime = eyeFeatures[p];
         let dist = eucDistance(x, x_prime);
         let k_value = 0;
-        k_value = sigma_one * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
+        k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
+        K_xxstar[p] = k_value
+    }
+
+    let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
+    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+
+    return [pred, variance]
+}
+
+/**
+ * Performs GP regression with a kernel (product of toeplitz matrices) plus a white kernel.
+ * @param {Array} eyeFeatures - Eye features for training.
+ * @param {Array} AngleArray - Array of Angles for training.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number}  sigma_one - variance of RBF.
+ * @param {Number} l_width - length scale of width toeplitz matrix.
+ * @param {Number} l_height - length scale of height toeplitz matrix.
+ * @param {Number} sigma_two - variance of noise.
+ * @return{Number} predicted angle.
+ */
+util_regression.CustomGPRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, l_width, l_height, sigma_two) {
+    let image_width = 20;
+    let image_height = 6;
+    let train_length = eyeFeatures[0].length;
+    let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
+    let K_xxstar = new Array(train_length)
+
+    // Construct the C matrix
+    let width_matrix = new Array(image_width).fill(null).map(() => new Array(image_width).fill(null));
+    for (var i = 0; i < image_width; i++) {
+        for (var j = 0; j < image_width; j++) {
+            width_matrix[i][j] = Math.exp(-((i - j) ** 2) / (2 * (l_width ** 2)))
+        }
+    }
+    let height_matrix = new Array(image_height).fill(null).map(() => new Array(image_height).fill(null));
+    for (var i = 0; i < image_height; i++) {
+        for (var j = 0; j < image_height; j++) {
+            height_matrix[i][j] = Math.exp(-((i - j) ** 2) / (2 * (l_height ** 2)))
+        }
+    }
+
+    let C_matrix = Math.kron(width_matrix, height_matrix);
+    let N = train_length * train_length
+
+    // Calculate K_xx
+    for (var i = 0; i < train_length; i++) {
+        for (var j = 0; j < train_length; j++) {
+            let x = eyeFeatures[i];
+            let x_prime = eyeFeatures[j];
+            let x_diff = x_prime.map((e, i) => e - x[i]);
+            let k_value = 0;
+            if (i === j) {
+                k_value = (sigma_one ** 2) * Math.exp(-math.multiply(math.transpose(x_diff), math.multiply(C_matrix, x_diff)) / (2 * N)) + sigma_two ** 2
+            } else {
+                k_value = (sigma_one ** 2) * Math.exp(-math.multiply(math.transpose(x_diff), math.multiply(C_matrix, x_diff)) / (2 * N))
+            }
+            K_xx[i][j] = k_value
+        }
+    }
+
+    let Kxx_inv = math.inv(Kxx)
+
+    // Calculate K_xxstar
+    for (var p = 0; p < train_length; p++) {
+        let x = eyeFeatsCurrent;
+        let x_prime = eyeFeatures[p];
+        let x_diff = x_prime.map((e, i) => e - x[i]);
+        let k_value = 0;
+        k_value = (sigma_one ** 2) * Math.exp(-math.multiply(math.transpose(x_diff), math.multiply(C_matrix, x_diff)) / (2 * N))
         K_xxstar[p] = k_value
     }
 
