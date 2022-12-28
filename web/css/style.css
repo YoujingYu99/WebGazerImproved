@@ -2,8 +2,23 @@ body {
     min-width: 600px !important;
 }
 
-#lpd_content {
+/*#lpd_content {*/
+/*    width: 1200px;*/
+/*    !*width: 700px;*!*/
+/*    !*margin-left: 350px;*!*/
+/*    margin-left: 50px;*/
+/*    margin-top: 100px;*/
+/*    padding: 0;*/
+/*    font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;*/
+/*    font-size: 16px;*/
+/*    line-height: 22px;*/
+/*    color: #222;*/
+/*}*/
+
+#page-size {
     width: 700px;
+    /*width: 700px;*/
+    /*margin-left: 350px;*/
     margin-left: 350px;
     margin-top: 100px;
     padding: 0;
@@ -11,6 +26,23 @@ body {
     font-size: 16px;
     line-height: 22px;
     color: #222;
+}
+
+#blind-spot {
+    width: 1200px;
+    /*width: 700px;*/
+    /*margin-left: 350px;*/
+    margin-left: 50px;
+    margin-top: 100px;
+    padding: 0;
+    font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 22px;
+    color: #222;
+}
+
+#blind-spot-instruction {
+    margin-left: 300px;
 }
 
 #wrapper, #content {

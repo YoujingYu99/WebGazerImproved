@@ -5,6 +5,8 @@
 //Store all the configuration data in variable 'data'
 var data = { dataType: "configurationData" };
 data["ballPosition"] = [];
+data["ballEntryPosition"] = [];
+data["ballLeavePosition"] = [];
 data["fullScreenClicked"] = false;
 data["sliderClicked"] = false;
 
@@ -63,14 +65,15 @@ function configureBlindSpot() {
   $("#page-size").remove();
   $("#blind-spot").css({ visibility: "visible" });
   $(document).on("keydown", goAnimateBall);
-  $(document).on("keydown", recordPosition);
+  $(document).on("keydown", recordEntryPosition);
+  $(document).on("keydown", recordLeavePosition);
 }
 
 /**
- * Go to configure blindspot if key "G" is pressed.
+ * Go to configure blindspot if key "Space" is pressed.
  */
 function goAnimateBall(event) {
-  if (event.keyCode == "83") {
+  if (event.keyCode == "32") {
     animateBall();
   }
 }
@@ -99,11 +102,11 @@ function drawBall(pos = 180) {
   const rectX = distanceSetup.px2mm(cardWidthPx) * pos;
 
   // const ballX = rectX * 0.6; // define where the ball is
-  const ballX = rectX * 0.3; // define where the ball is
+  const ballX = rectX * 0.8; // define where the ball is
   var ball = mySVG.circle(20).move(ballX, 50).fill("#f00");
   window.ball = ball;
   // var square = mySVG.rect(30, 30).move(Math.min(rectX - 50, 950), 50); //square position
-  var square = mySVG.rect(30, 30).move(Math.min(rectX - 250, 950), 50); //square position
+  var square = mySVG.rect(30, 30).move(Math.min(rectX - 50, 950), 50); //square position
   data["squarePosition"] = distanceSetup.round(square.cx(), 2);
   data["rectX"] = rectX;
   data["ballX"] = ballX;
@@ -111,15 +114,15 @@ function drawBall(pos = 180) {
 
 function animateBall() {
   document.activeElement.blur();
-  // Disable S key
+  // Disable Space key
   $("html").bind("keydown", function (e) {
-    if (e.keyCode == 83) {
+    if (e.keyCode == 32) {
       return false;
     }
   });
 
   ball
-    .animate({ duration: 7000 })
+    .animate({ duration: 14000 })
     .during(function (pos) {
       // moveX = -pos * data["ballX"];
       moveX = -pos * data["ballX"];
@@ -136,20 +139,29 @@ function animateBall() {
   $("#start").attr("disabled", true);
 }
 
-function recordPosition(event, angle = 13.5) {
+function recordEntryPosition(event, angle = 15.0) {
+  // angle: define horizontal blind spot entry point position in degrees.
+  if (event.keyCode == "83") {
+    //Press "S": the ball enters blind spot
+    data["ballEntryPosition"].push(distanceSetup.round(ball.cx() + moveX, 2));
+  }
+}
+
+function recordLeavePosition(event, angle = 15.0) {
   // angle: define horizontal blind spot entry point position in degrees.
   if (event.keyCode == "65") {
-    //Press "A"
-
-    data["ballPosition"].push(distanceSetup.round(ball.cx() + moveX, 2));
-    var sum = data["ballPosition"].reduce((a, b) => a + b, 0);
-    var ballPosLen = data["ballPosition"].length;
-    data["avgBallPos"] = distanceSetup.round(sum / ballPosLen, 2);
+    //Press "A": the ball leaves blind spot
+    data["ballLeavePosition"].push(distanceSetup.round(ball.cx() + moveX, 2));
+    var entrySum = data["ballEntryPosition"].reduce((a, b) => a + b, 0);
+    var leaveSum = data["ballLeavePosition"].reduce((a, b) => a + b, 0);
+    var ballPosLen = data["ballEntryPosition"].length;
+    data["avgBallPos"] = distanceSetup.round(
+      (entrySum + leaveSum) / (2 * ballPosLen),
+      2
+    );
     var ball_sqr_distance =
       (data["squarePosition"] - data["avgBallPos"]) / data["px2mm"];
-    console.log("ball square dist", ball_sqr_distance);
     var viewDistance = ball_sqr_distance / Math.tan(Math.radians(angle));
-    console.log(Math.radians(angle));
     data["viewDistance_mm"] = distanceSetup.round(viewDistance, 2);
 
     //counter and stop
@@ -158,6 +170,13 @@ function recordPosition(event, angle = 13.5) {
     $("#click").text(Math.max(counter, 0));
     if (counter <= 0) {
       ball.stop();
+
+      // Disable S key
+      $("html").bind("keydown", function (e) {
+        if (e.keyCode == 83) {
+          return false;
+        }
+      });
 
       // Disable A key
       $("html").bind("keydown", function (e) {
