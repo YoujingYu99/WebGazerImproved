@@ -6,7 +6,7 @@ var CalibrationBlockPoints = {};
 var DataCollectionPoints = {};
 const numClickPerPoint = 5;
 var buttonCount = 1;
-const numDataPointsToCollect = 200;
+const numDataPointsToCollect = 500;
 
 // /**
 //  * Clear the canvas and the calibration button.
@@ -517,16 +517,26 @@ function generateRandomButton(buttonCount) {
   //   randomTop = getRandomInt(241, canvas.height * 0.95);
   // }
 
-  let index = getRandomInt(0, 2);
+  let index = getRandomInt(0, 3);
   let randomTop;
   let randomLeft;
 
   if (index === 0) {
     randomTop = getRandomInt(canvas.height * 0.1, 241);
     randomLeft = getRandomInt(321, canvas.width * 0.95);
-  } else {
+  } else if (index === 1) {
     randomTop = getRandomInt(241, canvas.height * 0.95);
     randomLeft = getRandomInt(canvas.width * 0.05, 321);
+  } else {
+    randomTop = getRandomInt(canvas.height * 0.05, canvas.height * 0.95);
+    randomLeft = getRandomInt(canvas.width * 0.05, canvas.width * 0.95);
+    // If randomTop/Left in the video range
+    if (0 <= randomTop <= 241) {
+      randomLeft = getRandomInt(321, canvas.width * 0.95);
+    }
+    if (0 <= randomLeft <= 321) {
+      randomTop = getRandomInt(241, canvas.height * 0.95);
+    }
   }
 
   buttonDataCollection.style.top = randomTop + "px";
