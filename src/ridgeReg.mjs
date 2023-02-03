@@ -154,6 +154,7 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
 
     // Eye grey histogram for both left and right eyes
     // length 120
+    console.log("get eye features")
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
 
@@ -227,20 +228,30 @@ reg.RidgeReg.prototype.predictRotationGP = function (eyesObj) {
     var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
     // console.log("eye feature length", eyeFeatures.length)
 
-    // // eyeFeatures needs to be the 120 pixel eye features;
-    // // console.log(eyeFeatures)
-    // var coefficientsX = util_regression.ridge(xAngleArray, eyeFeatures, this.ridgeParameter);
-    // var coefficientsY = util_regression.ridge(yAngleArray, eyeFeatures, this.ridgeParameter);
 
     // Eye grey histogram for both left and right eyes
     // length 120
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
-    let [predictedXAngle, predictedXVariance] = util_regression.GPSERegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x)
-    let [predictedYAngle, predictedYVariance] = util_regression.GPSERegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y)
+    //// SE Kernel
+    let [predictedXAngle, predictedXVariance] = util_regression.GPSERegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120)
+    let [predictedYAngle, predictedYVariance] = util_regression.GPSERegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120)
 
-    // let [predictedXAngle, predictedXVariance] = util_regression.GPRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_custom_x, params.l_width_x, params.l_height_x, params.sigma_two_custom_x)
-    // let [predictedYAngle, predictedYVariance] = util_regression.GPRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_custom_y, params.l_width_y, params.l_height_y, params.sigma_two_custom_y)
+    //// RQ Kernel
+    // let [predictedXAngle, predictedXVariance] = util_regression.GPRQRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x ,params.sigma_two_RQ_x, 120)
+    // let [predictedYAngle, predictedYVariance] = util_regression.GPRQRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120)
+
+
+    //// Custom Kernel
+    // let [width_matrix_custom_x,
+    //     height_matrix_custom_x] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_x, params.l_height_x)
+    //
+    // let [width_matrix_custom_y,
+    //     height_matrix_custom_y] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_y, params.l_height_y)
+    //
+    //
+    // let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.sigma_two_x, width_matrix_custom_x, height_matrix_custom_x, 120)
+    // let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.sigma_two_y, width_matrix_custom_y, height_matrix_custom_y, 120)
 
     // Convert the predicted angles (in radians) to position
     // Convert from actual to pixel density

@@ -189,12 +189,13 @@ function eucDistance(a, b) {
  * @param {Array} eyeFeatures - Eye features for training.
  * @param {Array} AngleArray - Array of Angles for training.
  * @param {Array} eyeFeatsCurrent - Current eye feature.
- * @param {Number}  sigma_one - variance of RBF.
+ * @param {Number}  sigma_one - Scale factor of RBF.
  * @param {Number} length_scale - length scale of RBF.
- * @param {Number} sigma_two - variance of noise.
+ * @param {Number} sigma_two - Std of noise.
+ * @param {Number} feature_size - Size of feature vector. 120
  * @return{Number} predicted angle.
  */
-util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, sigma_two) {
+util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size) {
     let train_length = eyeFeatures[0].length
     let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
     let K_xxstar = new Array(train_length)
@@ -207,9 +208,9 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
             let dist = eucDistance(x, x_prime);
             let k_value = 0;
             if (i === j) {
-                k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2))) + sigma_two ** 2
+                k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2) * feature_size)) + sigma_two ** 2
             } else {
-                k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
+                k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2) * feature_size))
             }
             K_xx[i][j] = k_value
         }
@@ -223,7 +224,7 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
         let x_prime = eyeFeatures[p];
         let dist = eucDistance(x, x_prime);
         let k_value = 0;
-        k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2)))
+        k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2) * feature_size))
         K_xxstar[p] = k_value
     }
 
@@ -232,6 +233,58 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
 
     return [pred, variance]
 }
+
+
+/**
+ * Performs GP regression with a rational quadratic kernel plus a white kernel.
+ * @param {Array} eyeFeatures - Eye features for training.
+ * @param {Array} AngleArray - Array of Angles for training.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number}  sigma_one - Scale factor of RQ.
+ * @param {Number} length_scale - length scale of RQ.
+ * @param {Number} alpha - mixture factor of RQ.
+ * @param {Number} sigma_two - Std of noise.
+ * @return{Number} predicted angle.
+ */
+util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size) {
+    let train_length = eyeFeatures[0].length
+    let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
+    let K_xxstar = new Array(train_length)
+
+    // Calculate K_xx
+    for (var i = 0; i < train_length; i++) {
+        for (var j = 0; j < train_length; j++) {
+            let x = eyeFeatures[i];
+            let x_prime = eyeFeatures[j];
+            let dist = eucDistance(x, x_prime);
+            let k_value = 0;
+            if (i === j) {
+                k_value = (sigma_one ** 2) * (1 + (dist ** 2) / (2 * feature_size * alpha * (length_scale ** 2))) + sigma_two ** 2
+            } else {
+                k_value = (sigma_one ** 2) * (1 + (dist ** 2) / (2 * feature_size * alpha * (length_scale ** 2)))
+            }
+            K_xx[i][j] = k_value
+        }
+    }
+
+    let Kxx_inv = math.inv(Kxx)
+
+    // Calculate K_xxstar
+    for (var p = 0; p < train_length; p++) {
+        let x = eyeFeatsCurrent;
+        let x_prime = eyeFeatures[p];
+        let dist = eucDistance(x, x_prime);
+        let k_value = 0;
+        k_value = (sigma_one ** 2) * (1 + (dist ** 2) / (2 * feature_size * alpha * (length_scale ** 2)))
+        K_xxstar[p] = k_value
+    }
+
+    let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
+    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+
+    return [pred, variance]
+}
+
 
 /**
  * Calculate width and height matrics (Cx, Cy).

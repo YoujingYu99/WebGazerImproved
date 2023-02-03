@@ -354,6 +354,7 @@ async function loop() {
         paintCurrentFrame(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
 
         // Get gaze prediction (ask clm to track; pass the data to the regressor; get back a prediction)
+        console.log("get latest gaze data")
         latestGazeData = getPrediction();
         // Count time
         var elapsedTime = performance.now() - clockStart;
