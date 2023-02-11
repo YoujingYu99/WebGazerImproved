@@ -289,22 +289,23 @@ util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
 /**
  * Calculate width and height matrics (Cx, Cy).
  * @param {Number} image_width - width of image. Set to 10.
- * @param {Number} image_height - height of image. Set to 20.
+ * @param {Number} image_height - height of image. Set to 12.
  * @param {Number} l_width - length scale of width toeplitz matrix.
  * @param {Number} l_height - length scale of height toeplitz matrix.
+ * @param {Number} feature_sizw - Size of feature. Set to 120.
  * */
-util_regression.getWidthHeightMatrices = function (image_width, image_height, l_width, l_height) {
+util_regression.getWidthHeightMatrices = function (image_width, image_height, l_width, l_height, feature_size) {
     // Construct the C matrix
     let width_matrix = new Array(image_width).fill(null).map(() => new Array(image_width).fill(null));
     for (var i = 0; i < image_width; i++) {
         for (var j = 0; j < image_width; j++) {
-            width_matrix[i][j] = math.exp(-0.5 * (i - j) ** 2 / (l_width ** 2))
+            width_matrix[i][j] = math.exp(-0.5 * (i - j) ** 2 / (feature_size * l_width ** 2))
         }
     }
     let height_matrix = new Array(image_height).fill(null).map(() => new Array(image_height).fill(null));
     for (var i = 0; i < image_height; i++) {
         for (var j = 0; j < image_height; j++) {
-            height_matrix[i][j] = math.exp(-0.5 * (i - j) ** 2 / (l_height ** 2))
+            height_matrix[i][j] = math.exp(-0.5 * (i - j) ** 2 / (feature_size * l_height ** 2))
         }
     }
     return [width_matrix, height_matrix]

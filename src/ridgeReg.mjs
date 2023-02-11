@@ -315,10 +315,10 @@ reg.RidgeReg.prototype.predictRotationGPCustom = function (eyesObj) {
     // console.log("eye feature length", eyeFeatures.length)
 
     let [width_matrix_custom_x,
-        height_matrix_custom_x] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_x, params.l_height_x)
+        height_matrix_custom_x] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_x, params.l_height_x, 120)
 
     let [width_matrix_custom_y,
-        height_matrix_custom_y] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_y, params.l_height_y)
+        height_matrix_custom_y] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_y, params.l_height_y, 120)
     // Eye grey histogram for both left and right eyes
     // length 120
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
