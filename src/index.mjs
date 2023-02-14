@@ -316,8 +316,12 @@ async function getPrediction(regModelIndex) {
         return null;
     }
     for (var reg in regs) {
+        //// Original Webgazer impelmentation
         // predictions.push(regs[reg].predict(latestEyeFeatures));
-        predictions.push(regs[reg].predictRotation(latestEyeFeatures));
+        // // Ridge regression with angles.
+        // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
+        // GP SE kernel.
+        predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {

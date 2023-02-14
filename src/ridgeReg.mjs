@@ -190,7 +190,7 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
 };
 
 /**
- * Try to predict eye rotation from pupil data using Gaussian Process.
+ * Try to predict eye rotation from pupil data using Gaussian Process SE kernel.
  * after apply linear regression on data set.
  * @param {Object} eyesObj - The current user eyes object.
  * @returns {Object}
@@ -315,16 +315,16 @@ reg.RidgeReg.prototype.predictRotationGPCustom = function (eyesObj) {
     // console.log("eye feature length", eyeFeatures.length)
 
     let [width_matrix_custom_x,
-        height_matrix_custom_x] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_x, params.l_height_x, 120)
+        height_matrix_custom_x] = util_regression.getWidthHeightMatrices(10, 6, params.l_width_x, params.l_height_x, 120)
 
     let [width_matrix_custom_y,
-        height_matrix_custom_y] = util_regression.getWidthHeightMatrices(10, 12, params.l_width_y, params.l_height_y, 120)
+        height_matrix_custom_y] = util_regression.getWidthHeightMatrices(10, 6, params.l_width_y, params.l_height_y, 120)
     // Eye grey histogram for both left and right eyes
     // length 120
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
-    let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.sigma_two_x, width_matrix_custom_x, height_matrix_custom_x, 120)
-    let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.sigma_two_y, width_matrix_custom_y, height_matrix_custom_y, 120)
+    let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.M_x, params.sigma_two_x, width_matrix_custom_x, height_matrix_custom_x, 120)
+    let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.M_y, params.sigma_two_y, width_matrix_custom_y, height_matrix_custom_y, 120)
 
     // Convert the predicted angles (in radians) to position
     // Convert from actual to pixel density

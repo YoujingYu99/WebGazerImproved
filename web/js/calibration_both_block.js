@@ -297,6 +297,7 @@ $(document).ready(function () {
                 //clear the calibration & hide the last middle button
                 // Go to the next calibration task
                 RestartBlock();
+                // If we don't want the next block calibration phase, just call ClearCanvas();
               } else {
                 //use restart function to restart the calibration
                 document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
