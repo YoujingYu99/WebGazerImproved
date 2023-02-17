@@ -30,7 +30,7 @@ const params = {
     storingPoints: false,
     // SE
     sigma_one_x: 0.105,
-    length_scale_x: 5,
+    length_scale_x: 55.59,
     sigma_two_x: 0.000285,
     sigma_one_y: 0.0542,
     length_scale_y: 25.28,
@@ -45,16 +45,16 @@ const params = {
     alpha_RQ_y: 0.0157,
     sigma_two_RQ_y: 0.00000753,
     // Custom
-    sigma_one_custom_x: 0,
-    M_x: 0,
-    l_width_x: 0,
-    l_height_x: 0,
-    sigma_two_custom_x: 0.0,
-    sigma_one_custom_y: 0.0,
-    M_y: 0,
-    l_width_y: 0,
-    l_height_y: 0,
-    sigma_two_custom_y: 0.0,
+    sigma_one_custom_x: 0.188,
+    M_x: 87.26,
+    l_width_x: 1.033,
+    l_height_x: 1.676,
+    sigma_two_custom_x: 0.001,
+    sigma_one_custom_y: 0.27,
+    M_y: 14.16,
+    l_width_y: 1.253,
+    l_height_y: 0.941,
+    sigma_two_custom_y: 0.001,
 
 };
 

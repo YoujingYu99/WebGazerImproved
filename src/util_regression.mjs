@@ -1,9 +1,12 @@
-import math from 'mathjs';
+import {create, all} from 'mathjs'
+
+const math = create(all, {})
 import util from './util';
 import numeric from 'numeric';
 import mat from './mat';
 import params from './params';
 import webgazer from "./index.mjs";
+import {test_util} from "@tensorflow/tfjs";
 
 const util_regression = {};
 
@@ -196,7 +199,7 @@ function eucDistance(a, b) {
  * @return{Number} predicted angle.
  */
 util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size) {
-    let train_length = eyeFeatures[0].length
+    let train_length = eyeFeatures.length
     let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
     let K_xxstar = new Array(train_length)
 
@@ -215,8 +218,8 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
             K_xx[i][j] = k_value
         }
     }
+    let Kxx_inv = math.inv(K_xx)
 
-    let Kxx_inv = math.inv(Kxx)
 
     // Calculate K_xxstar
     for (var p = 0; p < train_length; p++) {
@@ -247,7 +250,7 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
  * @return{Number} predicted angle.
  */
 util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size) {
-    let train_length = eyeFeatures[0].length
+    let train_length = eyeFeatures.length
     let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
     let K_xxstar = new Array(train_length)
 
@@ -267,7 +270,7 @@ util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
         }
     }
 
-    let Kxx_inv = math.inv(Kxx)
+    let Kxx_inv = math.inv(K_xx)
 
     // Calculate K_xxstar
     for (var p = 0; p < train_length; p++) {
@@ -509,6 +512,7 @@ util_regression.createArray = function (length) {
 
     return arr;
 }
+
 /**
  * Transpose the last two dimensions.
  * @param {Array} array - 3D array.
@@ -527,6 +531,26 @@ util_regression.transpose3DArray = function (array) {
 }
 
 /**
+ * Calculate the pariwise between first and second features.
+ * @param {Array} first_features - 3D array.
+ * @param {Array} second_features - 3D array.
+ * */
+util_regression.pairwiseDifference = function (first_features, second_features) {
+
+    let d = util_regression.createArray([first_features.length * second_features.length, 6, 10]);
+    for (var l = 0; l < first_features.length; l++) {
+        for (var i = 0; i < second_features.length; i++) {
+            for (var j = 0; j < 6; j++) {
+                for (var k = 0; k < 10; k++) {
+                    d[i + l][j][k] = first_features[l][j][k] - second_features[i][j][k]
+                }
+            }
+        }
+    }
+    return d
+}
+
+/**
  * Get quadratic term in the K matrix in custom kernel.
  * @param {Array} first_features - First features.
  * @param {Array} second_features - Second features.
@@ -537,9 +561,8 @@ util_regression.calculateQuadraticForm = function (first_features, second_featur
     let height = 6
     let width = 10
 
-    // TODO: pairwise differences in JS
-    let d = []
-    let d_merged = math.reshape(d, [-1, height, width]);
+    let d = util_regression.pairwiseDifference(first_features, second_features)
+    // let d_merged = math.reshape(d, [-1, height, width]);
 
     let d1 = math.multiply(math.reshape(d_merged, [-1, width]), width_matrix);
     let d2 = util_regression.transpose3DArray((math.reshape(d1, [-1, height, width])));
@@ -618,7 +641,7 @@ util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsC
 
     let pred = math.multiply(K_xstarx, math.multiply(Kxx_inv, AngleArray))
     let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
-    
+
     return [pred, variance]
 }
 
