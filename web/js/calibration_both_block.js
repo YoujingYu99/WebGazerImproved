@@ -8,20 +8,21 @@ const numClickPerPoint = 5;
 var buttonCount = 1;
 const numDataPointsToCollect = 500;
 
-// /**
-//  * Clear the canvas and the calibration button.
-//  */
-// function clearCanvas() {
-//   $(".Calibration").hide();
-//   var canvas = document.getElementById("plotting_canvas");
-//   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-// }
+/**
+ * Clear the canvas and the calibration button.
+ */
+function clearCanvas() {
+  $(".Calibration").hide();
+  $(".CalibrationBlock").hide();
+  var canvas = document.getElementById("plotting_canvas");
+  canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+}
 
 /**
  * Show the instruction of using calibration at the start up screen.
  */
 function calibrationInstructionNine() {
-  ClearCanvas();
+  clearCanvas();
   swal({
     title: "Calibration A: Nine Points",
     text: "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",
@@ -55,7 +56,7 @@ function calibrationInstructionBlock() {
  * Show the instruction of using calibration at the start up screen.
  */
 function dataCollectionRandomInstruction() {
-  ClearCanvas();
+  clearCanvas();
   swal({
     title: "Data Collection: Random Points",
     text: "Please click five times on the red point on the screen. You must click on each point 5 times till it goes yellow.",
@@ -83,7 +84,7 @@ function chaseRedBlockInstruction() {
     },
   }).then((isConfirm) => {
     // // Clear previous canvas
-    // ClearCanvas();
+    // clearCanvas();
     showFlickeringMaze();
   });
 }
@@ -94,7 +95,7 @@ function chaseRedBlockInstruction() {
 function showFlickeringMaze() {
   if (blockChasingDisabled) return;
   // // Clear previous canvas
-  // ClearCanvas();
+  // clearCanvas();
   // Render frame first
   renderFrame();
   let gazePositionInfo = {
@@ -162,7 +163,7 @@ function traceShapeInstruction() {
 function showTraceShape() {
   if (shapeTracingDisabled) return;
   // // Clear previous canvas
-  // ClearCanvas();
+  // clearCanvas();
   // Render frame first
   renderFrame();
   let gazePositionInfo = {
@@ -296,8 +297,9 @@ $(document).ready(function () {
               if (isConfirm) {
                 //clear the calibration & hide the last middle button
                 // Go to the next calibration task
-                RestartBlock();
-                // If we don't want the next block calibration phase, just call ClearCanvas();
+                // RestartBlock();
+                clearCanvas();
+                // If we don't want the next block calibration phase, just call clearCanvas();
               } else {
                 //use restart function to restart the calibration
                 document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";

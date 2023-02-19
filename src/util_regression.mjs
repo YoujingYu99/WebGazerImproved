@@ -1,12 +1,11 @@
-import {create, all} from 'mathjs'
-
-const math = create(all, {})
+import {all, create} from 'mathjs'
 import util from './util';
 import numeric from 'numeric';
 import mat from './mat';
 import params from './params';
 import webgazer from "./index.mjs";
-import {test_util} from "@tensorflow/tfjs";
+
+const math = create(all, {})
 
 const util_regression = {};
 
@@ -433,29 +432,21 @@ util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
 //     return [pred, variance]
 // }
 
+
 /**
  * Calculate width and height matrics (Cx, Cy).
- * @param {Number} image_width - width of image. Set to 10.
- * @param {Number} image_height - height of image. Set to 6.
- * @param {Number} l_width - length scale of width toeplitz matrix.
- * @param {Number} l_height - length scale of height toeplitz matrix.
- * @param {Number} feature_size - Size of feature. Set to 120.
+ * @param {Number} image_size - width of image / height of image.
+ * @param {Number} l - length scale of toeplitz matrix.
  * */
-util_regression.getWidthHeightMatrices = function (image_width, image_height, l_width, l_height, feature_size) {
+util_regression.getDistMatrix = function (image_size, l) {
     // Construct the C matrix
-    let width_matrix = new Array(image_width).fill(null).map(() => new Array(image_width).fill(null));
-    for (var i = 0; i < image_width; i++) {
-        for (var j = 0; j < image_width; j++) {
-            width_matrix[i][j] = math.exp(-0.5 * (i - j) ** 2 / (feature_size * l_width ** 2))
+    let dist_matrix = new Array(image_size).fill(null).map(() => new Array(image_size).fill(null));
+    for (var i = 0; i < image_size; i++) {
+        for (var j = 0; j < image_size; j++) {
+            dist_matrix[i][j] = math.exp(-0.5 * (i - j) ** 2 / (l ** 2))
         }
     }
-    let height_matrix = new Array(image_height).fill(null).map(() => new Array(image_height).fill(null));
-    for (var i = 0; i < image_height; i++) {
-        for (var j = 0; j < image_height; j++) {
-            height_matrix[i][j] = math.exp(-0.5 * (i - j) ** 2 / (feature_size * l_height ** 2))
-        }
-    }
-    return [width_matrix, height_matrix]
+    return dist_matrix
 }
 
 /**
@@ -464,8 +455,8 @@ util_regression.getWidthHeightMatrices = function (image_width, image_height, l_
  * @param {Array} first_features_right - First features right eye.
  * @param {Array} second_features_left - Second features left eye.
  * @param {Array} second_features_right - Second features right eye.
- * @param {Array} height_matrix - Cy.
  * @param {Array} width_matrix - Cx.
+ * @param {Array} height_matrix - Cy.
  * @param {Number} pixel_scale - M.
  * @param {Number} sigma_one - Scaling sigma.
  * @param {Number} sigma_two - noise sigma.
@@ -475,54 +466,47 @@ util_regression.getKMatrixVec = function (first_features_left,
                                           first_features_right,
                                           second_features_left,
                                           second_features_right,
-                                          height_matrix,
                                           width_matrix,
+                                          height_matrix,
                                           pixel_scale,
                                           sigma_one,
                                           sigma_two,
                                           cross_term,) {
     let K_left = util_regression.calculateQuadraticForm(first_features_left, second_features_left, height_matrix, width_matrix);
     let K_right = util_regression.calculateQuadraticForm(first_features_right, second_features_right, height_matrix, width_matrix);
-    // Function for matrix 2D summation.
-    Array.prototype.matriceSum = function (a) {
-        return this.reduce((p, c, i) => (p[i] = c.reduce((f, s, j) => (f[j] += s, f), p[i]), p), a.slice());
-    };
-    let K_total = K_left.matriceSum(K_right)
-    let K = sigma_one ** 2 * K_total.map(x => math.exp(x));
+    let K_total = math.multiply(math.add(K_left, K_right), -1 / (4 * 120 * (pixel_scale ** 2)))
+    let K = math.multiply(math.map(K_total, math.exp), sigma_one ** 2)
     // Calculate xstarx
     if (cross_term === false) {
+        console.log("K before addition of noise term", K)
         // Add identity matrix if not cross term
-        K = K.matriceSum(math.identity(first_features_left.length))
+        let id_matrix = new Array(first_features_left.length).fill(0).map(() => new Array(first_features_left.length).fill(0));
+        for (var i = 0; i < first_features_left.length; i++) {
+            id_matrix[i][i] = 1
+        }
+        let noise_term = math.multiply(id_matrix, sigma_two ** 2)
+        K = math.add(K, noise_term)
+        console.log("K total for Kxx", K_total)
+        console.log("K for Kxx", K)
+
+    } else {
+        console.log("k left", K_left)
+        console.log("k total", K_total)
+        console.log("K", K)
     }
     return K
 }
 
-/**
- * Create array of dimension.
- * @param {Array} length - Dimension of array.
- * */
-util_regression.createArray = function (length) {
-    var arr = new Array(length || 0),
-        i = length;
-
-    if (arguments.length > 1) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        while (i--) arr[length - 1 - i] = createArray.apply(this, args);
-    }
-
-    return arr;
-}
 
 /**
  * Transpose the last two dimensions.
  * @param {Array} array - 3D array.
  * */
 util_regression.transpose3DArray = function (array) {
-    const array_dims = [array.length, array[0][0].length, array[0].length];
-    let transposed_array = util_regression.createArray(array_dims)
+    let transposed_array = new Array(array.length).fill(null).map(() => new Array(array[0][0].length).fill(null).map(() => new Array(array[0].length).fill(null)));
     for (var i = 0; i < array.length; i++) {
         for (var j = 0; j < array[0].length; j++) {
-            for (var k = 0; k < array[0].length; k++) {
+            for (var k = 0; k < array[0][0].length; k++) {
                 transposed_array[i][k][j] = array[i][j][k]
             }
         }
@@ -531,18 +515,22 @@ util_regression.transpose3DArray = function (array) {
 }
 
 /**
- * Calculate the pariwise between first and second features.
- * @param {Array} first_features - 3D array.
- * @param {Array} second_features - 3D array.
+ * Calculate the pairwise difference between first and second features.
+ * @param {Array} first_features - 2D array.
+ * @param {Array} second_features - 2D array.
  * */
 util_regression.pairwiseDifference = function (first_features, second_features) {
+    let first_features_3D = first_features.map(x => math.reshape(x, [6, 10]))
+    let second_features_3D = second_features.map(x => math.reshape(x, [6, 10]))
 
-    let d = util_regression.createArray([first_features.length * second_features.length, 6, 10]);
-    for (var l = 0; l < first_features.length; l++) {
-        for (var i = 0; i < second_features.length; i++) {
+    // let d = util_regression.createArray([first_features.length * second_features.length, 6, 10]);
+    let d = new Array(first_features.length * second_features.length).fill(null).map(() => new Array(6).fill(null).map(() => new Array(10).fill(null)));
+
+    for (var l = 0; l < first_features_3D.length; l++) {
+        for (var i = 0; i < second_features_3D.length; i++) {
             for (var j = 0; j < 6; j++) {
                 for (var k = 0; k < 10; k++) {
-                    d[i + l][j][k] = first_features[l][j][k] - second_features[i][j][k]
+                    d[l * first_features_3D.length + i][j][k] = first_features_3D[l][j][k] - second_features_3D[i][j][k]
                 }
             }
         }
@@ -561,23 +549,26 @@ util_regression.calculateQuadraticForm = function (first_features, second_featur
     let height = 6
     let width = 10
 
-    let d = util_regression.pairwiseDifference(first_features, second_features)
-    // let d_merged = math.reshape(d, [-1, height, width]);
+    let d = util_regression.pairwiseDifference(first_features, second_features) // (k1k2, 6, 10)
+    let d_reshaped = math.reshape(d, [-1, width]) // (6 k1k2, 10)
+    let d1 = mat.mult(d_reshaped, width_matrix); // (6 k1k2, 10)
+    let d2 = util_regression.transpose3DArray((math.reshape(d1, [-1, height, width]))); // (k1k2, 10, 6)
+    let d3 = mat.mult(math.reshape(d2, [-1, height]), height_matrix); // (10 k1k2, 6)
+    let d4 = util_regression.transpose3DArray(math.reshape(d3, [-1, width, height])); // (k1k2, 6, 10)
+    let dCd = math.dotMultiply(d, d4); // (k1k2)
 
-    let d1 = math.multiply(math.reshape(d_merged, [-1, width]), width_matrix);
-    let d2 = util_regression.transpose3DArray((math.reshape(d1, [-1, height, width])));
-    let d3 = math.multiply(math.reshape(d2, [-1, height]), height_matrix);
-    let d4 = util_regression.transpose3DArray((math.reshape(d3, [-1, width, height])));
-    let dCd = math.dotMultiply(d_merged, d4);
-    // Sum over third dimension
-    let first_sum = [];
-    dCd.forEach((e) => {
-        first_sum.push(e.reduce((r, a, i) => a.map((b, j) => r[j] + b)));
-    })
-    // Sum over second dimension
-    return first_sum.map(subArr => {
-        return subArr.reduce((pre, item) => pre + item, 0)
-    })
+    let sum_arr = new Array(dCd.length).fill(0);
+    for (var l = 0; l < dCd.length; l++) {
+        for (var i = 0; i < dCd[0].length; i++) {
+            for (var j = 0; j < dCd[0][0].length; j++) {
+                sum_arr[l] += dCd[l][i][j]
+            }
+        }
+    }
+
+    // (k1, k2)
+    // TODO: This value is huge for test features. Need to fix this
+    return math.reshape(sum_arr, [first_features.length, second_features.length])
 
 }
 
@@ -590,36 +581,30 @@ util_regression.calculateQuadraticForm = function (first_features, second_featur
  * @param {Number} sigma_one - Scaling Std.
  * @param {Number} pixel_scale - Pixel scale. M in equation.
  * @param {Number} sigma_two - Noise Std.
- * @param {Number} width_matrix_custom - Cx.
- * @param {Number} height_matrix_custom - Cy.
+ * @param {Array} width_matrix_custom - Cx.
+ * @param {Array} height_matrix_custom - Cy.
  * @param {Number} feature_size - Feature dimension. 120.
  * @return{Number} predicted angle.
  */
 util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, pixel_scale, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
-
-    let train_length = eyeFeatures[0].length;
-
-    // Slice left and right eyes for training and test dataset
-    var eyeFeaturesLeft = eyeFeatures.map(function (v) {
-        return v.slice(60)
-    });
-    var eyeFeaturesRight = eyeFeatures.map(function (v) {
-        return v.slice(-60)
-    });
-    var eyeFeatsCurrentLeft = eyeFeatsCurrent.map(function (v) {
-        return v.slice(60)
-    });
-    var eyeFeatsCurrentRight = eyeFeatsCurrent.map(function (v) {
-        return v.slice(-60)
-    });
-
+    //Slice left and right eyes for training and test dataset
+    var eyeFeaturesLeft = [];
+    for (var i = 0; i < eyeFeatures.length; i++) {
+        eyeFeaturesLeft.push(eyeFeatures[i].slice(0, 60))
+    }
+    var eyeFeaturesRight = [];
+    for (var i = 0; i < eyeFeatures.length; i++) {
+        eyeFeaturesRight.push(eyeFeatures[i].slice(-60))
+    }
+    var eyeFeatsCurrentLeft = [eyeFeatsCurrent.slice(0, 60)]
+    var eyeFeatsCurrentRight = [eyeFeatsCurrent.slice(-60)]
 
     let K_xx = util_regression.getKMatrixVec(eyeFeaturesLeft,
         eyeFeaturesRight,
-        eyeFeatsCurrentLeft,
-        eyeFeatsCurrentRight,
-        height_matrix,
-        width_matrix,
+        eyeFeaturesLeft,
+        eyeFeaturesRight,
+        width_matrix_custom,
+        height_matrix_custom,
         pixel_scale,
         sigma_one,
         sigma_two,
@@ -632,15 +617,15 @@ util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsC
         eyeFeatsCurrentRight,
         eyeFeaturesLeft,
         eyeFeaturesRight,
-        height_matrix,
-        width_matrix,
+        width_matrix_custom,
+        height_matrix_custom,
         pixel_scale,
         sigma_one,
         sigma_two,
         true)
 
     let pred = math.multiply(K_xstarx, math.multiply(Kxx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+    let variance = sigma_two ** 2 - math.multiply(K_xstarx, math.multiply(Kxx_inv, math.transpose(K_xstarx)))
 
     return [pred, variance]
 }
