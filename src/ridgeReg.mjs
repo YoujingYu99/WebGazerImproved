@@ -237,27 +237,24 @@ reg.RidgeReg.prototype.predictRotationGP = function (eyesObj) {
     // let [predictedXAngle, predictedXVariance] = util_regression.GPSERegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120)
     // let [predictedYAngle, predictedYVariance] = util_regression.GPSERegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120)
 
-    // //// RQ Kernel
-    // let [predictedXAngle, predictedXVariance] = util_regression.GPRQRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120)
-    // let [predictedYAngle, predictedYVariance] = util_regression.GPRQRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120)
+    //// RQ Kernel
+    let [predictedXAngle, predictedXVariance] = util_regression.GPRQRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120)
+    let [predictedYAngle, predictedYVariance] = util_regression.GPRQRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120)
+
+    // // Custom Kernel
+    // let width_matrix_custom_x = util_regression.getDistMatrix(10, params.l_width_x)
+    // let height_matrix_custom_x = util_regression.getDistMatrix(6, params.l_height_x)
+    // let width_matrix_custom_y = util_regression.getDistMatrix(10, params.l_width_y)
+    // let height_matrix_custom_y = util_regression.getDistMatrix(6, params.l_height_y)
+    //
+    // let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120)
+    // let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120)
 
 
-    // Custom Kernel
-    let width_matrix_custom_x = util_regression.getDistMatrix(10, params.l_width_x)
-    let height_matrix_custom_x = util_regression.getDistMatrix(6, params.l_height_x)
-    let width_matrix_custom_y = util_regression.getDistMatrix(10, params.l_width_y)
-    let height_matrix_custom_y = util_regression.getDistMatrix(6, params.l_height_y)
-
-    let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120)
-    let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120)
-
-    console.log("predicted x angle", predictedXAngle)
     // Convert the predicted angles (in radians) to position
     // Convert from actual to pixel density
     let predictedX = webgazer.xDist + webgazer.currentViewingDistance * Math.tan(predictedXAngle) * webgazer.LPD
     let predictedY = webgazer.yDist - webgazer.currentViewingDistance * Math.tan(predictedYAngle) * webgazer.LPD
-
-    console.log("predicted x value", predictedX)
 
     if (params.applyKalmanFilter) {
         // Update Kalman model, and get prediction

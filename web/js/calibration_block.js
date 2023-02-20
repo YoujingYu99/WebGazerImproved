@@ -43,7 +43,7 @@ function chaseRedBlockInstruction() {
     },
   }).then((isConfirm) => {
     // // Clear previous canvas
-    // ClearCanvas();
+    // clearCanvas();
     showFlickeringMaze();
   });
 }
@@ -54,7 +54,7 @@ function chaseRedBlockInstruction() {
 function showFlickeringMaze() {
   if (blockChasingDisabled) return;
   // // Clear previous canvas
-  // ClearCanvas();
+  // clearCanvas();
   // Render frame first
   renderFrame();
   let gazePositionInfo = {
@@ -122,7 +122,7 @@ function traceShapeInstruction() {
 function showTraceShape() {
   if (shapeTracingDisabled) return;
   // // Clear previous canvas
-  // ClearCanvas();
+  // clearCanvas();
   // Render frame first
   renderFrame();
   let gazePositionInfo = {

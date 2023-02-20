@@ -225,12 +225,12 @@ $(document).ready(function () {
     }
     CalibrationPoints[id]++; // increments values
 
-    if (CalibrationPoints[id] === 5) {
+    if (CalibrationPoints[id] === numClickPerPoint) {
       //only turn to yellow after 5 clicks
       $(this).css("background-color", "yellow");
       $(this).prop("disabled", true); //disables the button
       PointCalibrate++;
-    } else if (CalibrationPoints[id] < 5) {
+    } else if (CalibrationPoints[id] < numClickPerPoint) {
       //Gradually increase the opacity of calibration points when click to give some indication to user.
       var opacity = 0.2 * CalibrationPoints[id] + 0.2;
       $(this).css("opacity", opacity);
@@ -328,12 +328,12 @@ $(document).ready(function () {
     }
     CalibrationBlockPoints[id]++; // increments values
 
-    if (CalibrationBlockPoints[id] === 5) {
+    if (CalibrationBlockPoints[id] === numClickPerPoint) {
       //only turn to yellow after 5 clicks
       $(this).css("background-color", "yellow");
       $(this).prop("disabled", true); //disables the button
       PointBlockCalibrate++;
-    } else if (CalibrationBlockPoints[id] < 5) {
+    } else if (CalibrationBlockPoints[id] < numClickPerPoint) {
       //Gradually increase the opacity of calibration points when click to give some indication to user.
       var opacity = 0.2 * CalibrationBlockPoints[id] + 0.2;
       $(this).css("opacity", opacity);
@@ -428,7 +428,7 @@ $(document).ready(function () {
     }
     DataCollectionPoints[id]++; // increments values
 
-    if (DataCollectionPoints[id] === 5) {
+    if (DataCollectionPoints[id] === numClickPerPoint) {
       // Disable after 5 clicks
       $(this).prop("disabled", true); //disables the button
       PointDataCollection++;
@@ -441,7 +441,7 @@ $(document).ready(function () {
         generateRandomButton(buttonCount);
       } else {
       }
-    } else if (DataCollectionPoints[id] < 5) {
+    } else if (DataCollectionPoints[id] < numClickPerPoint) {
       // Gradually increase the opacity of calibration points when click to give some indication to user.
       var opacity = 0.2 * DataCollectionPoints[id] + 0.2;
       $(this).css("opacity", opacity);
@@ -574,7 +574,7 @@ function dataCollectionRandomPoint(buttonCount) {
         }
         DataCollectionPoints[id]++; // increments values
 
-        if (DataCollectionPoints[id] === 5) {
+        if (DataCollectionPoints[id] === numClickPerPoint) {
           // Disable after 5 clicks
           $(buttonPresent).prop("disabled", true); //disables the button
           PointDataCollection++;
@@ -589,7 +589,7 @@ function dataCollectionRandomPoint(buttonCount) {
           } else {
             stopDataCollection();
           }
-        } else if (DataCollectionPoints[id] < 5) {
+        } else if (DataCollectionPoints[id] < numClickPerPoint) {
           // Gradually increase the opacity of calibration points when click to give some indication to user.
           var opacity = 0.2 * DataCollectionPoints[id] + 0.2;
           $(buttonPresent).css("opacity", opacity);

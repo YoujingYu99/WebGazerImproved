@@ -4,7 +4,7 @@ var CalibrationPoints = {};
 /**
  * Clear the canvas and the calibration button.
  */
-function ClearCanvas() {
+function clearCanvas() {
   $(".Calibration").hide();
   var canvas = document.getElementById("plotting_canvas");
   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
@@ -14,7 +14,7 @@ function ClearCanvas() {
  * Show the instruction of using calibration at the start up screen.
  */
 function CalibrationInstruction() {
-  ClearCanvas();
+  clearCanvas();
   swal({
     title: "Calibration",
     text: "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",
@@ -40,7 +40,7 @@ function helpModalShow() {
  * checks that all buttons have been clicked 5 times each, and then goes on to measuring the precision
  */
 $(document).ready(function () {
-  ClearCanvas();
+  clearCanvas();
   helpModalShow();
   $(".Calibration").click(function () {
     // click event on the calibration buttons
@@ -120,7 +120,7 @@ $(document).ready(function () {
             }).then((isConfirm) => {
               if (isConfirm) {
                 //clear the calibration & hide the last middle button
-                ClearCanvas();
+                clearCanvas();
               } else {
                 //use restart function to restart the calibration
                 document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
@@ -128,7 +128,7 @@ $(document).ready(function () {
                 // document.getElementById("yError").innerHTML = "<a>N.A.</a>";
                 webgazer.clearData();
                 ClearCalibration();
-                ClearCanvas();
+                clearCanvas();
                 ShowCalibrationPoint();
               }
             });
@@ -176,7 +176,7 @@ function chaseRedBlockInstruction() {
     },
   }).then((isConfirm) => {
     // // Clear previous canvas
-    // ClearCanvas();
+    // clearCanvas();
     showFlickeringMaze();
   });
 }
@@ -187,7 +187,7 @@ function chaseRedBlockInstruction() {
 function showFlickeringMaze() {
   if (blockChasingDisabled) return;
   // // Clear previous canvas
-  // ClearCanvas();
+  // clearCanvas();
   // Render frame first
   renderFrame();
   let gazePositionInfo = {
@@ -255,7 +255,7 @@ function traceShapeInstruction() {
 function showTraceShape() {
   if (shapeTracingDisabled) return;
   // // Clear previous canvas
-  // ClearCanvas();
+  // clearCanvas();
   // Render frame first
   renderFrame();
   let gazePositionInfo = {

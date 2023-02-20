@@ -478,7 +478,6 @@ util_regression.getKMatrixVec = function (first_features_left,
     let K = math.multiply(math.map(K_total, math.exp), sigma_one ** 2)
     // Calculate xstarx
     if (cross_term === false) {
-        console.log("K before addition of noise term", K)
         // Add identity matrix if not cross term
         let id_matrix = new Array(first_features_left.length).fill(0).map(() => new Array(first_features_left.length).fill(0));
         for (var i = 0; i < first_features_left.length; i++) {
@@ -486,13 +485,7 @@ util_regression.getKMatrixVec = function (first_features_left,
         }
         let noise_term = math.multiply(id_matrix, sigma_two ** 2)
         K = math.add(K, noise_term)
-        console.log("K total for Kxx", K_total)
-        console.log("K for Kxx", K)
 
-    } else {
-        console.log("k left", K_left)
-        console.log("k total", K_total)
-        console.log("K", K)
     }
     return K
 }
@@ -578,15 +571,15 @@ util_regression.calculateQuadraticForm = function (first_features, second_featur
  * @param {Array} eyeFeatures - Eye features for training.
  * @param {Array} AngleArray - Array of Angles for training.
  * @param {Array} eyeFeatsCurrent - Current eye feature.
- * @param {Number} sigma_one - Scaling Std.
  * @param {Number} pixel_scale - Pixel scale. M in equation.
+ * @param {Number} sigma_one - Scaling Std.
  * @param {Number} sigma_two - Noise Std.
  * @param {Array} width_matrix_custom - Cx.
  * @param {Array} height_matrix_custom - Cy.
  * @param {Number} feature_size - Feature dimension. 120.
  * @return{Number} predicted angle.
  */
-util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, pixel_scale, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
+util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
     //Slice left and right eyes for training and test dataset
     var eyeFeaturesLeft = [];
     for (var i = 0; i < eyeFeatures.length; i++) {
