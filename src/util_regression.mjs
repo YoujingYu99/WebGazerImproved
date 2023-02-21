@@ -313,124 +313,101 @@ util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
 //     return [width_matrix, height_matrix]
 // }
 //
-// /**
-//  * Get value of the custom kernel.
-//  * @param {Array} x - Eye features for one data point.
-//  * @param {Array} x_prime - Eye features for another data point.
-//  * @param {Array} height_matrix - Cy.
-//  * @param {Array} width_matrix - Cy.
-//  * @param {Number} feature_size - Feature dimension. 120.
-//  * @return{Number} custom kernel value.
-//  */
-// util_regression.getCustomKernelValue = function (x, x_prime, height_matrix, width_matrix, feature_size) {
-//     let x_diff = x_prime.map((e, i) => e - x[i]);
-//     let V = math.transpose(math.reshape(x_diff, [12, 10]))
-//     let kernel_matrix = math.multiply(width_matrix, math.multiply(V, math.transpose(height_matrix)))
-//     let kernel_vec = math.multiply(math.transpose(x_diff), math.reshape(math.transpose(kernel_matrix), [-1, 1]))[0]
-//     return math.exp(-kernel_vec / (2 * feature_size))
-// }
-//
-//
-// /**
-//  * Performs GP regression with a kernel (product of toeplitz matrices) plus a white kernel.
-//  * @param {Array} eyeFeatures - Eye features for training.
-//  * @param {Array} AngleArray - Array of Angles for training.
-//  * @param {Array} eyeFeatsCurrent - Current eye feature.
-//  * @param {Number} sigma_one - Scaling Std.
-//  * @param {Number} sigma_two - Noise Std.
-//  * @param {Number} width_matrix_custom - Cx.
-//  * @param {Number} height_matrix_custom - Cy.
-//  * @param {Number} feature_size - Feature dimension. 120.
-//  * @return{Number} predicted angle.
-//  */
-// util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
-//
-//     let train_length = eyeFeatures[0].length;
-//     // Test features length is 1
-//     let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
-//     let K_xxstar = new Array(train_length)
-//
-//     // Calculate K_xx
-//     for (var i = 0; i < train_length; i++) {
-//         for (var j = 0; j < train_length; j++) {
-//             let x = eyeFeatures[i];
-//             let x_prime = eyeFeatures[j];
-//             let k_value = 0;
-//             if (i === j) {
-//                 k_value = (sigma_one ** 2) * util_regression.getCustomKernelValue(x, x_prime, height_matrix_custom, width_matrix_custom, feature_size) + sigma_two ** 2
-//             } else {
-//                 k_value = (sigma_one ** 2) * util_regression.getCustomKernelValue(x, x_prime, height_matrix_custom, width_matrix_custom, feature_size)
-//             }
-//             K_xx[i][j] = k_value
-//         }
-//     }
-//
-//     let Kxx_inv = math.inv(Kxx)
-//
-//
-//     // Calculate K_xxstar
-//     for (var p = 0; p < train_length; p++) {
-//         let x = eyeFeatsCurrent;
-//         let x_prime = eyeFeatures[p];
-//         let k_value = 0;
-//         k_value = (sigma_one ** 2) * util_regression.getCustomKernelValue(x, x_prime, height_matrix_custom, width_matrix_custom, feature_size)
-//         K_xxstar[p] = k_value
-//     }
-//
-//     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
-//     let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
-//
-//
-//     // // Construct the C matrix
-//     // let width_matrix = new Array(image_width).fill(null).map(() => new Array(image_width).fill(null));
-//     // for (var i = 0; i < image_width; i++) {
-//     //     for (var j = 0; j < image_width; j++) {
-//     //         width_matrix[i][j] = Math.exp(-((i - j) ** 2) / (2 * (l_width ** 2)))
-//     //     }
-//     // }
-//     // let height_matrix = new Array(image_height).fill(null).map(() => new Array(image_height).fill(null));
-//     // for (var i = 0; i < image_height; i++) {
-//     //     for (var j = 0; j < image_height; j++) {
-//     //         height_matrix[i][j] = Math.exp(-((i - j) ** 2) / (2 * (l_height ** 2)))
-//     //     }
-//     // }
-//     //
-//     // let C_matrix = Math.kron(width_matrix, height_matrix);
-//     // let N = 120
-//     //
-//     // // Calculate K_xx
-//     // for (var i = 0; i < train_length; i++) {
-//     //     for (var j = 0; j < train_length; j++) {
-//     //         let x = eyeFeatures[i];
-//     //         let x_prime = eyeFeatures[j];
-//     //         let x_diff = x_prime.map((e, i) => e - x[i]);
-//     //         let k_value = 0;
-//     //         if (i === j) {
-//     //             k_value = (sigma_one ** 2) * Math.exp(-math.multiply(math.transpose(x_diff), math.multiply(C_matrix, x_diff)) / (2 * N)) + sigma_two ** 2
-//     //         } else {
-//     //             k_value = (sigma_one ** 2) * Math.exp(-math.multiply(math.transpose(x_diff), math.multiply(C_matrix, x_diff)) / (2 * N))
-//     //         }
-//     //         K_xx[i][j] = k_value
-//     //     }
-//     // }
-//     //
-//     // let Kxx_inv = math.inv(Kxx)
-//
-//     // // Calculate K_xxstar
-//     // for (var p = 0; p < train_length; p++) {
-//     //     let x = eyeFeatsCurrent;
-//     //     let x_prime = eyeFeatures[p];
-//     //     let x_diff = x_prime.map((e, i) => e - x[i]);
-//     //     let k_value = 0;
-//     //     k_value = (sigma_one ** 2) * Math.exp(-math.multiply(math.transpose(x_diff), math.multiply(C_matrix, x_diff)) / (2 * N))
-//     //     K_xxstar[p] = k_value
-//     // }
-//     //
-//     // let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
-//     // let variance = sigma_two - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
-//
-//     return [pred, variance]
-// }
+/**
+ * Get value of the custom kernel. x^T C x.
+ * @param {Array} x - Eye features for one data point.
+ * @param {Array} x_prime - Eye features for another data point.
+ * @param {Array} height_matrix - Cy.
+ * @param {Array} width_matrix - Cy.
+ * @param {Number} feature_size - Feature dimension. 120.
+ * @return{Number} custom kernel value.
+ */
+util_regression.getCustomKernelValue = function (x, x_prime, height_matrix, width_matrix, feature_size) {
+    // let x_diff = x_prime.map((e, i) => e - x[i]);
+    let x_diff = math.subtract(x, x_prime[0]) // (1, 60)
+    let V = math.transpose(math.reshape(x_diff, [6, 10])) // (10, 6)
+    let kernel_matrix = math.multiply(width_matrix, math.multiply(V, math.transpose(height_matrix))) // (10, 6)
+    let kernel_vec = math.multiply(x_diff, math.reshape(math.transpose(kernel_matrix), [-1, 1]))
+    return kernel_vec
+}
+
+
+/**
+ * Performs GP regression with a kernel (product of toeplitz matrices) plus a white kernel.
+ * @param {Array} eyeFeatures - Eye features for training.
+ * @param {Array} AngleArray - Array of Angles for training.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number} pixel_scale - M.
+ * @param {Number} sigma_one - Scaling Std.
+ * @param {Number} sigma_two - Noise Std.
+ * @param {Array} width_matrix_custom - Cx.
+ * @param {Array} height_matrix_custom - Cy.
+ * @param {Number} feature_size - Feature dimension. 120.
+ * @return{Number} predicted angle.
+ */
+util_regression.GPCustomRegressorLoop = function (eyeFeatures, AngleArray, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
+
+    //Slice left and right eyes for training and test dataset
+    var eyeFeaturesLeft = [];
+    for (var i = 0; i < eyeFeatures.length; i++) {
+        eyeFeaturesLeft.push(eyeFeatures[i].slice(0, 60))
+    }
+    var eyeFeaturesRight = [];
+    for (var i = 0; i < eyeFeatures.length; i++) {
+        eyeFeaturesRight.push(eyeFeatures[i].slice(-60))
+    }
+    var eyeFeatsCurrentLeft = [eyeFeatsCurrent.slice(0, 60)]
+    var eyeFeatsCurrentRight = [eyeFeatsCurrent.slice(-60)]
+
+    // Test features length is 1
+    let K_xx = new Array(eyeFeatures.length).fill(0).map(() => new Array(eyeFeatures.length).fill(0));
+    let K_xxstar = new Array(eyeFeatures.length)
+
+    // Calculate K_xx
+    for (var i = 0; i < eyeFeatures.length; i++) {
+        for (var j = 0; j < eyeFeatures.length; j++) {
+            // Left eye
+            let x_left = eyeFeaturesLeft[i];
+            let x_prime_left = eyeFeaturesLeft[j];
+            let k_value_left = util_regression.getCustomKernelValue(x_left, x_prime_left, height_matrix_custom, width_matrix_custom, feature_size)
+
+            // Right eye
+            let x_right = eyeFeaturesRight[i];
+            let x_prime_right = eyeFeaturesRight[j];
+            let k_value_right = util_regression.getCustomKernelValue(x_right, x_prime_right, height_matrix_custom, width_matrix_custom, feature_size)
+            let K_total = (k_value_left[0] + k_value_right[0]) * (-1 / (4 * 120 * (pixel_scale ** 2)))
+            let K = sigma_one ** 2 * math.exp(K_total)
+            if (i === j) {
+                K += sigma_two ** 2
+            }
+            K_xx[i][j] = K
+        }
+    }
+
+    let Kxx_inv = math.inv(K_xx)
+
+
+    // Calculate K_xxstar
+    for (var p = 0; p < eyeFeatures.length; p++) {
+        // Left eye
+        let x_left = eyeFeatsCurrentLeft;
+        let x_prime_left = eyeFeaturesLeft[p];
+        let k_value_left = util_regression.getCustomKernelValue(x_left, x_prime_left, height_matrix_custom, width_matrix_custom, feature_size)
+        // Right eye
+        let x_right = eyeFeatsCurrentRight;
+        let x_prime_right = eyeFeaturesRight[p];
+        let k_value_right = util_regression.getCustomKernelValue(x_right, x_prime_right, height_matrix_custom, width_matrix_custom, feature_size)
+        let K_total = (k_value_left[0][0] + k_value_right[0][0]) * (-1 / (4 * 120 * (pixel_scale ** 2)))
+        let K = sigma_one ** 2 * math.exp(K_total)
+        K_xxstar[p] = K
+    }
+
+
+    let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
+    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+
+    return [pred, variance]
+}
 
 
 /**
@@ -558,9 +535,6 @@ util_regression.calculateQuadraticForm = function (first_features, second_featur
             }
         }
     }
-
-    // (k1, k2)
-    // TODO: This value is huge for test features. Need to fix this
     return math.reshape(sum_arr, [first_features.length, second_features.length])
 
 }
