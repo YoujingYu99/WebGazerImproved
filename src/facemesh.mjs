@@ -56,22 +56,41 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
     // Keypoints indexes are documented at
     // https://github.com/tensorflow/tfjs-models/blob/118d4727197d4a21e2d4691e134a7bc30d90deee/face-landmarks-detection/mesh_map.jpg
     const [leftBBox, rightBBox] = [
+        // // left
+        // {
+        //     eyeTopArcKeypoints: [
+        //         25, 33, 246, 161, 160, 159, 158, 157, 173, 243,
+        //     ],
+        //     eyeBottomArcKeypoints: [
+        //         25, 110, 24, 23, 22, 26, 112, 243,
+        //     ],
+        // },
+        // // right
+        // {
+        //     eyeTopArcKeypoints: [
+        //         463, 398, 384, 385, 386, 387, 388, 466, 263, 255,
+        //     ],
+        //     eyeBottomArcKeypoints: [
+        //         463, 341, 256, 252, 253, 254, 339, 255,
+        //     ],
+        // },
+        // New arcs to include more information in the vertical direction
         // left
         {
             eyeTopArcKeypoints: [
-                25, 33, 246, 161, 160, 159, 158, 157, 173, 243,
+                130, 247, 30, 29, 27, 28, 56, 190, 243,
             ],
             eyeBottomArcKeypoints: [
-                25, 110, 24, 23, 22, 26, 112, 243,
+                130, 25, 110, 24, 23, 22, 26, 112, 243,
             ],
         },
         // right
         {
             eyeTopArcKeypoints: [
-                463, 398, 384, 385, 386, 387, 388, 466, 263, 255,
+                463, 414, 286, 258, 257, 259, 260, 167, 359,
             ],
             eyeBottomArcKeypoints: [
-                463, 341, 256, 252, 253, 254, 339, 255,
+                463, 341, 256, 252, 253, 254, 339, 255, 359,
             ],
         },
     ].map(({eyeTopArcKeypoints, eyeBottomArcKeypoints}) => {

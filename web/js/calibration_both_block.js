@@ -4,7 +4,7 @@ var PointDataCollection = 0;
 var CalibrationPoints = {};
 var CalibrationBlockPoints = {};
 var DataCollectionPoints = {};
-const numClickPerPoint = 5;
+const numClickPerPoint = 3;
 var buttonCount = 1;
 const numDataPointsToCollect = 500;
 
@@ -299,6 +299,7 @@ $(document).ready(function () {
                 // Go to the next calibration task
                 // RestartBlock();
                 clearCanvas();
+                webgazer.calibrationPhase = false; // Stop storing datapoints after calibration
                 // If we don't want the next block calibration phase, just call clearCanvas();
               } else {
                 //use restart function to restart the calibration

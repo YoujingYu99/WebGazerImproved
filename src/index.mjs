@@ -34,6 +34,7 @@ webgazer.latestEyeFeatures = 0;
 webgazer.xDist = 0;
 webgazer.yDist = 0;
 webgazer.storeData = null;
+webgazer.calibrationPhase = true; // true if still in calibration and adding datapoints
 
 //PRIVATE VARIABLES
 
@@ -437,7 +438,8 @@ var recordScreenPosition = function (x, y, eventType) {
         return null;
     }
     for (var reg in regs) {
-        if (latestEyeFeatures)
+        // only add data during the calibration phase
+        if (latestEyeFeatures && webgazer.calibrationPhase)
             regs[reg].addData(latestEyeFeatures, [x, y], eventType);
     }
 };
