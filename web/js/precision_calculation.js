@@ -151,18 +151,18 @@ function determineBlockPositionPaint(xPrediction, yPrediction) {
  */
 function stopShapeTracing() {
   if (shapeTracingDisabled) return;
-  // clearCanvas();
-  //// Disable the alert to take screenshot: do not want the pop up menu
-  // swal({
-  //   title: "Shaped Traced",
-  //   text: "You have completed the shape tracing task!",
-  //   buttons: {
-  //     cancel: false,
-  //     confirm: true,
-  //   },
-  // }).then((isConfirm) => {
-  //   clearCanvas();
-  //   shapeTracingDisabled = true;
-  //   console.log(shapeTracingDisabled);
-  // });
+  clearCanvas();
+  // Disable the alert to take screenshot: do not want the pop up menu
+  swal({
+    title: "Shaped Traced",
+    text: "You have completed the shape tracing task!",
+    buttons: {
+      cancel: false,
+      confirm: true,
+    },
+  }).then((isConfirm) => {
+    clearCanvas();
+    shapeTracingDisabled = true;
+    console.log("after stopping", shapeTracingDisabled);
+  });
 }

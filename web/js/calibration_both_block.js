@@ -4,9 +4,10 @@ var PointDataCollection = 0;
 var CalibrationPoints = {};
 var CalibrationBlockPoints = {};
 var DataCollectionPoints = {};
-const numClickPerPoint = 3;
+const numClickPerPoint = 5;
+const numClickPerPointDataCollection = 3;
 var buttonCount = 1;
-const numDataPointsToCollect = 500;
+const numDataPointsToCollect = 10;
 
 /**
  * Clear the canvas and the calibration button.
@@ -14,6 +15,7 @@ const numDataPointsToCollect = 500;
 function clearCanvas() {
   $(".Calibration").hide();
   $(".CalibrationBlock").hide();
+  $(".dataCollection").hide();
   var canvas = document.getElementById("plotting_canvas");
   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -32,23 +34,6 @@ function calibrationInstructionNine() {
     },
   }).then((isConfirm) => {
     ShowCalibrationPointNine();
-  });
-}
-
-/**
- * Show the instruction of using calibration at the start up screen.
- */
-function calibrationInstructionBlock() {
-  // clearCanvas();
-  swal({
-    title: "Calibration B: 4 by 4 Grid",
-    text: "Please click on each of the 16 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",
-    buttons: {
-      cancel: false,
-      confirm: true,
-    },
-  }).then((isConfirm) => {
-    ShowCalibrationPointBlock();
   });
 }
 
@@ -146,7 +131,8 @@ function showFlickeringMaze() {
  * Show the instruction of using calibration at the start up screen.
  */
 function traceShapeInstruction() {
-  if (shapeTracingDisabled) return;
+  // if (shapeTracingDisabled) return;
+  shapeTracingDisabled = false;
   clearCanvas();
   swal({
     title: "Trace Shape",
@@ -183,8 +169,10 @@ function showTraceShape() {
       var xPrediction = data.x; //these x coordinates are relative to the viewport
       var yPrediction = data.y; //these y coordinates are relative to the viewport
 
-      determineBlockPositionPaint(xPrediction, yPrediction);
-
+      // Only determine block position if shapetracing is enabled
+      if (shapeTracingDisabled === false) {
+        determineBlockPositionPaint(xPrediction, yPrediction);
+      }
       // Record timings and positions in arrays
       gazePositionInfo.timings.push(elapsedTime);
       gazePositionInfo.xPos.push(xPrediction);
@@ -296,11 +284,8 @@ $(document).ready(function () {
             }).then((isConfirm) => {
               if (isConfirm) {
                 //clear the calibration & hide the last middle button
-                // Go to the next calibration task
-                // RestartBlock();
                 clearCanvas();
-                webgazer.calibrationPhase = false; // Stop storing datapoints after calibration
-                // If we don't want the next block calibration phase, just call clearCanvas();
+                // webgazer.calibrationPhase = false; // Stop storing datapoints after calibration
               } else {
                 //use restart function to restart the calibration
                 document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
@@ -310,106 +295,6 @@ $(document).ready(function () {
                 clearCalibration();
                 clearCanvas();
                 ShowCalibrationPoint();
-              }
-            });
-          });
-        });
-      });
-    }
-  });
-
-  // When clicking on the 16 points
-  $(".CalibrationBlock").click(function () {
-    // click event on the calibration buttons
-    var id = $(this).attr("id");
-
-    if (!CalibrationBlockPoints[id]) {
-      // initialises if not done
-      CalibrationBlockPoints[id] = 0;
-    }
-    CalibrationBlockPoints[id]++; // increments values
-
-    if (CalibrationBlockPoints[id] === numClickPerPoint) {
-      //only turn to yellow after 5 clicks
-      $(this).css("background-color", "yellow");
-      $(this).prop("disabled", true); //disables the button
-      PointBlockCalibrate++;
-    } else if (CalibrationBlockPoints[id] < numClickPerPoint) {
-      //Gradually increase the opacity of calibration points when click to give some indication to user.
-      var opacity = 0.2 * CalibrationBlockPoints[id] + 0.2;
-      $(this).css("opacity", opacity);
-    }
-
-    //Show the middle calibration point after all other points have been clicked.
-    if (PointBlockCalibrate === 16) {
-      // $(".Calibration").hide();
-      clearCanvas();
-      $("#Pt17_block").show();
-    }
-
-    if (PointBlockCalibrate >= 17) {
-      // last point is calibrated
-      //using jquery to grab every element in Calibration class and hide them except the middle point.
-      // $(".Calibration").hide();
-      clearCanvas();
-      $("#Pt17_block").show();
-
-      // clears the canvas
-      var canvas = document.getElementById("plotting_canvas");
-      canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-
-      // notification for the measurement process
-      swal({
-        title: "Calculating measurement",
-        text: "Please don't move your mouse & stare at the middle dot for the next 5 seconds. This will allow us to calculate the accuracy of our predictions.",
-        closeOnEsc: false,
-        allowOutsideClick: false,
-        closeModal: true,
-      }).then((isConfirm) => {
-        // makes the variables true for 5 seconds & plots the points
-        $(document).ready(function () {
-          storePointsVariable(); // start storing the prediction points
-
-          sleep(5000).then(() => {
-            stopStoringPointsVariable(); // stop storing the prediction points
-            var past50 = webgazer.getStoredPoints(); // retrieve the stored points
-            // Access precision, x and y errors
-            var accuracyMeasurement = calculatePrecisionErrors(past50)[0];
-            var xAverageError = calculatePrecisionErrors(past50)[1];
-            var yAverageError = calculatePrecisionErrors(past50)[2];
-            document.getElementById("Accuracy").innerHTML =
-              "<a>Accuracy | " + accuracyMeasurement.toPrecision(3) + "%</a>"; // Show the accuracy in the nav bar.
-            // document.getElementById("xError").innerHTML =
-            //   "<a>X Error | " + xAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
-            // document.getElementById("yError").innerHTML =
-            //   "<a>Y Error | " + yAverageError.toPrecision(3) + "%</a>"; // Show the x error in the nav bar.
-            swal({
-              title:
-                "Your accuracy and x/y errors are " +
-                accuracyMeasurement +
-                "%, " +
-                xAverageError +
-                "px, " +
-                yAverageError +
-                "px.",
-              allowOutsideClick: false,
-              buttons: {
-                cancel: "Recalibrate",
-                confirm: true,
-              },
-            }).then((isConfirm) => {
-              if (isConfirm) {
-                //clear the calibration & hide the last middle button
-                clearCanvas();
-              } else {
-                //use restart function to restart the calibration
-                document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
-                // document.getElementById("xError").innerHTML = "<a>N.A.</a>";
-                // document.getElementById("yError").innerHTML = "<a>N.A.</a>";
-                webgazer.clearData();
-                clearCalibration();
-                clearCanvas();
-                calibrationInstructionNine();
               }
             });
           });
@@ -456,17 +341,6 @@ $(document).ready(function () {
 function ShowCalibrationPointNine() {
   $(".Calibration").show();
   $("#Pt5").hide(); // initially hides the middle button
-}
-
-/**
- * Show the 16 Calibration Points
- */
-function ShowCalibrationPointBlock() {
-  drawGridLines();
-  $(".Calibration").hide();
-  $(".CalibrationBlock").show();
-  console.log("red dots should show");
-  $("#Pt17_block").hide(); // initially hides the middle button
 }
 
 /**
@@ -575,7 +449,7 @@ function dataCollectionRandomPoint(buttonCount) {
         }
         DataCollectionPoints[id]++; // increments values
 
-        if (DataCollectionPoints[id] === numClickPerPoint) {
+        if (DataCollectionPoints[id] === numClickPerPointDataCollection) {
           // Disable after 5 clicks
           $(buttonPresent).prop("disabled", true); //disables the button
           PointDataCollection++;
@@ -590,7 +464,7 @@ function dataCollectionRandomPoint(buttonCount) {
           } else {
             stopDataCollection();
           }
-        } else if (DataCollectionPoints[id] < numClickPerPoint) {
+        } else if (DataCollectionPoints[id] < numClickPerPointDataCollection) {
           // Gradually increase the opacity of calibration points when click to give some indication to user.
           var opacity = 0.2 * DataCollectionPoints[id] + 0.2;
           $(buttonPresent).css("opacity", opacity);
@@ -613,35 +487,6 @@ function stopDataCollection() {
   }).then((isConfirm) => {
     clearCanvas();
   });
-}
-
-function drawGridLines() {
-  // Set global parameters
-  let canvas = document.getElementById("plotting_canvas");
-  const strokeLineWidth = 5;
-  const numSquares = 4;
-  const squareWidth = 100;
-  const xMargin = (canvas.width - numSquares * squareWidth) / 2;
-  const yMargin = (canvas.height - numSquares * squareWidth) / 2 + 50;
-
-  // Stroke
-  ctx.lineWidth = strokeLineWidth;
-  // Set colour of strokes to be black
-  ctx.strokeStyle = "rgb(0, 0, 0)";
-
-  // For loop to create the 4 columns in one row then 4 rows in one column
-  for (let columnCount = 0; columnCount < numSquares; columnCount += 1) {
-    for (let rowCount = 0; rowCount < numSquares; rowCount += 1) {
-      let square = {
-        x: xMargin + columnCount * squareWidth,
-        y: yMargin + rowCount * squareWidth,
-        w: squareWidth,
-        h: squareWidth,
-      };
-      // Draw the square
-      ctx.strokeRect(square.x, square.y, square.w, square.h);
-    }
-  }
 }
 
 /**

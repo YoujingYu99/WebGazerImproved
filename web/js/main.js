@@ -10,7 +10,7 @@ window.onload = async function () {
       //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
       //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
     })
-    .saveDataAcrossSessions(false)
+    .saveDataAcrossSessions(true)
     .begin();
   webgazer
     .showVideoPreview(true) /* shows all video previews */
@@ -81,20 +81,6 @@ function Restart() {
   webgazer.clearData();
   ClearCalibration();
   calibrationInstructionNine();
-}
-
-/**
- * Restart the calibration process for block
- */
-function RestartBlock() {
-  document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
-  // document.getElementById("xError").innerHTML = "<a>N.A.</a>";
-  // document.getElementById("yError").innerHTML = "<a>N.A.</a>";
-  clearCanvas();
-  $(".lpd_bspot").hide();
-  // webgazer.clearData();
-  ClearCalibration();
-  calibrationInstructionBlock();
 }
 
 /**

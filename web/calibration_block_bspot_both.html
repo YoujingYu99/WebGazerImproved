@@ -55,11 +55,7 @@ Instructions on use can be found in the README repository.
             <ul class="nav navbar-nav">
                 <!-- Accuracy -->
                 <li id="Accuracy"><a>Not yet Calibrated</a></li>
-                <!--                <li id="xError"><a>N.A.</a></li>-->
-                <!--                <li id="yError"><a>N.A.</a></li>-->
                 <li><a href="#" onclick="Restart()">Recalibrate</a></li>
-                <li><a href="#" onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)">Toggle Kalman
-                    Filter</a></li>
                 <li class="helpBtn" data-target="#helpModal" data-toggle="modal"><a data-toggle="modal"><span
                         class="glyphicon glyphicon-cog"></span> Help</a></li>
             </ul>
@@ -69,21 +65,25 @@ Instructions on use can be found in the README repository.
 
 <div class="lpd_bspot" id="lpd_content">
     <div id="page-size">
-        <h2> Let us find out what your monitor size is (click to go into
-            <div onclick='fullScreen(); registerClick();' style='display:inline; cursor:pointer; color: red'><em><u>full
-                screen mode</u></em></div>
-            ).
-        </h2>
+        <div id="page-size-instructions">
+            <h2 style="margin-left: 10px"> Let us find out what your monitor size is.</h2>
 
-        <p>Please use any credit card that you have available (it can also be a grocery store membership card, your
-            driving license, or anything that is of the same format), hold it onto the screen, and adjust the slider
-            below to its size.</p>
+            <p style="margin-left: 10px">Please use any credit card that you have available (it can also be a grocery
+                store membership card, your
+                driving license, or anything that is of the same format), hold it onto the screen, and adjust the slider
+                below to its size.</p>
 
-        <p>(If you don't have access to a real card, you can use a ruler to measure image width to 3.37 inch or 85.6 mm,
-            or make your best guess!)</p>
-        <b style="font-style: italic">Make sure you put the card onto your screen.</b>
-        <p>Press <span style="color: red; font-size: 25px">G</span> on the keyboard when you are finished.
-        </p>
+            <p style="margin-left: 10px">(If you don't have access to a real card, you can use a ruler to measure image
+                width to 3.37 inch or 85.6
+                mm,
+                or make your best guess!)</p>
+            <b style="font-style: italic;margin-left: 10px">Make sure you put the card onto your screen.</b>
+            <p style="margin-left: 10px">Press <span style="color: red; font-size: 25px">G</span> on the keyboard when
+                you are finished.
+            </p>
+            <br>
+        </div>
+        <br>
         <br>
         <div id="container">
             <div id="slider"></div>
@@ -96,23 +96,28 @@ Instructions on use can be found in the README repository.
     <div id="blind-spot" style="visibility: hidden">
         <!-- <h2 class="bolded-blue">Task 2: Where’s your blind spot?</h2> -->
         <div id="blind-spot-instruction">
-            <h3>Now, let us quickly test how far away you are sitting.</h3>
+            <h3 style="margin-left: 10px">Now, let us quickly test how far away you are sitting.</h3>
 
-            <h3>Instructions</h3>
-            <p>1. Put your finger on <b>space bar</b> on the keyboard.</p>
-            <p>2. Close your right eye. <em>(Tips: it might be easier to cover your right eye by hand!)</em></p>
-            <p>3. Using your left eye, focus on the black square.</p>
-            <p>4. Press <span style="color: red; font-size: 25px">Space</span> on the keyboard to start the animation of
+            <h3 style="margin-left: 10px">Instructions</h3>
+            <p style="margin-left: 10px">1. Put your finger on <b>space bar</b> on the keyboard.</p>
+            <p style="margin-left: 10px">2. Close your right eye. <em>(Tips: it might be easier to cover your right eye
+                by hand!)</em></p>
+            <p style="margin-left: 10px">3. Using your left eye, focus on the black square.</p>
+            <p style="margin-left: 10px">4. Press <span style="color: red; font-size: 25px">Space</span> on the keyboard
+                to start the
+                animation of
                 the
                 red
                 ball. The <b style="color: red">red
                     ball</b> will
-                disappear as it moves from right to left. Press the <span style="color: red; font-size: 25px">S</span>
+                disappear as it moves from right to left. Press the <span
+                        style="color: red; font-size: 25px">S</span>
                 key as soon as the ball disappears from your eye sight. Then press <span
                         style="color: red; font-size: 25px">A</span>
                 when the ball reappears.</p>
             <br>
-            <p>Please do it <b>five</b> times. Keep your right eye closed and hit the keys fast!</p>
+            <p style="margin-left: 10px">Please do it <b>five</b> times. Keep your right eye closed and hit the keys
+                fast!</p>
             <br>
         </div>
         <!--        <button class="btn btn-primary" id="start" onclick="animateBall()">Start</button>-->
@@ -141,26 +146,6 @@ Instructions on use can be found in the README repository.
     <input class="Calibration" id="Pt9" type="button"></input>
 </div>
 
-<!-- Calibration points -->
-<div class="calibrationDivBlock">
-    <input class="CalibrationBlock" id="Pt1_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt2_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt3_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt4_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt5_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt6_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt7_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt8_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt9_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt10_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt11_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt12_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt13_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt14_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt15_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt16_block" type="button"></input>
-    <input class="CalibrationBlock" id="Pt17_block" type="button"></input>
-</div>
 
 <!-- Modal -->
 <div class="modal fade" id="helpModal" role="dialog">
@@ -178,11 +163,9 @@ Instructions on use can be found in the README repository.
                         type="button">
                     Get LPD
                 </button>
-                <!--                <button class="btn btn-primary" data-dismiss="modal" id="getBSpot"-->
-                <!--                        onclick="configureBlindSpot()"-->
-                <!--                        type="button">-->
-                <!--                    Get Blind Spot-->
-                <!--                </button>-->
+                <button class="btn btn-primary" data-dismiss="modal" id="start_calibration" onclick="Restart()"
+                        type="button">Calibrate
+                </button>
                 <button class="btn btn-primary" data-dismiss="modal" id="load_maze" onclick="chaseFlickeringMaze()"
                         type="button">
                     Catch the Red
@@ -190,13 +173,6 @@ Instructions on use can be found in the README repository.
                 <button class="btn btn-primary" data-dismiss="modal" id="trace_shape" onclick="traceShapeMaze()"
                         type="button">
                     Trace the Shape
-                </button>
-                <button class="btn btn-primary" data-dismiss="modal" id="start_calibration" onclick="Restart()"
-                        type="button">Calibrate A
-                </button>
-                <button class="btn btn-primary" data-dismiss="modal" id="start_calibration_block"
-                        onclick="RestartBlock()"
-                        type="button">Calibrate B
                 </button>
                 <button class="btn btn-primary" data-dismiss="modal" id="collect_user_data"
                         onclick="dataCollection()"

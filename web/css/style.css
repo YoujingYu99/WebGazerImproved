@@ -19,8 +19,8 @@ body {
     width: 700px;
     /*width: 700px;*/
     /*margin-left: 350px;*/
-    margin-left: 350px;
-    margin-top: 100px;
+    margin-left: 350px; /*350*/
+    margin-top: 100px; /*100*/
     padding: 0;
     font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
     font-size: 16px;
@@ -28,8 +28,14 @@ body {
     color: #222;
 }
 
+#page-size-instructions {
+    background-color: AliceBlue;
+    border: 10px solid #d7ecff;
+    border-radius: 25px;
+}
+
 #blind-spot {
-    width: 1200px;
+    width: 1100px;
     /*width: 700px;*/
     /*margin-left: 350px;*/
     margin-left: 50px;
@@ -43,6 +49,9 @@ body {
 
 #blind-spot-instruction {
     margin-left: 300px;
+    background-color: AliceBlue;
+    border: 10px solid #d7ecff;
+    border-radius: 25px;
 }
 
 #wrapper, #content {

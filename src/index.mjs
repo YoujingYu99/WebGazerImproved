@@ -319,10 +319,10 @@ async function getPrediction(regModelIndex) {
     for (var reg in regs) {
         //// Original Webgazer impelmentation
         // predictions.push(regs[reg].predict(latestEyeFeatures));
-        // // Ridge regression with angles.
-        // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
-        // GP SE kernel.
-        predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
+        // Ridge regression with angles.
+        predictions.push(regs[reg].predictRotation(latestEyeFeatures));
+        // // GP SE kernel.
+        // predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {
@@ -359,7 +359,7 @@ async function loop() {
         paintCurrentFrame(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
 
         // Get gaze prediction (ask clm to track; pass the data to the regressor; get back a prediction)
-        console.log("get latest gaze data")
+        // console.log("get latest gaze data")
         latestGazeData = getPrediction();
         // Count time
         var elapsedTime = performance.now() - clockStart;
