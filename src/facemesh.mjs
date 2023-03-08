@@ -156,11 +156,11 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
 
     // Start building object to be returned
     var eyeObjs = {};
-    var eyeObjsFeatures = {}
-
     // For eye objects with new arcs
     var eyeObjsNewArc = {};
-    var eyeObjsFeaturesNewArc = {}
+
+    // Final object to be returned
+    var eyeObjsFeatures = {}
 
     var leftImageData = imageCanvas.getContext('2d').getImageData(leftOriginX, leftOriginY, leftWidth, leftHeight);
     var leftImageDataNewArc = imageCanvas.getContext('2d').getImageData(leftOriginXNewArc, leftOriginYNewArc, leftWidthNewArc, leftHeightNewArc);

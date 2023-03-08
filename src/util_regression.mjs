@@ -710,6 +710,9 @@ util_regression.addRotationData = function (eyes, screenPos, rotationAngles, typ
         this.dataRotationClicks.push({
             'eyes': eyes,
             'screenPositions': screenPos,
+            'screenDistances': [webgazer.xDist, webgazer.yDist],
+            'viewingDistance': webgazer.currentViewingDistance,
+            'LPD': webgazer.LPD,
             'rotationAngles': [rotationAngles[0], rotationAngles[1]],
             'type': type
         });
@@ -722,6 +725,9 @@ util_regression.addRotationData = function (eyes, screenPos, rotationAngles, typ
         this.dataRotationTrail.push({
             'eyes': eyes,
             'screenPositions': screenPos,
+            'screenDistances': [webgazer.xDist, webgazer.yDist],
+            'viewingDistance': webgazer.currentViewingDistance,
+            'LPD': webgazer.LPD,
             'rotationAngles': [rotationAngles[0], rotationAngles[1]],
             'type': type
         });

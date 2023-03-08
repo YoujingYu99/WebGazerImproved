@@ -44,7 +44,7 @@ function dataCollectionRandomInstruction() {
   clearCanvas();
   swal({
     title: "Data Collection: Random Points",
-    text: "Please click five times on the red point on the screen. You must click on each point 5 times till it goes yellow.",
+    text: "Please click on the red point on the screen. You must click on each point three times till it goes yellow.",
     buttons: {
       cancel: false,
       confirm: true,
@@ -418,10 +418,10 @@ function generateRandomButton(buttonCount) {
     yMax = 580;
   }
   // Initialise random point
-  let randomTop = getRandomInt(canvas.height * 0.05, canvas.height * 0.9);
+  let randomTop = getRandomInt(canvas.height * 0.1, canvas.height * 0.95);
   let randomLeft = getRandomInt(canvas.width * 0.05, canvas.width * 0.95);
 
-  // Generate point
+  // Generate point until not in forbidden region
   while (true) {
     let inForbiddenRegion = testForbiddenRegion(
       randomLeft,
@@ -431,13 +431,11 @@ function generateRandomButton(buttonCount) {
       yMin,
       yMax
     );
-    console.log("in forbidden region", inForbiddenRegion);
     if (inForbiddenRegion === false) {
-      console.log("Found a usable point", randomLeft, randomTop);
       break; // If not in the forbidden region, use the points
     }
     // Generate point
-    randomTop = getRandomInt(canvas.height * 0.05, canvas.height * 0.9);
+    randomTop = getRandomInt(canvas.height * 0.1, canvas.height * 0.9);
     randomLeft = getRandomInt(canvas.width * 0.05, canvas.width * 0.95);
   }
 
@@ -457,7 +455,6 @@ function dataCollectionRandomPoint(buttonCount) {
   let buttonPresentID = "Pt" + buttonCount.toString() + "_datacollection";
   // var buttonPresent = document.getElementsByClassName(buttonPresentClass)[0];
   var buttonPresent = document.getElementById(buttonPresentID);
-  console.log("got the button");
   buttonPresent.addEventListener(
     "click",
     function (e) {
