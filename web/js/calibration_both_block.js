@@ -4,10 +4,10 @@ var PointDataCollection = 0;
 var CalibrationPoints = {};
 var CalibrationBlockPoints = {};
 var DataCollectionPoints = {};
-const numClickPerPoint = 5;
+const numClickPerPoint = 3;
 const numClickPerPointDataCollection = 3;
+const numDataPointsToCollect = 300;
 var buttonCount = 1;
-const numDataPointsToCollect = 10;
 
 /**
  * Clear the canvas and the calibration button.
@@ -353,6 +353,13 @@ function getRandomInt(min, max) {
 }
 
 /**
+ * Test whether the point generated is in the forbidden region.
+ */
+function testForbiddenRegion(xPos, yPos, xMin, xMax, yMin, yMax) {
+  return xMin < xPos && xPos < xMax && yMin < yPos && yPos < yMax;
+}
+
+/**
  * Generate Random button.
  */
 function generateRandomButton(buttonCount) {
@@ -362,10 +369,6 @@ function generateRandomButton(buttonCount) {
   let buttonDataCollection = document.createElement("input");
   // Set attributes
   buttonDataCollection.setAttribute("type", "button");
-  // buttonDataCollection.setAttribute(
-  //   "class",
-  //   "dataCollection" + buttonCount.toString()
-  // );
   buttonDataCollection.setAttribute("class", "dataCollection");
   buttonDataCollection.setAttribute(
     "id",
@@ -384,43 +387,62 @@ function generateRandomButton(buttonCount) {
   buttonDataCollection.style["border-color"] = "black";
   buttonDataCollection.style["border-style"] = "solid";
 
-  // Set position
-  // let randomTop = getRandomInt(canvas.height * 0.05, canvas.height * 0.95);
-  // let randomLeft = getRandomInt(canvas.width * 0.05, canvas.width * 0.95);
-  // // If randomTop/Left in the video range
-  // if (0 <= randomTop <= 241) {
-  //   randomLeft = getRandomInt(321, canvas.width * 0.95);
-  // }
-  // if (0 <= randomLeft <= 321) {
-  //   randomTop = getRandomInt(241, canvas.height * 0.95);
-  // }
+  let xMin = 0;
+  let xMax = 320;
+  let yMin = 0;
+  let yMax = 240;
 
-  let index = getRandomInt(0, 3);
-  let randomTop;
-  let randomLeft;
+  if (videoPosition === 0) {
+    // upper left
+    xMin = 0;
+    xMax = 320;
+    yMin = 0;
+    yMax = 240;
+  } else if (videoPosition === 1) {
+    // upper right
+    xMin = 960;
+    xMax = 1280;
+    yMin = 0;
+    yMax = 240;
+  } else if (videoPosition === 2) {
+    // lower left
+    xMin = 0;
+    xMax = 320;
+    yMin = 340;
+    yMax = 580;
+  } else if (videoPosition === 3) {
+    // lower right
+    xMin = 960;
+    xMax = 1280;
+    yMin = 340;
+    yMax = 580;
+  }
+  // Initialise random point
+  let randomTop = getRandomInt(canvas.height * 0.05, canvas.height * 0.9);
+  let randomLeft = getRandomInt(canvas.width * 0.05, canvas.width * 0.95);
 
-  if (index === 0) {
-    randomTop = getRandomInt(canvas.height * 0.1, 241);
-    randomLeft = getRandomInt(321, canvas.width * 0.95);
-  } else if (index === 1) {
-    randomTop = getRandomInt(241, canvas.height * 0.95);
-    randomLeft = getRandomInt(canvas.width * 0.05, 321);
-  } else {
-    randomTop = getRandomInt(canvas.height * 0.05, canvas.height * 0.95);
+  // Generate point
+  while (true) {
+    let inForbiddenRegion = testForbiddenRegion(
+      randomLeft,
+      randomTop,
+      xMin,
+      xMax,
+      yMin,
+      yMax
+    );
+    console.log("in forbidden region", inForbiddenRegion);
+    if (inForbiddenRegion === false) {
+      console.log("Found a usable point", randomLeft, randomTop);
+      break; // If not in the forbidden region, use the points
+    }
+    // Generate point
+    randomTop = getRandomInt(canvas.height * 0.05, canvas.height * 0.9);
     randomLeft = getRandomInt(canvas.width * 0.05, canvas.width * 0.95);
-    // If randomTop/Left in the video range
-    if (0 <= randomTop <= 241) {
-      randomLeft = getRandomInt(321, canvas.width * 0.95);
-    }
-    if (0 <= randomLeft <= 321) {
-      randomTop = getRandomInt(241, canvas.height * 0.95);
-    }
   }
 
   buttonDataCollection.style.top = randomTop + "px";
   buttonDataCollection.style.left = randomLeft + "px";
-  // buttonDataCollection.style.top = "50vh";
-  // buttonDataCollection.style.left = "50vw";
   document.body.appendChild(buttonDataCollection);
 }
 

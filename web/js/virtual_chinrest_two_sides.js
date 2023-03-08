@@ -41,6 +41,8 @@ function configureLPD() {
   //
   // $("#blind-spot").css({visibility: "hidden"});
   // $("#page-size").css({visibility: "visible"});
+
+  console.log("width and height", window.innerWidth, window.innerHeight);
   $(document).on("keydown", goBlindSpot);
 }
 

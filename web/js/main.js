@@ -1,5 +1,6 @@
 let shapeTracingDisabled = false;
 let blockChasingDisabled = false;
+let videoPosition = 0;
 
 window.onload = async function () {
   //start the webgazer tracker

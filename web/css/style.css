@@ -74,8 +74,8 @@ button {
 #webgazerVideoContainer {
     display: block !important;
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
+    left: 0 !important; /*960*/
+    top: 0 !important; /*340*/
     width: 320px !important;
     height: 240px !important;
     z-index: 1;

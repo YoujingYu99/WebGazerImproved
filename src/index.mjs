@@ -246,7 +246,8 @@ function paintCurrentFrame(canvas, width, height) {
     }
 
     var ctx = canvas.getContext('2d');
-    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height); // upper left
+    // ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height); // upper right
 }
 
 /**
@@ -307,10 +308,8 @@ async function getPrediction(regModelIndex) {
     let distVector = await getXDistYDist(latestEyeFeatures);
     let xDist = distVector[0];
     webgazer.xDist = xDist;
-    // console.log("xdist", xDist);
     let yDist = distVector[1];
     webgazer.yDist = yDist;
-    // console.log("ydist", yDist);
 
     if (regs.length === 0) {
         console.log('regression not set, call setRegression()');
@@ -464,7 +463,7 @@ var recordRotationAngles = function (x, y, eventType) {
     }
     for (var reg in regs) {
         if (latestEyeFeatures)
-            regs[reg].addRotationData(latestEyeFeatures, [horizontalAngle, verticalAngle], eventType);
+            regs[reg].addRotationData(latestEyeFeatures, [x, y], [horizontalAngle, verticalAngle], eventType);
     }
 };
 

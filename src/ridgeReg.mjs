@@ -137,7 +137,10 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
             // console.log(acceptTime);
         }
     }
-    // eyeFeaturesTrail contains eye size as grey histogram;
+
+    // screenX/YTrailArray contains the cursor movements;
+    var screenXArray = this.screenXClicksArray.data.concat(trailX);
+    var screenYArray = this.screenYClicksArray.data.concat(trailY);
     // screenX/YAngleArray contains the angles;
     var xAngleArray = this.screenXAngleArray.data.concat(trailXAngle);
     var yAngleArray = this.screenYAngleArray.data.concat(trailYAngle);

@@ -687,12 +687,14 @@ util_regression.addData = function (eyes, screenPos, type) {
     //eyes.right.patch = Array.from(eyes.right.patch.data);
 };
 
-
-util_regression.addRotationData = function (eyes, rotationAngles, type) {
-    let screenX = webgazer.xDist + webgazer.currentViewingDistance * Math.tan(rotationAngles[0]) * webgazer.LPD
-    let screenY = webgazer.yDist - webgazer.currentViewingDistance * Math.tan(rotationAngles[1]) * webgazer.LPD
-    // let horizontalAngle = Math.atan(((screenPos[0] - webgazer.xDist) / webgazer.LPD) / webgazer.currentViewingDistance);
-    // let verticalAngle = Math.atan(((webgazer.yDist - screenPos[1]) / webgazer.LPD) / webgazer.currentViewingDistance);
+/**
+ * Add rotation data.
+ * @param {Object} eyes - JS object.
+ * @param {Array} screenPos - [x, y] screen positions.
+ * @param {Array} rotationAngles - [horizontal angle, vertical angle] rotation angles.
+ * @param {String} type - type of movement.
+ */
+util_regression.addRotationData = function (eyes, screenPos, rotationAngles, type) {
 
     if (!eyes) {
         return;
@@ -702,20 +704,16 @@ util_regression.addRotationData = function (eyes, rotationAngles, type) {
     //     return;
     // }
     if (type === 'click') {
-        this.screenXClicksArray.push([screenX]);
-        this.screenYClicksArray.push([screenY]);
-
         this.screenXAngleArray.push([rotationAngles[0]]);
         this.screenYAngleArray.push([rotationAngles[1]]);
         this.eyeFeaturesClicks.push(util.getEyeFeats(eyes)[1]);
         this.dataRotationClicks.push({
             'eyes': eyes,
+            'screenPositions': screenPos,
             'rotationAngles': [rotationAngles[0], rotationAngles[1]],
             'type': type
         });
     } else if (type === 'move') {
-        this.screenXTrailArray.push([screenX]);
-        this.screenYTrailArray.push([screenY]);
         this.screenXAngleTrailArray.push([rotationAngles[0]]);
         this.screenYAngleTrailArray.push([rotationAngles[1]]);
 
@@ -723,6 +721,7 @@ util_regression.addRotationData = function (eyes, rotationAngles, type) {
         this.trailTimes.push(performance.now());
         this.dataRotationTrail.push({
             'eyes': eyes,
+            'screenPositions': screenPos,
             'rotationAngles': [rotationAngles[0], rotationAngles[1]],
             'type': type
         });

@@ -56,41 +56,22 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
     // Keypoints indexes are documented at
     // https://github.com/tensorflow/tfjs-models/blob/118d4727197d4a21e2d4691e134a7bc30d90deee/face-landmarks-detection/mesh_map.jpg
     const [leftBBox, rightBBox] = [
-        // // left
-        // {
-        //     eyeTopArcKeypoints: [
-        //         25, 33, 246, 161, 160, 159, 158, 157, 173, 243,
-        //     ],
-        //     eyeBottomArcKeypoints: [
-        //         25, 110, 24, 23, 22, 26, 112, 243,
-        //     ],
-        // },
-        // // right
-        // {
-        //     eyeTopArcKeypoints: [
-        //         463, 398, 384, 385, 386, 387, 388, 466, 263, 255,
-        //     ],
-        //     eyeBottomArcKeypoints: [
-        //         463, 341, 256, 252, 253, 254, 339, 255,
-        //     ],
-        // },
-        // New arcs to include more information in the vertical direction
         // left
         {
             eyeTopArcKeypoints: [
-                130, 247, 30, 29, 27, 28, 56, 190, 243,
+                25, 33, 246, 161, 160, 159, 158, 157, 173, 243,
             ],
             eyeBottomArcKeypoints: [
-                130, 25, 110, 24, 23, 22, 26, 112, 243,
+                25, 110, 24, 23, 22, 26, 112, 243,
             ],
         },
         // right
         {
             eyeTopArcKeypoints: [
-                463, 414, 286, 258, 257, 259, 260, 167, 359,
+                463, 398, 384, 385, 386, 387, 388, 466, 263, 255,
             ],
             eyeBottomArcKeypoints: [
-                463, 341, 256, 252, 253, 254, 339, 255, 359,
+                463, 341, 256, 252, 253, 254, 339, 255,
             ],
         },
     ].map(({eyeTopArcKeypoints, eyeBottomArcKeypoints}) => {
@@ -118,6 +99,51 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
     var rightWidth = rightBBox.width;
     var rightHeight = rightBBox.height;
 
+    // TODO: Keep only one arc during implementation!
+    const [leftBBoxNewArc, rightBBoxNewArc] = [
+        // left
+        {
+            eyeTopArcKeypointsNewArc: [
+                130, 247, 30, 29, 27, 28, 56, 190, 243,
+            ],
+            eyeBottomArcKeypointsNewArc: [
+                130, 25, 110, 24, 23, 22, 26, 112, 243,
+            ],
+        },
+        // right
+        {
+            eyeTopArcKeypointsNewArc: [
+                463, 414, 286, 258, 257, 259, 260, 167, 359,
+            ],
+            eyeBottomArcKeypointsNewArc: [
+                463, 341, 256, 252, 253, 254, 339, 255, 359,
+            ],
+        },
+    ].map(({eyeTopArcKeypointsNewArc, eyeBottomArcKeypointsNewArc}) => {
+        const topLeftOriginNewArc = {
+            x: Math.round(Math.min(...eyeTopArcKeypointsNewArc.map(k => scaledMesh[k][0]))),
+            y: Math.round(Math.min(...eyeTopArcKeypointsNewArc.map(k => scaledMesh[k][1]))),
+        };
+        const bottomRightOriginNewArc = {
+            x: Math.round(Math.max(...eyeBottomArcKeypointsNewArc.map(k => scaledMesh[k][0]))),
+            y: Math.round(Math.max(...eyeBottomArcKeypointsNewArc.map(k => scaledMesh[k][1]))),
+        };
+
+        return {
+            origin: topLeftOriginNewArc,
+            width: bottomRightOriginNewArc.x - topLeftOriginNewArc.x,
+            height: bottomRightOriginNewArc.y - topLeftOriginNewArc.y,
+        }
+    });
+    var leftOriginXNewArc = leftBBoxNewArc.origin.x;
+    var leftOriginYNewArc = leftBBoxNewArc.origin.y;
+    var leftWidthNewArc = leftBBoxNewArc.width;
+    var leftHeightNewArc = leftBBoxNewArc.height;
+    var rightOriginXNewArc = rightBBoxNewArc.origin.x;
+    var rightOriginYNewArc = rightBBoxNewArc.origin.y;
+    var rightWidthNewArc = rightBBoxNewArc.width;
+    var rightHeightNewArc = rightBBoxNewArc.height;
+
     if (leftWidth === 0 || rightWidth === 0) {
         console.log('an eye patch had zero width');
         return null;
@@ -132,7 +158,13 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
     var eyeObjs = {};
     var eyeObjsFeatures = {}
 
+    // For eye objects with new arcs
+    var eyeObjsNewArc = {};
+    var eyeObjsFeaturesNewArc = {}
+
     var leftImageData = imageCanvas.getContext('2d').getImageData(leftOriginX, leftOriginY, leftWidth, leftHeight);
+    var leftImageDataNewArc = imageCanvas.getContext('2d').getImageData(leftOriginXNewArc, leftOriginYNewArc, leftWidthNewArc, leftHeightNewArc);
+
     eyeObjs.left = {
         patch: leftImageData,
         imagex: leftOriginX,
@@ -140,8 +172,17 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         width: leftWidth,
         height: leftHeight,
     };
+    eyeObjsNewArc.left = {
+        patch: leftImageDataNewArc,
+        imagex: leftOriginX,
+        imagey: leftOriginY,
+        width: leftWidth,
+        height: leftHeight,
+    };
+
 
     var rightImageData = imageCanvas.getContext('2d').getImageData(rightOriginX, rightOriginY, rightWidth, rightHeight);
+    var rightImageDataNewArc = imageCanvas.getContext('2d').getImageData(rightOriginXNewArc, rightOriginYNewArc, rightWidthNewArc, rightHeightNewArc);
     eyeObjs.right = {
         patch: rightImageData,
         imagex: rightOriginX,
@@ -149,27 +190,42 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
         width: rightWidth,
         height: rightHeight,
     };
+    eyeObjsNewArc.right = {
+        patch: rightImageDataNewArc,
+        imagex: rightOriginX,
+        imagey: rightOriginY,
+        width: rightWidth,
+        height: rightHeight,
+    };
+
 
     let [eyeGrays, eyeFeatures] = util.getEyeFeats(eyeObjs)
+    let [eyeGraysNewArc, eyeFeaturesNewArc] = util.getEyeFeats(eyeObjsNewArc)
 
     eyeObjsFeatures.left = {
         patch: leftImageData,
+        patchNew: leftImageDataNewArc,
         imagex: leftOriginX,
         imagey: leftOriginY,
         width: leftWidth,
         height: leftHeight,
         grayImage: eyeGrays,
-        equalisedFeatures: eyeFeatures
+        grayImageNew: eyeGraysNewArc,
+        equalisedFeatures: eyeFeatures,
+        equalisedFeaturesNew: eyeFeaturesNewArc,
     };
 
     eyeObjsFeatures.right = {
         patch: rightImageData,
+        patchNew: rightImageDataNewArc,
         imagex: rightOriginX,
         imagey: rightOriginY,
         width: rightWidth,
         height: rightHeight,
         grayImage: eyeGrays,
-        equalisedFeatures: eyeFeatures
+        grayImageNew: eyeGraysNewArc,
+        equalisedFeatures: eyeFeatures,
+        equalisedFeaturesNew: eyeFeaturesNewArc,
     };
 
     this.predictionReady = true;
