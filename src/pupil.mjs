@@ -1,3 +1,5 @@
+import webgazer from "./index.mjs";
+
 const pupil = {};
 
 /**
@@ -91,21 +93,24 @@ const getPupils = function (eyesObj) {
     if (!eyesObj) {
         return eyesObj;
     }
+    // Calculate video to camera conversion factor
+    webgazer.videoToCameraWidthRatio = 0.5 //webgazer.getVideoPreviewToCameraResolutionRatio()[0]
+    webgazer.videoToCameraHeightRatio = 0.5 //webgazer.getVideoPreviewToCameraResolutionRatio()[1]
     if (!eyesObj.left.blink) {
         // Add pupil data into the js object which is to be saved as json
         eyesObj.left.pupil = getSinglePupil(Array.prototype.slice.call(webgazer.util.grayscale(eyesObj.left.patch.data, eyesObj.left.width, eyesObj.left.height)), eyesObj.left.width, eyesObj.left.height);
-        eyesObj.left.pupil[0][0] -= eyesObj.left.pupil[1];
-        eyesObj.left.pupil[0][1] -= eyesObj.left.pupil[1];
+        eyesObj.left.pupil[0][0] -= eyesObj.left.pupil[1]; // minus half width of pupil (horizontal direction)
+        eyesObj.left.pupil[0][1] -= eyesObj.left.pupil[1]; // minus half width of pupil (vertical direction)
         // Exact pupil location on screen
-        eyesObj.left.pupilXCoordinate = eyesObj.left.imagex + eyesObj.left.width - eyesObj.left.pupil[0][0];
-        eyesObj.left.pupilYCoordinate = eyesObj.left.imagey + eyesObj.left.height - eyesObj.left.pupil[0][1];
+        eyesObj.left.pupilXCoordinate = (eyesObj.left.imagex + eyesObj.left.width - eyesObj.left.pupil[0][0]) / webgazer.videoToCameraWidthRatio; // convert from video resolution to screen resolution
+        eyesObj.left.pupilYCoordinate = (eyesObj.left.imagey + eyesObj.left.height - eyesObj.left.pupil[0][1]) / webgazer.videoToCameraWidthRatio
     }
     if (!eyesObj.right.blink) {
         eyesObj.right.pupil = getSinglePupil(Array.prototype.slice.call(webgazer.util.grayscale(eyesObj.right.patch.data, eyesObj.right.width, eyesObj.right.height)), eyesObj.right.width, eyesObj.right.height);
         eyesObj.right.pupil[0][0] -= eyesObj.right.pupil[1];
         eyesObj.right.pupil[0][1] -= eyesObj.right.pupil[1];
-        eyesObj.right.pupilXCoordinate = eyesObj.right.imagex + eyesObj.right.width - eyesObj.right.pupil[0][0];
-        eyesObj.right.pupilYCoordinate = eyesObj.right.imagey + eyesObj.right.height - eyesObj.right.pupil[0][1];
+        eyesObj.right.pupilXCoordinate = (eyesObj.right.imagex + eyesObj.right.width - eyesObj.right.pupil[0][0]) / webgazer.videoToCameraWidthRatio;
+        eyesObj.right.pupilYCoordinate = (eyesObj.right.imagey + eyesObj.right.height - eyesObj.right.pupil[0][1]) / webgazer.videoToCameraWidthRatio;
     }
     return eyesObj;
 }

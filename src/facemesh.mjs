@@ -164,7 +164,6 @@ TFFaceMesh.prototype.getEyePatches = async function (video, imageCanvas, width, 
 
     var leftImageData = imageCanvas.getContext('2d').getImageData(leftOriginX, leftOriginY, leftWidth, leftHeight);
     var leftImageDataNewArc = imageCanvas.getContext('2d').getImageData(leftOriginXNewArc, leftOriginYNewArc, leftWidthNewArc, leftHeightNewArc);
-
     eyeObjs.left = {
         patch: leftImageData,
         imagex: leftOriginX,

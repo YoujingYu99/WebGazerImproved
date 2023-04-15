@@ -408,18 +408,19 @@ function generateRandomButton(buttonCount) {
     // lower left
     xMin = 0;
     xMax = 320;
-    yMin = 340;
-    yMax = 580;
+    yMin = 329;
+    yMax = 569;
   } else if (videoPosition === 3) {
     // lower right
     xMin = 960;
     xMax = 1280;
-    yMin = 340;
-    yMax = 580;
+    yMin = 329;
+    yMax = 569;
   }
   // Initialise random point
   let randomTop = getRandomInt(canvas.height * 0.1, canvas.height * 0.95);
   let randomLeft = getRandomInt(canvas.width * 0.05, canvas.width * 0.95);
+  console.log("width, height", canvas.width, canvas.height);
 
   // Generate point until not in forbidden region
   while (true) {

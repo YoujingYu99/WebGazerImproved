@@ -1,6 +1,7 @@
 import util from './util';
 import util_regression from './util_regression';
 import params from './params';
+import webgazer from "./index.mjs";
 
 const reg = {};
 
@@ -157,7 +158,7 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
 
     // Eye grey histogram for both left and right eyes
     // length 120
-    console.log("get eye features")
+    // console.log("get eye features")
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
 

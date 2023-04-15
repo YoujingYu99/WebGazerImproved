@@ -35,6 +35,10 @@ webgazer.xDist = 0;
 webgazer.yDist = 0;
 webgazer.storeData = null;
 webgazer.calibrationPhase = true; // true if still in calibration and adding datapoints
+// webgazer.userScreenWidth = 1280;
+// webgazer.userScreenHeight = 720;
+webgazer.videoToCameraWidthRatio = 0 // How many video pixels maps to camera width
+webgazer.videoToCameraHeightRatio = 0
 
 //PRIVATE VARIABLES
 
@@ -268,7 +272,7 @@ async function assignNewViewingDistance(latestEyeFeatures) {
 }
 
 /**
- * calculates the x distance and y distance from screen.
+ * calculates the x distance and y distance (in screen resolution) from screen.
  * @param {Number|undefined} latestEyeFeatures - The current eye features.
  * @returns [x distance, y distance]
  */
@@ -279,16 +283,7 @@ async function getXDistYDist(latestEyeFeatures) {
     if (latestEyeFeaturesWithPupils != null) {
         xDist = (latestEyeFeaturesWithPupils.left.pupilXCoordinate + latestEyeFeaturesWithPupils.right.pupilXCoordinate) / 2
         yDist = (latestEyeFeaturesWithPupils.left.pupilYCoordinate + latestEyeFeaturesWithPupils.right.pupilYCoordinate) / 2
-        // console.log("Left eye origin location", latestEyeFeaturesWithPupils.left.imagex, latestEyeFeaturesWithPupils.left.imagey);
-        // console.log("lefy eye pupil location", latestEyeFeaturesWithPupils.left.pupilXCoordinate, latestEyeFeaturesWithPupils.left.pupilYCoordinate);
-        // console.log("left eye width and height", latestEyeFeaturesWithPupils.left.width, latestEyeFeaturesWithPupils.left.height);
     }
-    // let leftPupilX = latestEyeFeaturesWithPupils.left["pupil"][0][0];
-    // let leftPupilY = latestEyeFeaturesWithPupils.left["pupil"][0][1];
-    // let rightPupilX = latestEyeFeaturesWithPupils.right["pupil"][0][0];
-    // let rightPupilY = latestEyeFeaturesWithPupils.right["pupil"][0][1];
-    // let xDist = (leftPupilX + rightPupilX) / 2
-    // let yDist = (leftPupilY + rightPupilY) / 2
     return [xDist, yDist]
 }
 
@@ -1317,6 +1312,7 @@ webgazer.getVideoElementCanvas = function () {
 webgazer.getVideoPreviewToCameraResolutionRatio = function () {
     return [webgazer.params.videoViewerWidth / videoElement.videoWidth, webgazer.params.videoViewerHeight / videoElement.videoHeight];
 }
+
 
 /*
  * Gets the fifty most recent tracker predictions
