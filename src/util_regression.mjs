@@ -27,7 +27,7 @@ util_regression.InitRegression = function () {
     this.screenYAngleArray = new util.DataWindow(dataWindow);
     this.eyeFeaturesClicks = new util.DataWindow(dataWindow);
 
-    //sets to one second worth of cursor trail
+    // sets to one second worth of cursor trail
     this.trailTime = 1000;
     // 1000/50 = 20
     this.trailDataWindow = this.trailTime / params.moveTickSize;

@@ -58,9 +58,10 @@ reg.RidgeReg.prototype.predict = function (eyesObj) {
             trailX.push(this.screenXTrailArray.get(i));
             trailY.push(this.screenYTrailArray.get(i));
             trailFeat.push(this.eyeFeaturesTrail.get(i));
-            // console.log(i);
-            // console.log(this.trailTimes.get(i));
-            // console.log(acceptTime);
+            // console.log("i", i);
+            // console.log("trailtimes.get(i)", this.trailTimes.get(i));
+            // console.log("accept time", acceptTime);
+            // console.log("trailX length", trailX.length)
         }
     }
     // eyeFeaturesTrail contains eye size as grey histogram;
@@ -203,33 +204,41 @@ reg.RidgeReg.prototype.predictRotationGP = function (eyesObj) {
     if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
         return null;
     }
-    // accept times is how long it has been after the trailtime, which is 1000ms
-    var acceptTime = performance.now() - this.trailTime;
-    var trailX = [];
-    var trailY = [];
-    var trailXAngle = [];
-    var trailYAngle = [];
-    var trailFeat = [];
-    // trailDataWindow is 1000/50=20.
-    for (var i = 0; i < this.trailDataWindow; i++) {
-        // What is happening here?
-        if (this.trailTimes.get(i) > acceptTime) {
-            trailFeat.push(this.eyeFeaturesTrail.get(i));
-            trailXAngle.push(this.screenXAngleTrailArray.get(i));
-            trailYAngle.push(this.screenYAngleTrailArray.get(i));
-            // console.log(i);
-            // console.log(this.trailTimes.get(i));
-            // console.log(acceptTime);
+    let maxNumberOfDataPoints = 40;
+    // If more than 40 data points already, use the data points collected during calibration:
+    if (this.screenXAngleArray.data.length > maxNumberOfDataPoints) {
+        var xAngleArray = this.screenXAngleArray.data.slice(0, maxNumberOfDataPoints);
+        var yAngleArray = this.screenYAngleArray.data.slice(0, maxNumberOfDataPoints);
+        var eyeFeatures = this.eyeFeaturesClicks.data.slice(0, maxNumberOfDataPoints);
+    } else {
+        // Else, use all data points
+        // accept times is how long it has been after the trail time, the trail time is 1000ms.
+        // This is so we accept trails during th 1000ms window
+        var acceptTime = performance.now() - this.trailTime;
+        var trailXAngle = [];
+        var trailYAngle = [];
+        var trailFeat = [];
+        // trailDataWindow is 1000/50=20. There are 20 data points in the 1000ms window.
+        for (var i = 0; i < this.trailDataWindow; i++) {
+            // If the trail time is within the 1000ms window after the click
+            if (this.trailTimes.get(i) > acceptTime) {
+                trailFeat.push(this.eyeFeaturesTrail.get(i));
+                trailXAngle.push(this.screenXAngleTrailArray.get(i));
+                trailYAngle.push(this.screenYAngleTrailArray.get(i));
+                // console.log("trailtimes.get(i)", this.trailTimes.get(i));
+                // console.log("accept time", acceptTime);
+                // console.log("trailX length", trailXAngle.length)
+            }
         }
+        // eyeFeaturesTrail contains eye size as grey histogram;
+        // screenX/YAngleArray contains the angles;
+        var xAngleArray = this.screenXAngleArray.data.concat(trailXAngle);
+        var yAngleArray = this.screenYAngleArray.data.concat(trailYAngle);
+
+
+        // size n * 120, n varies depending on how many datapoints are accepted
+        var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
     }
-    // eyeFeaturesTrail contains eye size as grey histogram;
-    // screenX/YAngleArray contains the angles;
-    var xAngleArray = this.screenXAngleArray.data.concat(trailXAngle);
-    var yAngleArray = this.screenYAngleArray.data.concat(trailYAngle);
-
-
-    // size n * 120, n varies depending on how many datapoints are accepted
-    var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
 
     // Eye grey histogram for both left and right eyes
     // length 120
