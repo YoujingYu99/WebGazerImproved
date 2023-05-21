@@ -572,11 +572,42 @@ util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsC
     return [pred, variance]
 }
 
+/**
+ * Performs Sparse GP regression with a RBF kernel plus a white kernel.
+ * @param {Array} eyeFeatures - Predetermined eye features.
+ * @param {Array} angles - Predetermined eye angles.
+ * @param {Array} Kxx_inv - Inverse of K_xx
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number}  sigma_one - Scale factor of RBF.
+ * @param {Number} length_scale - length scale of RBF.
+ * @param {Number} sigma_two - Std of noise.
+ * @param {Number} feature_size - Size of feature vector. 120
+ * @return{Number} predicted angle and variance..
+ */
+util_regression.GPPrecomputedSERegressor = function (eyeFeatures, angles, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size) {
+    let train_length = eyeFeatures.length
+    let K_xxstar = new Array(train_length)
+
+    // Calculate K_xxstar (for SE)
+    for (var p = 0; p < train_length; p++) {
+        let x = eyeFeatsCurrent;
+        let x_prime = eyeFeatures[p];
+        let dist = eucDistance(x, x_prime);
+        let k_value = 0;
+        k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2) * feature_size))
+        K_xxstar[p] = k_value
+    }
+
+    let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, angles))
+    // TODO: Leave variance as 0 for now
+
+    return [pred, 0]
+}
+
 
 /**
  * Performs Sparse GP regression with a RBF kernel plus a white kernel.
  * @param {Array} eyeFeatures - Inducing points eye features.
- * @param {Array} K_xx - Gram matrix for inducing points.
  * @param {Array} Kxx_inv - Inverse of K_xx
  * @param {Array} eyeFeatsCurrent - Current eye feature.
  * @param {Number}  sigma_one - Scale factor of RBF.
@@ -587,7 +618,7 @@ util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsC
  * @param {Number} S - Covariance function of the posterior q(u). Size of eyeFeatures.
  * @return{Number} predicted angle and variance..
  */
-util_regression.GPSparseSERegressor = function (eyeFeatures, K_xx, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size, m, S) {
+util_regression.GPSparseSERegressor = function (eyeFeatures, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size, m, S) {
     let train_length = eyeFeatures.length
     let K_xxstar = new Array(train_length)
 
@@ -613,8 +644,40 @@ util_regression.GPSparseSERegressor = function (eyeFeatures, K_xx, Kxx_inv, eyeF
 
 /**
  * Performs Sparse GP regression with an RQ kernel plus a white kernel.
+ * @param {Array} eyeFeatures - Predetermined eye features.
+ * @param {Array} angles - Predetermined eye angles.
+ * @param {Array} Kxx_inv - Inverse of K_xx
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number}  sigma_one - Scale factor of RQ.
+ * @param {Number} length_scale - length scale of RQ.
+ * @param {Number} alpha - mixture factor of RQ.
+ * @param {Number} sigma_two - Std of noise.
+ * @param {Number} feature_size - Size of feature vector. 120
+ * @return {Number} predicted angle and variance.
+ */
+util_regression.GPPrecomputedRQRegressor = function (eyeFeatures, angles, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size) {
+    let train_length = eyeFeatures.length
+    let K_xxstar = new Array(train_length)
+
+    // Calculate K_xxstar (for SE)
+    for (var p = 0; p < train_length; p++) {
+        let x = eyeFeatsCurrent;
+        let x_prime = eyeFeatures[p];
+        let dist = eucDistance(x, x_prime);
+        let k_value = 0;
+        k_value = (sigma_one ** 2) * (1 + (dist ** 2) / (2 * feature_size * alpha * (length_scale ** 2)))
+        K_xxstar[p] = k_value
+    }
+
+    let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, angles))
+
+    return [pred, 0]
+}
+
+
+/**
+ * Performs Sparse GP regression with an RQ kernel plus a white kernel.
  * @param {Array} eyeFeatures - Inducing points eye features.
- * @param {Array} K_xx - Gram matrix for inducing points.
  * @param {Array} Kxx_inv - Inverse of K_xx
  * @param {Array} eyeFeatsCurrent - Current eye feature.
  * @param {Number}  sigma_one - Scale factor of RQ.
@@ -626,7 +689,7 @@ util_regression.GPSparseSERegressor = function (eyeFeatures, K_xx, Kxx_inv, eyeF
  * @param {Number} S - Covariance function of the posterior q(u). Size of eyeFeatures.
  * @return {Number} predicted angle and variance..
  */
-util_regression.GPSparseRQRegressor = function (eyeFeatures, K_xx, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size, m, S) {
+util_regression.GPSparseRQRegressor = function (eyeFeatures, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size, m, S) {
     let train_length = eyeFeatures.length
     let K_xxstar = new Array(train_length)
 
@@ -652,8 +715,53 @@ util_regression.GPSparseRQRegressor = function (eyeFeatures, K_xx, Kxx_inv, eyeF
 
 /**
  * Performs Sparse GP regression with an Custom kernel plus a white kernel.
+ * @param {Array} eyeFeatures - Predetermined eye features.
+ * @param {Array} angles - Predetermined eye angles.
+ * @param {Array} Kxx_inv - Inverse of K_xx
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number} pixel_scale - Pixel scale. M in equation.
+ * @param {Number} sigma_one - Scaling Std.
+ * @param {Number} sigma_two - Noise Std.
+ * @param {Array} width_matrix_custom - Cx.
+ * @param {Array} height_matrix_custom - Cy.
+ * @param {Number} feature_size - Size of feature vector. 120
+ * @return {Number} predicted angle and variance.
+ */
+util_regression.GPPrecomputedCustomRegressor = function (eyeFeatures, angles, Kxx_inv, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
+
+    //Slice left and right eyes for training and test dataset
+    var eyeFeaturesLeft = [];
+    for (var i = 0; i < eyeFeatures.length; i++) {
+        eyeFeaturesLeft.push(eyeFeatures[i].slice(0, 60))
+    }
+    var eyeFeaturesRight = [];
+    for (var i = 0; i < eyeFeatures.length; i++) {
+        eyeFeaturesRight.push(eyeFeatures[i].slice(-60))
+    }
+    var eyeFeatsCurrentLeft = [eyeFeatsCurrent.slice(0, 60)]
+    var eyeFeatsCurrentRight = [eyeFeatsCurrent.slice(-60)]
+
+    let K_xxstar = util_regression.getKMatrixVec(
+        eyeFeatsCurrentLeft,
+        eyeFeatsCurrentRight,
+        eyeFeaturesLeft,
+        eyeFeaturesRight,
+        width_matrix_custom,
+        height_matrix_custom,
+        pixel_scale,
+        sigma_one,
+        sigma_two,
+        true)
+
+    let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, angles))
+
+    return [pred, 0]
+}
+
+
+/**
+ * Performs Sparse GP regression with an Custom kernel plus a white kernel.
  * @param {Array} eyeFeatures - Inducing points eye features.
- * @param {Array} K_xx - Gram matrix for inducing points.
  * @param {Array} Kxx_inv - Inverse of K_xx
  * @param {Array} eyeFeatsCurrent - Current eye feature.
  * @param {Number} pixel_scale - Pixel scale. M in equation.
@@ -666,7 +774,7 @@ util_regression.GPSparseRQRegressor = function (eyeFeatures, K_xx, Kxx_inv, eyeF
  * @param {Number} S - Covariance function of the posterior q(u). Size of eyeFeatures.
  * @return {Number} predicted angle and variance.
  */
-util_regression.GPSparseCustomRegressor = function (eyeFeatures, K_xx, Kxx_inv, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size, m, S) {
+util_regression.GPSparseCustomRegressor = function (eyeFeatures, Kxx_inv, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size, m, S) {
 
     //Slice left and right eyes for training and test dataset
     var eyeFeaturesLeft = [];

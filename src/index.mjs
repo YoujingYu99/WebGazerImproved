@@ -41,17 +41,20 @@ webgazer.calibrationPhase = true; // true if still in calibration and adding dat
 webgazer.videoToCameraWidthRatio = 0 // How many video pixels maps to camera width
 webgazer.videoToCameraHeightRatio = 0
 
-// // load pre-computed variables
-// import npyjs from "npyjs";
-//
-// let n = new npyjs();
-// n.load("eye_features_xz419.npy", (array, shape) => {
-//     // `array` is a one-dimensional array of the raw data
-//     // `shape` is a one-dimensional array that holds a numpy-style shape.
-//     console.log(
-//         `You loaded an array with ${array.length} elements and ${shape.length} dimensions.`
-//     );
-// });
+
+import eyeFeaturesPrecomputed from './data/eye_features.json'
+import horizontalAnglesPrecomputed from './data/horizontal_angles.json'
+import KxxinverseHorizontalPrecomputed from './data/K_xxinverse_horizontal.json'
+import verticalAnglesPrecomputed from './data/vertical_angles.json'
+import KxxinverseVerticalPrecomputed from './data/K_xxinverse_vertical.json'
+
+
+webgazer.eyeFeaturesPrecomputed = JSON.parse(eyeFeaturesPrecomputed)
+webgazer.horizontalAnglesPrecomputed = JSON.parse(horizontalAnglesPrecomputed)
+webgazer.KxxinverseHorizontalPrecomputed = JSON.parse(KxxinverseHorizontalPrecomputed)
+webgazer.verticalAnglesPrecomputed = JSON.parse(verticalAnglesPrecomputed)
+webgazer.KxxinverseVerticalPrecomputed = JSON.parse(KxxinverseVerticalPrecomputed)
+
 
 //PRIVATE VARIABLES
 
@@ -324,12 +327,14 @@ async function getPrediction(regModelIndex) {
         return null;
     }
     for (var reg in regs) {
-        // Original WebGazer impelmentation
-        predictions.push(regs[reg].predict(latestEyeFeatures));
+        // // Original WebGazer impelmentation
+        // predictions.push(regs[reg].predict(latestEyeFeatures));
         // // Ridge regression with angles.
         // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
         // // // GP kernel.
         // predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
+        // // GP kernel with precomputed matrices.
+        predictions.push(regs[reg].predictRotationGPPrecomputed(latestEyeFeatures));
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {

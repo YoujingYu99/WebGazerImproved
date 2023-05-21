@@ -4,8 +4,8 @@ var PointDataCollection = 0;
 var CalibrationPoints = {};
 var CalibrationBlockPoints = {};
 var DataCollectionPoints = {};
-const numClickPerPoint = 3;
-const numClickPerPointDataCollection = 3;
+const numClickPerPoint = 1;
+const numClickPerPointDataCollection = 1;
 const numDataPointsToCollect = 300;
 var buttonCount = 1;
 
