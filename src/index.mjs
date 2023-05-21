@@ -26,6 +26,7 @@ webgazer.util = util;
 webgazer.params = params;
 
 // Initialise parameters
+webgazer.useRotation = false;
 webgazer.LPD = 0;
 webgazer.initialViewingDistance = 0;
 webgazer.currentViewingDistance = 0;
@@ -39,6 +40,18 @@ webgazer.calibrationPhase = true; // true if still in calibration and adding dat
 // webgazer.userScreenHeight = 720;
 webgazer.videoToCameraWidthRatio = 0 // How many video pixels maps to camera width
 webgazer.videoToCameraHeightRatio = 0
+
+// // load pre-computed variables
+// import npyjs from "npyjs";
+//
+// let n = new npyjs();
+// n.load("eye_features_xz419.npy", (array, shape) => {
+//     // `array` is a one-dimensional array of the raw data
+//     // `shape` is a one-dimensional array that holds a numpy-style shape.
+//     console.log(
+//         `You loaded an array with ${array.length} elements and ${shape.length} dimensions.`
+//     );
+// });
 
 //PRIVATE VARIABLES
 
@@ -311,12 +324,12 @@ async function getPrediction(regModelIndex) {
         return null;
     }
     for (var reg in regs) {
-        //// Original WebGazer impelmentation
-        // predictions.push(regs[reg].predict(latestEyeFeatures));
-        // Ridge regression with angles.
+        // Original WebGazer impelmentation
+        predictions.push(regs[reg].predict(latestEyeFeatures));
+        // // Ridge regression with angles.
         // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
-        // // GP kernel.
-        predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
+        // // // GP kernel.
+        // predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {
@@ -467,8 +480,11 @@ var recordRotationAngles = function (x, y, eventType) {
  * @param {Event} event - The listened event
  */
 var clickListener = async function (event) {
-    // recordScreenPosition(event.clientX, event.clientY, eventTypes[0]); // eventType[0] === 'click'
-    recordRotationAngles(event.clientX, event.clientY, eventTypes[0]);
+    if (webgazer.useRotation) {
+        recordRotationAngles(event.clientX, event.clientY, eventTypes[0])
+    } else {
+        recordScreenPosition(event.clientX, event.clientY, eventTypes[0]); // eventType[0] === 'click'
+    }
     if (webgazer.params.saveDataAcrossSessions) {
         // Each click stores the next data point into localforage.
         // await setGlobalData();
@@ -494,8 +510,12 @@ var moveListener = function (event) {
     } else {
         moveClock = now;
     }
-    // recordScreenPosition(event.clientX, event.clientY, eventTypes[1]);
-    recordRotationAngles(event.clientX, event.clientY, eventTypes[1]); //eventType[1] === 'move'
+
+    if (webgazer.useRotation) {
+        recordRotationAngles(event.clientX, event.clientY, eventTypes[0])
+    } else {
+        recordScreenPosition(event.clientX, event.clientY, eventTypes[0]); // eventType[0] === 'click'
+    }
 };
 
 /**

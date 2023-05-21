@@ -4,8 +4,8 @@ var PointDataCollection = 0;
 var CalibrationPoints = {};
 var CalibrationBlockPoints = {};
 var DataCollectionPoints = {};
-const numClickPerPoint = 5;
-const numClickPerPointDataCollection = 5;
+const numClickPerPoint = 3;
+const numClickPerPointDataCollection = 3;
 const numDataPointsToCollect = 300;
 var buttonCount = 1;
 
@@ -27,7 +27,7 @@ function calibrationInstructionNine() {
   clearCanvas();
   swal({
     title: "Calibration A: Nine Points",
-    text: "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",
+    text: "Please click on each of the 9 points on the screen. You must click on each point three times till it goes yellow. This will calibrate your eye movements.",
     buttons: {
       cancel: false,
       confirm: true,
