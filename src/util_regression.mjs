@@ -582,7 +582,7 @@ util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsC
  * @param {Number} length_scale - length scale of RBF.
  * @param {Number} sigma_two - Std of noise.
  * @param {Number} feature_size - Size of feature vector. 120
- * @return{Number} predicted angle and variance..
+ * @return{Number} predicted angle and variance.
  */
 util_regression.GPPrecomputedSERegressor = function (eyeFeatures, angles, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size) {
     let train_length = eyeFeatures.length

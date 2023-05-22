@@ -70,7 +70,8 @@ function calculatePrecisionPercentages(
 
     // New accuracy measure for the square box detection
     let allowedError = 50;
-    if (xDiff < allowedError && yDiff < allowedError) {
+
+    if (Math.abs(xDiff) < allowedError && Math.abs(yDiff) < allowedError) {
       // console.log("x diff", xDiff);
       // console.log("y diff", yDiff);
       precision = 100;
@@ -78,15 +79,10 @@ function calculatePrecisionPercentages(
       precision = 0;
     }
 
-    // console.log("x diff", xDiff);
-    // console.log("y diff", yDiff);
-    // console.log("Half window height", halfWindowHeight);
-    // console.log("Precision", precision);
-
     // Store the precision and x/y errors
     precisionPercentages[i] = precision;
-    xErrors[i] = xDiff;
-    yErrors[i] = yDiff;
+    xErrors[i] = Math.abs(xDiff);
+    yErrors[i] = Math.abs(yDiff);
   }
 }
 
@@ -105,8 +101,12 @@ function calculateAverage(dataArray) {
     return !Number.isNaN(value);
   });
 
-  // last50Points = dataArrayNoNan.slice(-50);
-  let last50Points = dataArrayNoNan; // TODO: change back to 50 if not custom kernel
+  if (dataArrayNoNan.length < 50) {
+    last50Points = dataArrayNoNan;
+  } else {
+    last50Points = dataArrayNoNan.slice(-50);
+  }
+  // let last50Points = dataArrayNoNan; // TODO: change back to 50 if not custom kernel
   let dataSum = last50Points.reduce((a, b) => a + b, 0);
   let dataAvg = dataSum / last50Points.length || 0;
   return dataAvg;

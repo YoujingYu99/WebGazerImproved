@@ -26,7 +26,7 @@ webgazer.util = util;
 webgazer.params = params;
 
 // Initialise parameters
-webgazer.useRotation = false;
+webgazer.useRotation = true;
 webgazer.LPD = 0;
 webgazer.initialViewingDistance = 0;
 webgazer.currentViewingDistance = 0;
@@ -44,17 +44,23 @@ webgazer.videoToCameraHeightRatio = 0
 
 import eyeFeaturesPrecomputed from './data/eye_features.json'
 import horizontalAnglesPrecomputed from './data/horizontal_angles.json'
-import KxxinverseHorizontalPrecomputed from './data/K_xxinverse_horizontal.json'
 import verticalAnglesPrecomputed from './data/vertical_angles.json'
-import KxxinverseVerticalPrecomputed from './data/K_xxinverse_vertical.json'
-
+import KxxinverseHorizontalSEPrecomputed from './data/K_xxinverse_horizontal_SE.json'
+import KxxinverseVerticalSEPrecomputed from './data/K_xxinverse_vertical_SE.json'
+import KxxinverseHorizontalRQPrecomputed from './data/K_xxinverse_horizontal_RQ.json'
+import KxxinverseVerticalRQPrecomputed from './data/K_xxinverse_vertical_RQ.json'
+import KxxinverseHorizontalCustomPrecomputed from './data/K_xxinverse_horizontal_custom.json'
+import KxxinverseVerticalCustomPrecomputed from './data/K_xxinverse_vertical_custom.json'
 
 webgazer.eyeFeaturesPrecomputed = JSON.parse(eyeFeaturesPrecomputed)
 webgazer.horizontalAnglesPrecomputed = JSON.parse(horizontalAnglesPrecomputed)
-webgazer.KxxinverseHorizontalPrecomputed = JSON.parse(KxxinverseHorizontalPrecomputed)
 webgazer.verticalAnglesPrecomputed = JSON.parse(verticalAnglesPrecomputed)
-webgazer.KxxinverseVerticalPrecomputed = JSON.parse(KxxinverseVerticalPrecomputed)
-
+webgazer.KxxinverseHorizontalSEPrecomputed = JSON.parse(KxxinverseHorizontalSEPrecomputed)
+webgazer.KxxinverseVerticalSEPrecomputed = JSON.parse(KxxinverseVerticalSEPrecomputed)
+webgazer.KxxinverseHorizontalRQPrecomputed = JSON.parse(KxxinverseHorizontalRQPrecomputed)
+webgazer.KxxinverseVerticalRQPrecomputed = JSON.parse(KxxinverseVerticalRQPrecomputed)
+webgazer.KxxinverseHorizontalCustomPrecomputed = JSON.parse(KxxinverseHorizontalCustomPrecomputed)
+webgazer.KxxinverseVerticalCustomPrecomputed = JSON.parse(KxxinverseVerticalCustomPrecomputed)
 
 //PRIVATE VARIABLES
 
@@ -327,14 +333,15 @@ async function getPrediction(regModelIndex) {
         return null;
     }
     for (var reg in regs) {
-        // // Original WebGazer impelmentation
+        // // // Original WebGazer impelmentation
         // predictions.push(regs[reg].predict(latestEyeFeatures));
+        // webgazer.useRotation = false;
         // // Ridge regression with angles.
         // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
-        // // // GP kernel.
-        // predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
-        // // GP kernel with precomputed matrices.
-        predictions.push(regs[reg].predictRotationGPPrecomputed(latestEyeFeatures));
+        // // GP kernel.
+        predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
+        // // // GP kernel with precomputed matrices.
+        // predictions.push(regs[reg].predictRotationGPPrecomputed(latestEyeFeatures));
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {
