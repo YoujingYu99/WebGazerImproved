@@ -294,7 +294,7 @@ async function assignNewViewingDistance(latestEyeFeatures) {
 }
 
 /**
- * calculates the x distance and y distance (in screen resolution) from screen.
+ * calculates the x distance and y distance (in screen coordinates) from screen.
  * @param {Number|undefined} latestEyeFeatures - The current eye features.
  * @returns [x distance, y distance]
  */

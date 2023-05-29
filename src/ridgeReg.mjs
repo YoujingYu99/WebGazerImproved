@@ -300,15 +300,15 @@ reg.RidgeReg.prototype.predictRotationGPPrecomputed = function (eyesObj) {
     // length 120
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
-    // // SE Kernel
-    // let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120)
-    // let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120)
+    // SE Kernel
+    let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120)
+    let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120)
     // // RQ Kernel
     // let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedRQRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalRQPrecomputed, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120)
     // let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedRQRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalRQPrecomputed, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120)
-    // Custom Kernel
-    let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalCustomPrecomputed, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120)
-    let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalCustomPrecomputed, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120)
+    // // Custom Kernel
+    // let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalCustomPrecomputed, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120)
+    // let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalCustomPrecomputed, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120)
 
     console.log("x and y angles", predictedXAngle, predictedYAngle)
     // Convert the predicted angles (in radians) to position
