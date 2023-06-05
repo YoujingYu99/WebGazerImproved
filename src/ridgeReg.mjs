@@ -194,67 +194,117 @@ reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
     }
 };
 
+
+// Only compute beforehand if using custom Kernel
+util_regression.width_matrix_custom_x = util_regression.getDistMatrix(10, params.l_width_x)
+util_regression.height_matrix_custom_x = util_regression.getDistMatrix(6, params.l_height_x)
+util_regression.width_matrix_custom_y = util_regression.getDistMatrix(10, params.l_width_y)
+util_regression.height_matrix_custom_y = util_regression.getDistMatrix(6, params.l_height_y)
+
+
 /**
  * Try to predict eye rotation from pupil data using Gaussian Process SE kernel.
  * after apply linear regression on data set.
  * @param {Object} eyesObj - The current user eyes object.
+ * @param {Boolean} useTrail - Whether to use trail data.
+ * @param {String} kernel - which kernel to use. SE, RQ or custom
  * @returns {Object}
  */
-reg.RidgeReg.prototype.predictRotationGP = function (eyesObj) {
+reg.RidgeReg.prototype.predictRotationGP = function (eyesObj, useTrail, kernel) {
     if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
         return null;
     }
 
-    // accept times is how long it has been after the trail time, the trail time is 1000ms.
-    // This is so we accept trails during th 1000ms window
-    var acceptTime = performance.now() - this.trailTime;
-    var trailXAngle = [];
-    var trailYAngle = [];
-    var trailFeat = [];
-    // trailDataWindow is 1000/50=20. There are 20 data points in the 1000ms window.
-    for (var i = 0; i < this.trailDataWindow; i++) {
-        // If the trail time is within the 1000ms window after the click
-        if (this.trailTimes.get(i) > acceptTime) {
-            trailFeat.push(this.eyeFeaturesTrail.get(i));
-            trailXAngle.push(this.screenXAngleTrailArray.get(i));
-            trailYAngle.push(this.screenYAngleTrailArray.get(i));
-            // console.log("trailtimes.get(i)", this.trailTimes.get(i));
-            // console.log("accept time", acceptTime);
-            // console.log("trailX length", trailXAngle.length)
-        }
+    if (useTrail) {
+        // accept times is how long it has been after the trail time, the trail time is 1000ms.
+        // This is so we accept trails during th 1000ms window
+        var acceptTime = performance.now() - this.trailTime;
+        var trailXAngle = [];
+        var trailYAngle = [];
+        var trailFeat = [];
+        // trailDataWindow is 1000/50=20. There are 20 data points in the 1000ms window.
+        for (var i = 0; i < this.trailDataWindow; i++) {
+            // If the trail time is within the 1000ms window after the click
+            if (this.trailTimes.get(i) > acceptTime) {
+                trailFeat.push(this.eyeFeaturesTrail.get(i));
+                trailXAngle.push(this.screenXAngleTrailArray.get(i));
+                trailYAngle.push(this.screenYAngleTrailArray.get(i));
+                // console.log("trailtimes.get(i)", this.trailTimes.get(i));
+                // console.log("accept time", acceptTime);
+                // console.log("trailX length", trailXAngle.length)
+            }
 
-        // eyeFeaturesTrail contains eye size as grey histogram;
-        // screenX/YAngleArray contains the angles;
-        var xAngleArray = this.screenXAngleArray.data.concat(trailXAngle);
-        var yAngleArray = this.screenYAngleArray.data.concat(trailYAngle);
+            // eyeFeaturesTrail contains eye size as grey histogram;
+            // screenX/YAngleArray contains the angles;
+            var xAngleArray = this.screenXAngleArray.data.concat(trailXAngle);
+            var yAngleArray = this.screenYAngleArray.data.concat(trailYAngle);
+
+
+            // size n * 120, n varies depending on how many datapoints are accepted
+            var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
+        }
+    } else {
+        var xAngleArray = this.screenXAngleArray.data;
+        var yAngleArray = this.screenYAngleArray.data;
 
 
         // size n * 120, n varies depending on how many datapoints are accepted
-        var eyeFeatures = this.eyeFeaturesClicks.data.concat(trailFeat);
+        var eyeFeatures = this.eyeFeaturesClicks.data;
     }
 
     // Eye grey histogram for both left and right eyes
     // length 120
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
+
     // SE Kernel
-    let [predictedXAngle, predictedXVariance] = util_regression.GPSERegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120)
-    let [predictedYAngle, predictedYVariance] = util_regression.GPSERegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120)
+    // let [predictedXAngle, predictedXVariance] = util_regression.GPSERegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120, "horizontal")
+    // let [predictedYAngle, predictedYVariance] = util_regression.GPSERegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120, "vertical")
 
-    // // RQ Kernel
-    // let [predictedXAngle, predictedXVariance] = util_regression.GPRQRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120)
-    // let [predictedYAngle, predictedYVariance] = util_regression.GPRQRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120)
 
-    // // Custom Kernel
-    // let width_matrix_custom_x = util_regression.getDistMatrix(10, params.l_width_x)
-    // let height_matrix_custom_x = util_regression.getDistMatrix(6, params.l_height_x)
-    // let width_matrix_custom_y = util_regression.getDistMatrix(10, params.l_width_y)
-    // let height_matrix_custom_y = util_regression.getDistMatrix(6, params.l_height_y)
-    // //
-    // // let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressorLoop(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120)
-    // // let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressorLoop(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120)
-    // let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120)
-    // let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120)
+    // Can use fixed values for Kxx_inv and eye features
+    let predictedXAngle = null
+    let predictedXVariance = null
+    let predictedYAngle = null
+    let predictedYVariance = null
+
+    if (kernel === "SE") {
+        // SE kernel
+        // Only stop updating if both not using trail and not in calibration phase
+        if (!useTrail && !webgazer.calibrationPhase) {
+            [predictedXAngle, predictedXVariance] = util_regression.GPSERegressorFixed(eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120, "horizontal");
+            [predictedYAngle, predictedYVariance] = util_regression.GPSERegressorFixed(eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120, "vertical");
+
+        } else {
+            [predictedXAngle, predictedXVariance] = util_regression.GPSERegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120, "horizontal");
+            [predictedYAngle, predictedYVariance] = util_regression.GPSERegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120, "vertical");
+        }
+    } else if (kernel === "RQ") {
+        // RQ Kernel
+        if (!useTrail && !webgazer.calibrationPhase) {
+
+            [predictedXAngle, predictedXVariance] = util_regression.GPRQRegressorFixed(eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120, "horizontal");
+            [predictedYAngle, predictedYVariance] = util_regression.GPRQRegressorFixed(eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120, "vertical");
+        } else {
+            [predictedXAngle, predictedXVariance] = util_regression.GPRQRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120, "horizontal");
+            [predictedYAngle, predictedYVariance] = util_regression.GPRQRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120, "vertical");
+        }
+    } else {
+        // Custom Kernel
+        if (!useTrail && !webgazer.calibrationPhase) {
+            console.log("using fixed");
+            [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressorLoopFixed(eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120, "horizontal");
+            [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressorLoopFixed(eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120, "horizontal");
+            // let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressorFixed(eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, util_regression.width_matrix_custom_x, util_regression.height_matrix_custom_x, 120, "horizontal");
+            // let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressorFixed(eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, util_regression.width_matrix_custom_y, util_regression.height_matrix_custom_y, 120, "vertical");
+        } else {
+            console.log("adding predictions");
+            [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressorLoop(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, util_regression.width_matrix_custom_x, util_regression.height_matrix_custom_x, 120, "horizontal");
+            [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressorLoop(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, util_regression.width_matrix_custom_y, util_regression.height_matrix_custom_y, 120, "vertical");
+            // let [predictedXAngle, predictedXVariance] = util_regression.GPCustomRegressor(eyeFeatures, xAngleArray, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, util_regression.width_matrix_custom_x, util_regression.height_matrix_custom_x, 120, "horizontal");
+            // let [predictedYAngle, predictedYVariance] = util_regression.GPCustomRegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, util_regression.width_matrix_custom_y, util_regression.height_matrix_custom_y, 120, "vertical");
+        }
+    }
 
     // Convert the predicted angles (in radians) to position
     // Convert from actual to pixel density
@@ -277,12 +327,6 @@ reg.RidgeReg.prototype.predictRotationGP = function (eyesObj) {
         };
     }
 };
-
-// // Custom Kernel
-// let width_matrix_custom_x = util_regression.getDistMatrix(10, params.l_width_x)
-// let height_matrix_custom_x = util_regression.getDistMatrix(6, params.l_height_x)
-// let width_matrix_custom_y = util_regression.getDistMatrix(10, params.l_width_y)
-// let height_matrix_custom_y = util_regression.getDistMatrix(6, params.l_height_y)
 
 
 /**

@@ -14,7 +14,7 @@ import Reg from './ridgeReg';
 import ridgeRegWeighted from './ridgeWeightedReg';
 import ridgeRegThreaded from './ridgeRegThreaded';
 import util from './util';
-import fileSaver from 'file-saver'
+
 
 const webgazer = {};
 webgazer.tracker = {};
@@ -26,7 +26,6 @@ webgazer.util = util;
 webgazer.params = params;
 
 // Initialise parameters
-webgazer.useRotation = true;
 webgazer.LPD = 0;
 webgazer.initialViewingDistance = 0;
 webgazer.currentViewingDistance = 0;
@@ -40,8 +39,42 @@ webgazer.calibrationPhase = true; // true if still in calibration and adding dat
 // webgazer.userScreenHeight = 720;
 webgazer.videoToCameraWidthRatio = 0 // How many video pixels maps to camera width
 webgazer.videoToCameraHeightRatio = 0
+// default GP with rotation, SE kernel, not using trail
+webgazer.useRotation = true;
+webgazer.algorithmType = "GP"
+webgazer.kernel = "SE"
+webgazer.useTrail = false
 
+webgazer.eyeFeaturesConditioning = null;
+webgazer.xAnglesConditioning = null;
+webgazer.yAnglesConditioning = null;
+webgazer.eyeFeaturesFixed = null;
+webgazer.xAnglesFixed = null;
+webgazer.yAnglesFixed = null;
 
+// SE kernel
+webgazer.Kxx_inv_SE_x_Conditioning = null;
+webgazer.Kxx_inv_SE_y_Conditioning = null;
+webgazer.Kxx_inv_SE_x = null;
+webgazer.Kxx_inv_SE_y = null;
+
+// RQ kernel
+webgazer.Kxx_inv_RQ_x_Conditioning = null;
+webgazer.Kxx_inv_RQ_y_Conditioning = null;
+webgazer.Kxx_inv_RQ_x = null;
+webgazer.Kxx_inv_RQ_y = null;
+
+// Custom
+webgazer.eyeFeaturesLeftConditioning = null;
+webgazer.eyeFeaturesRightConditioning = null;
+webgazer.Kxx_inv_custom_x_Conditioning = null;
+webgazer.Kxx_inv_custom_y_Conditioning = null;
+webgazer.eyeFeaturesLeftFixed = null;
+webgazer.eyeFeaturesRightFixed = null;
+webgazer.Kxx_inv_custom_x = null;
+webgazer.Kxx_inv_custom_y = null;
+
+// If using precomputed matrices - case (4) in report
 import eyeFeaturesPrecomputed from './data/eye_features.json'
 import horizontalAnglesPrecomputed from './data/horizontal_angles.json'
 import verticalAnglesPrecomputed from './data/vertical_angles.json'
@@ -333,15 +366,20 @@ async function getPrediction(regModelIndex) {
         return null;
     }
     for (var reg in regs) {
-        // // // Original WebGazer impelmentation
-        // predictions.push(regs[reg].predict(latestEyeFeatures));
-        // webgazer.useRotation = false;
-        // // Ridge regression with angles.
-        // predictions.push(regs[reg].predictRotation(latestEyeFeatures));
-        // // GP kernel.
-        predictions.push(regs[reg].predictRotationGP(latestEyeFeatures));
-        // // // GP kernel with precomputed matrices.
-        // predictions.push(regs[reg].predictRotationGPPrecomputed(latestEyeFeatures));
+        if (webgazer.algorithmType === "original") {
+            // Original WebGazer implementation
+            predictions.push(regs[reg].predict(latestEyeFeatures));
+            webgazer.useRotation = false;
+        } else if (webgazer.algorithmType === "LR") {
+            // Ridge regression with angles.
+            predictions.push(regs[reg].predictRotation(latestEyeFeatures));
+        } else if (webgazer.algorithmType === "GP") {
+            // GP kernel.
+            predictions.push(regs[reg].predictRotationGP(latestEyeFeatures, webgazer.useTrail, webgazer.kernel));
+        } else if (webgazer.algorithmType === "GPPrecomputed") {
+            // GP kernel with precomputed matrices.
+            predictions.push(regs[reg].predictRotationGPPrecomputed(latestEyeFeatures));
+        }
     }
     if (regModelIndex !== undefined) {
         return predictions[regModelIndex] === null ? null : {
@@ -458,8 +496,9 @@ var recordScreenPosition = function (x, y, eventType) {
     }
     for (var reg in regs) {
         // only add data during the calibration phase
-        if (latestEyeFeatures && webgazer.calibrationPhase)
+        if (latestEyeFeatures && webgazer.calibrationPhase) {
             regs[reg].addData(latestEyeFeatures, [x, y], eventType);
+        }
     }
 };
 
@@ -482,8 +521,9 @@ var recordRotationAngles = function (x, y, eventType) {
         return null;
     }
     for (var reg in regs) {
-        if (latestEyeFeatures)
+        if (latestEyeFeatures && webgazer.calibrationPhase) {
             regs[reg].addRotationData(latestEyeFeatures, [x, y], [horizontalAngle, verticalAngle], eventType);
+        }
     }
 };
 
@@ -992,7 +1032,6 @@ webgazer.showFaceOverlay = function (val) {
  * @return {webgazer} this
  */
 webgazer.showFaceFeedbackBox = function (val) {
-
     webgazer.params.showFaceFeedbackBox = val;
     if (faceFeedbackBox) {
         faceFeedbackBox.style.display = val ? 'block' : 'none';
@@ -1035,6 +1074,16 @@ webgazer.applyKalmanFilter = function (val) {
     webgazer.params.applyKalmanFilter = val;
     return webgazer;
 }
+
+/**
+ * Set whether to use trailing data.
+ * @return {webgazer} this
+ */
+webgazer.useTrail = function (val) {
+    webgazer.useTrail = val;
+    return webgazer;
+}
+
 
 /**
  * Define constraints on the video camera that is used. Useful for non-standard setups.
@@ -1208,9 +1257,11 @@ webgazer.setTracker = function (name) {
 /**
  * Sets the regression module and clears any other regression modules
  * @param {String} name - The name of the regression module to use
+ * @param {String} algorithmType - The type of algorithm; original, LR, GP, GPPrecomputed
+ * @param {String} GPKernel - The name of the GP kernel to use
  * @return {webgazer} this
  */
-webgazer.setRegression = function (name) {
+webgazer.setRegression = function (name, algorithmType, GPKernel) {
     if (regressionMap[name] === undefined) {
         console.log('Invalid regression selection');
         console.log('Options are: ');
@@ -1222,8 +1273,19 @@ webgazer.setRegression = function (name) {
     data = regs[0].getRotationData();
     regs = [regressionMap[name]()];
     regs[0].setRotationData(data);
+    webgazer.kernel = GPKernel;
+    webgazer.algorithmType = algorithmType;
     return webgazer;
 };
+
+// /**
+//  * Set the kernel to be used
+//  * @return {webgazer} this
+//  */
+// webgazer.setKernel = function (val) {
+//     webgazer.kernel = val;
+//     return webgazer;
+// }
 
 /**
  * Adds a new tracker module so that it can be used by setTracker()

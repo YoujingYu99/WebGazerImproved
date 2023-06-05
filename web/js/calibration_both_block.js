@@ -233,10 +233,13 @@ $(document).ready(function () {
 
     if (PointCalibrate >= 9) {
       // last point is calibrated
-      //using jquery to grab every element in Calibration class and hide them except the middle point.
+      // using jquery to grab every element in Calibration class and hide them except the middle point.
       // $(".Calibration").hide();
       clearCanvas();
       $("#Pt5").show();
+
+      // set parameters to fixed ones after the calibration phase
+      setParametersToFixed(webgazer.kernel);
 
       // clears the canvas
       var canvas = document.getElementById("plotting_canvas");
@@ -285,7 +288,10 @@ $(document).ready(function () {
               if (isConfirm) {
                 //clear the calibration & hide the last middle button
                 clearCanvas();
-                // webgazer.calibrationPhase = false; // Stop storing datapoints after calibration
+                // Set the current matrices to be fixed
+
+                // Stop storing data points after calibration
+                webgazer.calibrationPhase = false;
               } else {
                 //use restart function to restart the calibration
                 document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";
@@ -341,6 +347,68 @@ $(document).ready(function () {
 function ShowCalibrationPointNine() {
   $(".Calibration").show();
   $("#Pt5").hide(); // initially hides the middle button
+}
+
+/**
+ * Set parameters to fixed ones after the calibration phase
+ * TODO: brute forcing the dimensions now. eyeFeatures and Kxx_inv do not have same dimension.
+ */
+function setParametersToFixed(kernel) {
+  if (kernel === "SE") {
+    webgazer.eyeFeaturesFixed = webgazer.eyeFeaturesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_SE_x_Conditioning.length
+    );
+    webgazer.xAnglesFixed = webgazer.xAnglesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_SE_x_Conditioning.length
+    );
+    webgazer.yAnglesFixed = webgazer.yAnglesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_SE_x_Conditioning.length
+    );
+    webgazer.Kxx_inv_SE_x = webgazer.Kxx_inv_SE_x_Conditioning;
+    webgazer.Kxx_inv_SE_y = webgazer.Kxx_inv_SE_y_Conditioning;
+  } else if (kernel === "RQ") {
+    webgazer.eyeFeaturesFixed = webgazer.eyeFeaturesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_RQ_x_Conditioning.length
+    );
+    webgazer.xAnglesFixed = webgazer.xAnglesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_RQ_x_Conditioning.length
+    );
+    webgazer.yAnglesFixed = webgazer.yAnglesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_RQ_x_Conditioning.length
+    );
+    webgazer.Kxx_inv_RQ_x = webgazer.Kxx_inv_RQ_x_Conditioning;
+    webgazer.Kxx_inv_RQ_y = webgazer.Kxx_inv_RQ_y_Conditioning;
+  } else {
+    webgazer.eyeFeaturesFixed = webgazer.eyeFeaturesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_custom_x_Conditioning.length
+    );
+    webgazer.eyeFeaturesLeftFixed = webgazer.eyeFeaturesLeftConditioning.slice(
+      0,
+      webgazer.Kxx_inv_custom_x_Conditioning.length
+    );
+    webgazer.eyeFeaturesRightFixed =
+      webgazer.eyeFeaturesRightConditioning.slice(
+        0,
+        webgazer.Kxx_inv_custom_x_Conditioning.length
+      );
+    webgazer.xAnglesFixed = webgazer.xAnglesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_custom_x_Conditioning.length
+    );
+    webgazer.yAnglesFixed = webgazer.yAnglesConditioning.slice(
+      0,
+      webgazer.Kxx_inv_custom_x_Conditioning.length
+    );
+    webgazer.Kxx_inv_custom_x = webgazer.Kxx_inv_custom_x_Conditioning;
+    webgazer.Kxx_inv_custom_y = webgazer.Kxx_inv_custom_y_Conditioning;
+  }
 }
 
 /**

@@ -186,8 +186,9 @@ function eucDistance(a, b) {
         ** (1 / 2)
 }
 
+
 /**
- * Performs GP regression with a RBF kernel plus a white kernel.
+ * Performs GP regression with an RBF kernel plus a white kernel.
  * @param {Array} eyeFeatures - Eye features for training.
  * @param {Array} AngleArray - Array of Angles for training.
  * @param {Array} eyeFeatsCurrent - Current eye feature.
@@ -195,9 +196,10 @@ function eucDistance(a, b) {
  * @param {Number} length_scale - length scale of RBF.
  * @param {Number} sigma_two - Std of noise.
  * @param {Number} feature_size - Size of feature vector. 120
- * @return{Number} predicted angle and variance..
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
  */
-util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size) {
+util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size, direction) {
     let train_length = eyeFeatures.length
     let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
     let K_xxstar = new Array(train_length)
@@ -230,12 +232,60 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
         K_xxstar[p] = k_value
     }
 
+    // Update fixed parameters stored in script
+    if (direction === "horizontal") {
+        webgazer.xAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_SE_x_Conditioning = Kxx_inv
+    } else {
+        webgazer.yAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_SE_y_Conditioning = Kxx_inv
+    }
+    webgazer.eyeFeaturesConditioning = eyeFeatures
+
     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
     let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
 
     return [pred, variance]
 }
 
+
+/**
+ * Performs GP regression with an RBF kernel plus a white kernel.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number}  sigma_one - Scale factor of RBF.
+ * @param {Number} length_scale - length scale of RBF.
+ * @param {Number} sigma_two - Std of noise.
+ * @param {Number} feature_size - Size of feature vector. 120.
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
+ */
+util_regression.GPSERegressorFixed = function (eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size, direction) {
+
+    // Calculate K_xxstar
+    let K_xxstar = new Array(webgazer.eyeFeaturesFixed.length)
+    for (var p = 0; p < webgazer.eyeFeaturesFixed.length; p++) {
+        let x = eyeFeatsCurrent;
+        let x_prime = webgazer.eyeFeaturesFixed[p];
+        let dist = eucDistance(x, x_prime);
+        let k_value = 0;
+        k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2) * feature_size))
+        K_xxstar[p] = k_value
+    }
+
+    let AngleArray = null
+    let K_xx_inv = null
+    if (direction === "horizontal") {
+        K_xx_inv = webgazer.Kxx_inv_SE_x
+        AngleArray = webgazer.xAnglesFixed
+    } else {
+        K_xx_inv = webgazer.Kxx_inv_SE_y
+        AngleArray = webgazer.yAnglesFixed
+    }
+    let pred = math.multiply(K_xxstar, math.multiply(K_xx_inv, AngleArray))
+    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
+
+    return [pred, variance]
+}
 
 /**
  * Performs GP regression with a rational quadratic kernel plus a white kernel.
@@ -246,9 +296,11 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
  * @param {Number} length_scale - length scale of RQ.
  * @param {Number} alpha - mixture factor of RQ.
  * @param {Number} sigma_two - Std of noise.
- * @return{Number} predicted angle and variance..
+ * @param {Number} feature_size - Size of input vector. 120.
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
  */
-util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size) {
+util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size, direction) {
     let train_length = eyeFeatures.length
     let K_xx = new Array(train_length).fill(null).map(() => new Array(train_length).fill(null));
     let K_xxstar = new Array(train_length)
@@ -281,8 +333,57 @@ util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
         K_xxstar[p] = k_value
     }
 
+    // Update fixed parameters stored in script
+    if (direction === "horizontal") {
+        webgazer.xAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_RQ_x_Conditioning = Kxx_inv
+    } else {
+        webgazer.yAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_RQ_y_Conditioning = Kxx_inv
+    }
+    webgazer.eyeFeaturesConditioning = eyeFeatures
+
     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
     let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+
+    return [pred, variance]
+}
+
+
+/**
+ * Performs GP regression with an RQ kernel plus a white kernel.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number}  sigma_one - Scale factor of RQ.
+ * @param {Number} length_scale - length scale of RQ.
+ * @param {Number} alpha - mixture factor of RQ.
+ * @param {Number} sigma_two - Std of noise.
+ * @param {Number} feature_size - Size of feature vector. 120.
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
+ */
+util_regression.GPRQRegressorFixed = function (eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size, direction) {
+    // Calculate K_xxstar
+    let K_xxstar = new Array(webgazer.eyeFeaturesFixed.length)
+    for (var p = 0; p < webgazer.eyeFeaturesFixed.length; p++) {
+        let x = eyeFeatsCurrent;
+        let x_prime = webgazer.eyeFeaturesFixed[p];
+        let dist = eucDistance(x, x_prime);
+        let k_value = 0;
+        k_value = (sigma_one ** 2) * (1 + (dist ** 2) / (2 * feature_size * alpha * (length_scale ** 2)))
+        K_xxstar[p] = k_value
+    }
+
+    let AngleArray = null
+    let K_xx_inv = null
+    if (direction === "horizontal") {
+        K_xx_inv = webgazer.Kxx_inv_RQ_x
+        AngleArray = webgazer.xAnglesFixed
+    } else {
+        K_xx_inv = webgazer.Kxx_inv_RQ_y
+        AngleArray = webgazer.yAnglesFixed
+    }
+    let pred = math.multiply(K_xxstar, math.multiply(K_xx_inv, AngleArray))
+    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
 
     return [pred, variance]
 }
@@ -318,9 +419,10 @@ util_regression.getCustomKernelValue = function (x, x_prime, height_matrix, widt
  * @param {Array} width_matrix_custom - Cx.
  * @param {Array} height_matrix_custom - Cy.
  * @param {Number} feature_size - Feature dimension. 120.
- * @return{Number} predicted angle and variance..
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
  */
-util_regression.GPCustomRegressorLoop = function (eyeFeatures, AngleArray, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
+util_regression.GPCustomRegressorLoop = function (eyeFeatures, AngleArray, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size, direction) {
 
     //Slice left and right eyes for training and test dataset
     var eyeFeaturesLeft = [];
@@ -377,9 +479,70 @@ util_regression.GPCustomRegressorLoop = function (eyeFeatures, AngleArray, eyeFe
         K_xxstar[p] = K
     }
 
+    // Update fixed parameters stored in script
+    if (direction === "horizontal") {
+        webgazer.xAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_custom_x_Conditioning = Kxx_inv
+    } else {
+        webgazer.yAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_custom_y_Conditioning = Kxx_inv
+    }
+    webgazer.eyeFeaturesConditioning = eyeFeatures
+    webgazer.eyeFeaturesLeftConditioning = eyeFeaturesLeft
+    webgazer.eyeFeaturesRightConditioning = eyeFeaturesRight
+
 
     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
     let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+
+    return [pred, variance]
+}
+
+/**
+ * Performs GP regression with a kernel (product of toeplitz matrices) plus a white kernel.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number} pixel_scale - M.
+ * @param {Number} sigma_one - Scaling Std.
+ * @param {Number} sigma_two - Noise Std.
+ * @param {Array} width_matrix_custom - Cx.
+ * @param {Array} height_matrix_custom - Cy.
+ * @param {Number} feature_size - Feature dimension. 120.
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
+ */
+util_regression.GPCustomRegressorLoopFixed = function (eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size, direction) {
+    var eyeFeatsCurrentLeft = [eyeFeatsCurrent.slice(0, 60)]
+    var eyeFeatsCurrentRight = [eyeFeatsCurrent.slice(-60)]
+
+    let K_xxstar = new Array(webgazer.eyeFeaturesFixed.length)
+
+    // Calculate K_xxstar
+    for (var p = 0; p < webgazer.eyeFeaturesFixed.length; p++) {
+        // Left eye
+        let x_left = eyeFeatsCurrentLeft;
+        let x_prime_left = webgazer.eyeFeaturesLeftFixed[p];
+        let k_value_left = util_regression.getCustomKernelValue(x_left, x_prime_left, height_matrix_custom, width_matrix_custom, feature_size)
+        // Right eye
+        let x_right = eyeFeatsCurrentRight;
+        let x_prime_right = webgazer.eyeFeaturesRightFixed[p];
+        let k_value_right = util_regression.getCustomKernelValue(x_right, x_prime_right, height_matrix_custom, width_matrix_custom, feature_size)
+        let K_total = (k_value_left[0][0] + k_value_right[0][0]) * (-1 / (4 * 120 * (pixel_scale ** 2)))
+        K_xxstar[p] = sigma_one ** 2 * math.exp(K_total)
+    }
+
+    let AngleArray = null
+    let K_xx_inv = null
+
+    if (direction === "horizontal") {
+        K_xx_inv = webgazer.Kxx_inv_custom_x
+        AngleArray = webgazer.xAnglesFixed
+    } else {
+        K_xx_inv = webgazer.Kxx_inv_custom_y
+        AngleArray = webgazer.yAnglesFixed
+    }
+
+    let pred = math.multiply(K_xxstar, math.multiply(K_xx_inv, AngleArray))
+    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
 
     return [pred, variance]
 }
@@ -526,9 +689,10 @@ util_regression.calculateQuadraticForm = function (first_features, second_featur
  * @param {Array} width_matrix_custom - Cx.
  * @param {Array} height_matrix_custom - Cy.
  * @param {Number} feature_size - Feature dimension. 120.
- * @return{Number} predicted angle and variance..
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
  */
-util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size) {
+util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size, direction) {
     //Slice left and right eyes for training and test dataset
     var eyeFeaturesLeft = [];
     for (var i = 0; i < eyeFeatures.length; i++) {
@@ -566,8 +730,65 @@ util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsC
         sigma_two,
         true)
 
+    // Update fixed parameters stored in script
+    if (direction === "horizontal") {
+        webgazer.xAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_custom_x_Conditioning = Kxx_inv
+    } else {
+        webgazer.yAnglesConditioning = AngleArray
+        webgazer.Kxx_inv_custom_y_Conditioning = Kxx_inv
+    }
+    webgazer.eyeFeaturesConditioning = eyeFeatures
+    webgazer.eyeFeaturesLeftConditioning = eyeFeaturesLeft
+    webgazer.eyeFeaturesRightConditioning = eyeFeaturesRight
+
     let pred = math.multiply(K_xstarx, math.multiply(Kxx_inv, AngleArray))
     let variance = sigma_two ** 2 - math.multiply(K_xstarx, math.multiply(Kxx_inv, math.transpose(K_xstarx)))
+
+    return [pred, variance]
+}
+
+
+/**
+ * Performs GP regression with a kernel (product of toeplitz matrices) plus a white kernel.
+ * @param {Array} eyeFeatsCurrent - Current eye feature.
+ * @param {Number} pixel_scale - Pixel scale. M in equation.
+ * @param {Number} sigma_one - Scaling Std.
+ * @param {Number} sigma_two - Noise Std.
+ * @param {Array} width_matrix_custom - Cx.
+ * @param {Array} height_matrix_custom - Cy.
+ * @param {Number} feature_size - Feature dimension. 120.
+ * @param {String} direction - horizontal or vertical.
+ * @return{Number} predicted angle and variance.
+ */
+util_regression.GPCustomRegressorFixed = function (eyeFeatsCurrent, pixel_scale, sigma_one, sigma_two, width_matrix_custom, height_matrix_custom, feature_size, direction) {
+    var eyeFeatsCurrentLeft = [eyeFeatsCurrent.slice(0, 60)]
+    var eyeFeatsCurrentRight = [eyeFeatsCurrent.slice(-60)]
+
+    let K_xstarx = util_regression.getKMatrixVec(
+        eyeFeatsCurrentLeft,
+        eyeFeatsCurrentRight,
+        webgazer.eyeFeaturesLeftFixed,
+        webgazer.eyeFeaturesRightFixed,
+        width_matrix_custom,
+        height_matrix_custom,
+        pixel_scale,
+        sigma_one,
+        sigma_two,
+        true)
+
+    let AngleArray = null
+    let K_xx_inv = null
+    if (direction === "horizontal") {
+        K_xx_inv = webgazer.Kxx_inv_custom_x
+        AngleArray = webgazer.xAnglesFixed
+    } else {
+        K_xx_inv = webgazer.Kxx_inv_custom_y
+        AngleArray = webgazer.yAnglesFixed
+    }
+
+    let pred = math.multiply(K_xstarx, math.multiply(K_xx_inv, AngleArray))
+    let variance = sigma_two ** 2 - math.multiply(K_xstarx, math.multiply(K_xx_inv, math.transpose(K_xstarx)))
 
     return [pred, variance]
 }
