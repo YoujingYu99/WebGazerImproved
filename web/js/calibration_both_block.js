@@ -169,7 +169,7 @@ function showTraceShape() {
       var xPrediction = data.x; //these x coordinates are relative to the viewport
       var yPrediction = data.y; //these y coordinates are relative to the viewport
 
-      // Only determine block position if shapetracing is enabled
+      // Only determine block position if shape tracing is enabled
       if (shapeTracingDisabled === false) {
         determineBlockPositionPaint(xPrediction, yPrediction);
       }
