@@ -108,71 +108,21 @@ function calculateAverage(dataArray) {
   }
   // let last50Points = dataArrayNoNan; // TODO: change back to 50 if not custom kernel
   let dataSum = last50Points.reduce((a, b) => a + b, 0);
-  let dataAvg = dataSum / last50Points.length || 0;
-  return dataAvg;
+  return dataSum / last50Points.length || 0;
 }
 
 /**
- * Determine the block where the current gaze falls into and paint the block grey-green.
+ * Sets store_points to true, so all the occuring prediction
+ * points are stored
  */
-function determineBlockPositionPaint(xPrediction, yPrediction) {
-  if (shapeTracingDisabled) return;
-  // For loop to determine the boundaries of each block.
-  for (let columnCount = 0; columnCount < numSquares; columnCount += 1) {
-    for (let rowCount = 0; rowCount < numSquares; rowCount += 1) {
-      let square = {
-        xLeft: xMargin + columnCount * squareWidth,
-        xRight: xMargin + columnCount * squareWidth + squareWidth,
-        yTop: yMargin + rowCount * squareWidth,
-        yBottom: yMargin + rowCount * squareWidth + squareWidth,
-        w: squareWidth - strokeLineWidth,
-        h: squareWidth - strokeLineWidth,
-      };
-      if (
-        square.xLeft <= xPrediction &&
-        xPrediction <= square.xRight &&
-        square.yTop <= yPrediction &&
-        yPrediction <= square.yBottom
-      ) {
-        // Paint the calculated blocks grey
-        ctx.fillStyle = "rgb(178, 190, 181)";
-        ctx.fillRect(
-          square.xLeft + strokeLineWidth / 2,
-          square.yTop + strokeLineWidth / 2,
-          square.w,
-          square.h
-        );
-      }
-      // If the bottom right block is detected
-      if (
-        xMargin + (numSquares - 1) * squareWidth <= xPrediction &&
-        xPrediction <= xMargin + numSquares * squareWidth &&
-        yMargin + (numSquares - 1) * squareWidth <= yPrediction &&
-        yPrediction <= yMargin + numSquares * squareWidth
-      ) {
-        stopShapeTracing();
-      }
-    }
-  }
+function storePointsVariable() {
+  webgazer.params.storingPoints = true;
 }
 
 /**
- * Stop tracing the L shape.
+ * Sets store_points to false, so prediction points aren't
+ * stored any more
  */
-function stopShapeTracing() {
-  if (shapeTracingDisabled) return;
-  clearCanvas();
-  // Disable the alert to take screenshot: do not want the pop up menu
-  swal({
-    title: "Shaped Traced",
-    text: "You have completed the shape tracing task!",
-    buttons: {
-      cancel: false,
-      confirm: true,
-    },
-  }).then((isConfirm) => {
-    clearCanvas();
-    shapeTracingDisabled = true;
-    console.log("after stopping", shapeTracingDisabled);
-  });
+function stopStoringPointsVariable() {
+  webgazer.params.storingPoints = false;
 }

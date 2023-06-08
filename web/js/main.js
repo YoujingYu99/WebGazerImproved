@@ -50,7 +50,6 @@ window.onbeforeunload = function () {
  */
 function clearCanvas() {
   $(".Calibration").hide();
-  $(".CalibrationBlock").hide();
   $(".dataCollection").hide();
   var canvas = document.getElementById("plotting_canvas");
   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
@@ -66,14 +65,10 @@ function ClearCalibration() {
   $(".Calibration").css("opacity", 0.2);
   $(".Calibration").prop("disabled", false);
 
-  $(".CalibrationBlock").css("background-color", "red");
-  $(".CalibrationBlock").css("opacity", 0.2);
-  $(".CalibrationBlock").prop("disabled", false);
-
   CalibrationPoints = {};
-  CalibrationBlockPoints = {};
+  // CalibrationBlockPoints = {};
   PointCalibrate = 0;
-  PointBlockCalibrate = 0;
+  // PointBlockCalibrate = 0;
 }
 
 /**
@@ -108,7 +103,7 @@ function traceShapeMaze() {
 }
 
 /**
- * Save User Eye Rotation Data
+ * Save user eye Rotation data; used in data collection process.
  */
 function saveData() {
   clearCanvas();
@@ -125,8 +120,7 @@ function saveData() {
 }
 
 /**
- * Restart the calibration process for nine points by clearing the local storage
- *  and resetting the calibration point
+ * Start the data collection process.
  */
 function dataCollection() {
   document.getElementById("Accuracy").innerHTML = "<a>N.A.</a>";

@@ -243,9 +243,9 @@ util_regression.GPSERegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
     webgazer.eyeFeaturesConditioning = eyeFeatures
 
     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 
@@ -282,9 +282,9 @@ util_regression.GPSERegressorFixed = function (eyeFeatsCurrent, sigma_one, lengt
         AngleArray = webgazer.yAnglesFixed
     }
     let pred = math.multiply(K_xxstar, math.multiply(K_xx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 /**
@@ -344,9 +344,9 @@ util_regression.GPRQRegressor = function (eyeFeatures, AngleArray, eyeFeatsCurre
     webgazer.eyeFeaturesConditioning = eyeFeatures
 
     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 
@@ -383,9 +383,9 @@ util_regression.GPRQRegressorFixed = function (eyeFeatsCurrent, sigma_one, lengt
         AngleArray = webgazer.yAnglesFixed
     }
     let pred = math.multiply(K_xxstar, math.multiply(K_xx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 
@@ -493,9 +493,9 @@ util_regression.GPCustomRegressorLoop = function (eyeFeatures, AngleArray, eyeFe
 
 
     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 /**
@@ -542,9 +542,9 @@ util_regression.GPCustomRegressorLoopFixed = function (eyeFeatsCurrent, pixel_sc
     }
 
     let pred = math.multiply(K_xxstar, math.multiply(K_xx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(K_xx_inv, math.transpose(K_xxstar)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 
@@ -743,9 +743,9 @@ util_regression.GPCustomRegressor = function (eyeFeatures, AngleArray, eyeFeatsC
     webgazer.eyeFeaturesRightConditioning = eyeFeaturesRight
 
     let pred = math.multiply(K_xstarx, math.multiply(Kxx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xstarx, math.multiply(Kxx_inv, math.transpose(K_xstarx)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xstarx, math.multiply(Kxx_inv, math.transpose(K_xstarx)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 
@@ -788,13 +788,13 @@ util_regression.GPCustomRegressorFixed = function (eyeFeatsCurrent, pixel_scale,
     }
 
     let pred = math.multiply(K_xstarx, math.multiply(K_xx_inv, AngleArray))
-    let variance = sigma_two ** 2 - math.multiply(K_xstarx, math.multiply(K_xx_inv, math.transpose(K_xstarx)))
+    // let variance = sigma_two ** 2 - math.multiply(K_xstarx, math.multiply(K_xx_inv, math.transpose(K_xstarx)))
 
-    return [pred, variance]
+    return [pred, 0]
 }
 
 /**
- * Performs Sparse GP regression with a RBF kernel plus a white kernel.
+ * Performs Precomputed GP regression with a RBF kernel plus a white kernel.
  * @param {Array} eyeFeatures - Predetermined eye features.
  * @param {Array} angles - Predetermined eye angles.
  * @param {Array} Kxx_inv - Inverse of K_xx
@@ -826,45 +826,8 @@ util_regression.GPPrecomputedSERegressor = function (eyeFeatures, angles, Kxx_in
 }
 
 
-// /**
-//  * Performs Sparse GP regression with a RBF kernel plus a white kernel.
-//  * @param {Array} eyeFeatures - Inducing points eye features.
-//  * @param {Array} Kxx_inv - Inverse of K_xx
-//  * @param {Array} eyeFeatsCurrent - Current eye feature.
-//  * @param {Number}  sigma_one - Scale factor of RBF.
-//  * @param {Number} length_scale - length scale of RBF.
-//  * @param {Number} sigma_two - Std of noise.
-//  * @param {Number} feature_size - Size of feature vector. 120
-//  * @param {Array} m - Mean of the posterior q(u). Same length of eyeFeatures.
-//  * @param {Number} S - Covariance function of the posterior q(u). Size of eyeFeatures.
-//  * @return{Number} predicted angle and variance..
-//  */
-// util_regression.GPSparseSERegressor = function (eyeFeatures, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size, m, S) {
-//     let train_length = eyeFeatures.length
-//     let K_xxstar = new Array(train_length)
-//
-//     // Calculate K_xxstar (for SE)
-//     for (var p = 0; p < train_length; p++) {
-//         let x = eyeFeatsCurrent;
-//         let x_prime = eyeFeatures[p];
-//         let dist = eucDistance(x, x_prime);
-//         let k_value = 0;
-//         k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2) * feature_size))
-//         K_xxstar[p] = k_value
-//     }
-//
-//     let variance_1 = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar))) // sigma^2 in report
-//     let variance_2 = math.multiply(K_xxstar, math.multiply(Kxx_inv, math.multiply(S, math.multiply(Kxx_inv, math.transpose(K_xxstar)))))
-//
-//     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, m))
-//     let variance = variance_1 + variance_2
-//
-//     return [pred, variance]
-// }
-
-
 /**
- * Performs Sparse GP regression with an RQ kernel plus a white kernel.
+ * Performs Precomputed GP regression with an RQ kernel plus a white kernel.
  * @param {Array} eyeFeatures - Predetermined eye features.
  * @param {Array} angles - Predetermined eye angles.
  * @param {Array} Kxx_inv - Inverse of K_xx
@@ -896,46 +859,8 @@ util_regression.GPPrecomputedRQRegressor = function (eyeFeatures, angles, Kxx_in
 }
 
 
-// /**
-//  * Performs Sparse GP regression with an RQ kernel plus a white kernel.
-//  * @param {Array} eyeFeatures - Inducing points eye features.
-//  * @param {Array} Kxx_inv - Inverse of K_xx
-//  * @param {Array} eyeFeatsCurrent - Current eye feature.
-//  * @param {Number}  sigma_one - Scale factor of RQ.
-//  * @param {Number} length_scale - length scale of RQ.
-//  * @param {Number} alpha - mixture factor of RQ.
-//  * @param {Number} sigma_two - Std of noise.
-//  * @param {Number} feature_size - Size of feature vector. 120
-//  * @param {Array} m - Mean of the posterior q(u). Same length of eyeFeatures.
-//  * @param {Number} S - Covariance function of the posterior q(u). Size of eyeFeatures.
-//  * @return {Number} predicted angle and variance..
-//  */
-// util_regression.GPSparseRQRegressor = function (eyeFeatures, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size, m, S) {
-//     let train_length = eyeFeatures.length
-//     let K_xxstar = new Array(train_length)
-//
-//     // Calculate K_xxstar (for SE)
-//     for (var p = 0; p < train_length; p++) {
-//         let x = eyeFeatsCurrent;
-//         let x_prime = eyeFeatures[p];
-//         let dist = eucDistance(x, x_prime);
-//         let k_value = 0;
-//         k_value = (sigma_one ** 2) * (1 + (dist ** 2) / (2 * feature_size * alpha * (length_scale ** 2)))
-//         K_xxstar[p] = k_value
-//     }
-//
-//     let variance_1 = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar))) // sigma^2 in report
-//     let variance_2 = math.multiply(K_xxstar, math.multiply(Kxx_inv, math.multiply(S, math.multiply(Kxx_inv, math.transpose(K_xxstar)))))
-//
-//     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, m))
-//     let variance = variance_1 + variance_2
-//
-//     return [pred, variance]
-// }
-
-
 /**
- * Performs Sparse GP regression with a Custom kernel plus a white kernel.
+ * Performs Precomputed GP regression with a Custom kernel plus a white kernel.
  * @param {Array} eyeFeatures - Predetermined eye features.
  * @param {Array} angles - Predetermined eye angles.
  * @param {Array} Kxx_inv - Inverse of K_xx
@@ -979,6 +904,80 @@ util_regression.GPPrecomputedCustomRegressor = function (eyeFeatures, angles, Kx
     return [pred, 0]
 }
 
+
+// /**
+//  * Performs Sparse GP regression with a RBF kernel plus a white kernel.
+//  * @param {Array} eyeFeatures - Inducing points eye features.
+//  * @param {Array} Kxx_inv - Inverse of K_xx
+//  * @param {Array} eyeFeatsCurrent - Current eye feature.
+//  * @param {Number}  sigma_one - Scale factor of RBF.
+//  * @param {Number} length_scale - length scale of RBF.
+//  * @param {Number} sigma_two - Std of noise.
+//  * @param {Number} feature_size - Size of feature vector. 120
+//  * @param {Array} m - Mean of the posterior q(u). Same length of eyeFeatures.
+//  * @param {Number} S - Covariance function of the posterior q(u). Size of eyeFeatures.
+//  * @return{Number} predicted angle and variance..
+//  */
+// util_regression.GPSparseSERegressor = function (eyeFeatures, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, sigma_two, feature_size, m, S) {
+//     let train_length = eyeFeatures.length
+//     let K_xxstar = new Array(train_length)
+//
+//     // Calculate K_xxstar (for SE)
+//     for (var p = 0; p < train_length; p++) {
+//         let x = eyeFeatsCurrent;
+//         let x_prime = eyeFeatures[p];
+//         let dist = eucDistance(x, x_prime);
+//         let k_value = 0;
+//         k_value = (sigma_one ** 2) * Math.exp(-(dist ** 2) / (2 * (length_scale ** 2) * feature_size))
+//         K_xxstar[p] = k_value
+//     }
+//
+//     let variance_1 = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar))) // sigma^2 in report
+//     let variance_2 = math.multiply(K_xxstar, math.multiply(Kxx_inv, math.multiply(S, math.multiply(Kxx_inv, math.transpose(K_xxstar)))))
+//
+//     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, m))
+//     let variance = variance_1 + variance_2
+//
+//     return [pred, 0]
+// }
+
+
+// /**
+//  * Performs Sparse GP regression with an RQ kernel plus a white kernel.
+//  * @param {Array} eyeFeatures - Inducing points eye features.
+//  * @param {Array} Kxx_inv - Inverse of K_xx
+//  * @param {Array} eyeFeatsCurrent - Current eye feature.
+//  * @param {Number}  sigma_one - Scale factor of RQ.
+//  * @param {Number} length_scale - length scale of RQ.
+//  * @param {Number} alpha - mixture factor of RQ.
+//  * @param {Number} sigma_two - Std of noise.
+//  * @param {Number} feature_size - Size of feature vector. 120
+//  * @param {Array} m - Mean of the posterior q(u). Same length of eyeFeatures.
+//  * @param {Number} S - Covariance function of the posterior q(u). Size of eyeFeatures.
+//  * @return {Number} predicted angle and variance..
+//  */
+// util_regression.GPSparseRQRegressor = function (eyeFeatures, Kxx_inv, eyeFeatsCurrent, sigma_one, length_scale, alpha, sigma_two, feature_size, m, S) {
+//     let train_length = eyeFeatures.length
+//     let K_xxstar = new Array(train_length)
+//
+//     // Calculate K_xxstar (for SE)
+//     for (var p = 0; p < train_length; p++) {
+//         let x = eyeFeatsCurrent;
+//         let x_prime = eyeFeatures[p];
+//         let dist = eucDistance(x, x_prime);
+//         let k_value = 0;
+//         k_value = (sigma_one ** 2) * (1 + (dist ** 2) / (2 * feature_size * alpha * (length_scale ** 2)))
+//         K_xxstar[p] = k_value
+//     }
+//
+//     let variance_1 = sigma_two ** 2 - math.multiply(K_xxstar, math.multiply(Kxx_inv, math.transpose(K_xxstar))) // sigma^2 in report
+//     let variance_2 = math.multiply(K_xxstar, math.multiply(Kxx_inv, math.multiply(S, math.multiply(Kxx_inv, math.transpose(K_xxstar)))))
+//
+//     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, m))
+//     let variance = variance_1 + variance_2
+//
+//     return [pred, 0]
+// }
 
 // /**
 //  * Performs Sparse GP regression with an Custom kernel plus a white kernel.
@@ -1027,7 +1026,7 @@ util_regression.GPPrecomputedCustomRegressor = function (eyeFeatures, angles, Kx
 //     let pred = math.multiply(K_xxstar, math.multiply(Kxx_inv, m))
 //     let variance = variance_1 + variance_2
 //
-//     return [pred, variance]
+//     return [pred, 0]
 // }
 
 

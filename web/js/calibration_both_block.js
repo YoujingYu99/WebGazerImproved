@@ -1,10 +1,8 @@
 var PointCalibrate = 0;
-var PointBlockCalibrate = 0;
 var PointDataCollection = 0;
 var CalibrationPoints = {};
-var CalibrationBlockPoints = {};
 var DataCollectionPoints = {};
-const numClickPerPoint = 3;
+const numClickPerPoint = 1;
 const numClickPerPointDataCollection = 3;
 const numDataPointsToCollect = 300;
 var buttonCount = 1;
@@ -14,7 +12,6 @@ var buttonCount = 1;
  */
 function clearCanvas() {
   $(".Calibration").hide();
-  $(".CalibrationBlock").hide();
   $(".dataCollection").hide();
   var canvas = document.getElementById("plotting_canvas");
   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
@@ -288,9 +285,7 @@ $(document).ready(function () {
               if (isConfirm) {
                 //clear the calibration & hide the last middle button
                 clearCanvas();
-                // Set the current matrices to be fixed
-
-                // Stop storing data points after calibration
+                // Set the current matrices to be fixed and stop storing data points after calibration
                 webgazer.calibrationPhase = false;
               } else {
                 //use restart function to restart the calibration
@@ -582,11 +577,9 @@ function stopDataCollection() {
  */
 function clearCalibration() {
   // Clear data from WebGazer
-
   $(".Calibration").css("background-color", "red");
   $(".Calibration").css("opacity", 0.2);
   $(".Calibration").prop("disabled", false);
-
   CalibrationPoints = {};
   PointCalibrate = 0;
 }
@@ -594,4 +587,69 @@ function clearCalibration() {
 // sleep function because java doesn't have one, sourced from http://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
 function sleep(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+/**
+ * Determine the block where the current gaze falls into and paint the block grey-green.
+ */
+function determineBlockPositionPaint(xPrediction, yPrediction) {
+  if (shapeTracingDisabled) return;
+  // For loop to determine the boundaries of each block.
+  for (let columnCount = 0; columnCount < numSquares; columnCount += 1) {
+    for (let rowCount = 0; rowCount < numSquares; rowCount += 1) {
+      let square = {
+        xLeft: xMargin + columnCount * squareWidth,
+        xRight: xMargin + columnCount * squareWidth + squareWidth,
+        yTop: yMargin + rowCount * squareWidth,
+        yBottom: yMargin + rowCount * squareWidth + squareWidth,
+        w: squareWidth - strokeLineWidth,
+        h: squareWidth - strokeLineWidth,
+      };
+      if (
+        square.xLeft <= xPrediction &&
+        xPrediction <= square.xRight &&
+        square.yTop <= yPrediction &&
+        yPrediction <= square.yBottom
+      ) {
+        // Paint the calculated blocks grey
+        ctx.fillStyle = "rgb(178, 190, 181)";
+        ctx.fillRect(
+          square.xLeft + strokeLineWidth / 2,
+          square.yTop + strokeLineWidth / 2,
+          square.w,
+          square.h
+        );
+      }
+      // If the bottom right block is detected
+      if (
+        xMargin + (numSquares - 1) * squareWidth <= xPrediction &&
+        xPrediction <= xMargin + numSquares * squareWidth &&
+        yMargin + (numSquares - 1) * squareWidth <= yPrediction &&
+        yPrediction <= yMargin + numSquares * squareWidth
+      ) {
+        stopShapeTracing();
+      }
+    }
+  }
+}
+
+/**
+ * Stop tracing the L shape.
+ */
+function stopShapeTracing() {
+  if (shapeTracingDisabled) return;
+  clearCanvas();
+  shapeTracingDisabled = true;
+  // Disable the alert to take screenshot: do not want the pop up menu
+  swal({
+    title: "Shaped Traced",
+    text: "You have completed the shape tracing task!",
+    buttons: {
+      cancel: false,
+      confirm: true,
+    },
+  }).then((isConfirm) => {
+    clearCanvas();
+    console.log("after stopping", shapeTracingDisabled);
+  });
 }
