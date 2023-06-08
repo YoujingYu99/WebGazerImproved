@@ -6,7 +6,7 @@ window.onload = async function () {
   //start the webgazer tracker
   await webgazer
     .setRegression(
-      "ridge",
+      "totalRegression",
       "GP",
       "SE"
     ) /* currently must set regression and tracker */

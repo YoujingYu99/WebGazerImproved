@@ -10,7 +10,7 @@ import './dom_util';
 import localforage from 'localforage';
 import TFFaceMesh from './facemesh';
 import pupil from './pupil.mjs'
-import Reg from './ridgeReg';
+import Reg from './totalReg.mjs';
 import ridgeRegWeighted from './ridgeWeightedReg';
 import ridgeRegThreaded from './ridgeRegThreaded';
 import util from './util';
@@ -133,7 +133,7 @@ var eventTypes = ['click', 'move'];
 var moveClock = performance.now();
 //currently used tracker and regression models, defaults to clmtrackr and linear regression
 var curTracker = new webgazer.tracker.TFFaceMesh();
-var regs = [new webgazer.reg.RidgeReg()];
+var regs = [new webgazer.reg.TotalReg()];
 // var blinkDetector = new webgazer.BlinkDetector();
 
 //lookup tables
@@ -143,8 +143,8 @@ var curTrackerMap = {
     },
 };
 var regressionMap = {
-    'ridge': function () {
-        return new webgazer.reg.RidgeReg();
+    'totalRegression': function () {
+        return new webgazer.reg.TotalReg();
     },
     'weightedRidge': function () {
         return new webgazer.reg.RidgeWeightedReg();
@@ -377,7 +377,8 @@ async function getPrediction(regModelIndex) {
             // GP kernel.
             predictions.push(regs[reg].predictRotationGP(latestEyeFeatures, webgazer.useTrail, webgazer.kernel));
         } else if (webgazer.algorithmType === "GPPrecomputed") {
-            // GP kernel with precomputed matrices.
+            // GP kernel with precomputed matrices. Do not need a calibration phase.
+            webgazer.calibrationPhase = false
             predictions.push(regs[reg].predictRotationGPPrecomputed(latestEyeFeatures));
         }
     }

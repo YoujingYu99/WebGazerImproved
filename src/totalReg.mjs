@@ -6,18 +6,18 @@ import webgazer from "./index.mjs";
 const reg = {};
 
 /**
- * Constructor of RidgeReg object,
+ * Constructor of TotalReg object,
  * this object allow to perform ridge regression
  * @constructor
  */
-reg.RidgeReg = function () {
+reg.TotalReg = function () {
     this.init();
 };
 
 /**
  * Initialize new arrays and initialize Kalman filter.
  */
-reg.RidgeReg.prototype.init = util_regression.InitRegression
+reg.TotalReg.prototype.init = util_regression.InitRegression
 
 /**
  * Add given data from eyes
@@ -25,7 +25,7 @@ reg.RidgeReg.prototype.init = util_regression.InitRegression
  * @param {Object} screenPos - The current screen point
  * @param {Object} type - The type of performed action
  */
-reg.RidgeReg.prototype.addData = util_regression.addData
+reg.TotalReg.prototype.addData = util_regression.addData
 
 /**
  * Add given data from eyes image and rotational angles
@@ -33,7 +33,7 @@ reg.RidgeReg.prototype.addData = util_regression.addData
  * @param {Object} rotationAngles - The current rotational angles
  * @param {Object} type - The type of performed action
  */
-reg.RidgeReg.prototype.addRotationData = util_regression.addRotationData
+reg.TotalReg.prototype.addRotationData = util_regression.addRotationData
 
 /**
  * Try to predict coordinates from pupil data
@@ -41,7 +41,7 @@ reg.RidgeReg.prototype.addRotationData = util_regression.addRotationData
  * @param {Object} eyesObj - The current user eyes object
  * @returns {Object}
  */
-reg.RidgeReg.prototype.predict = function (eyesObj) {
+reg.TotalReg.prototype.predict = function (eyesObj) {
     if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
         return null;
     }
@@ -116,7 +116,7 @@ reg.RidgeReg.prototype.predict = function (eyesObj) {
  * @param {Object} eyesObj - The current user eyes object
  * @returns {Object}
  */
-reg.RidgeReg.prototype.predictRotation = function (eyesObj) {
+reg.TotalReg.prototype.predictRotation = function (eyesObj) {
     if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
         return null;
     }
@@ -210,7 +210,7 @@ util_regression.height_matrix_custom_y = util_regression.getDistMatrix(6, params
  * @param {String} kernel - which kernel to use. SE, RQ or custom
  * @returns {Object}
  */
-reg.RidgeReg.prototype.predictRotationGP = function (eyesObj, useTrail, kernel) {
+reg.TotalReg.prototype.predictRotationGP = function (eyesObj, useTrail, kernel) {
     if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
         return null;
     }
@@ -262,7 +262,6 @@ reg.RidgeReg.prototype.predictRotationGP = function (eyesObj, useTrail, kernel) 
     // let [predictedYAngle, predictedYVariance] = util_regression.GPSERegressor(eyeFeatures, yAngleArray, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120, "vertical")
 
 
-    // Can use fixed values for Kxx_inv and eye features
     let predictedXAngle = null
     let predictedXVariance = null
     let predictedYAngle = null
@@ -335,7 +334,7 @@ reg.RidgeReg.prototype.predictRotationGP = function (eyesObj, useTrail, kernel) 
  * @param {Object} eyesObj - The current user eyes object.
  * @returns {Object}
  */
-reg.RidgeReg.prototype.predictRotationGPPrecomputed = function (eyesObj) {
+reg.TotalReg.prototype.predictRotationGPPrecomputed = function (eyesObj) {
     if (!eyesObj || this.eyeFeaturesClicks.length === 0) {
         return null;
     }
@@ -344,15 +343,25 @@ reg.RidgeReg.prototype.predictRotationGPPrecomputed = function (eyesObj) {
     // length 120
     var [eyeGraysCurrent, eyeFeatsCurrent] = util.getEyeFeats(eyesObj);
 
-    // SE Kernel
-    let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120)
-    let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120)
-    // // RQ Kernel
-    // let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedRQRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalRQPrecomputed, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120)
-    // let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedRQRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalRQPrecomputed, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120)
-    // // Custom Kernel
-    // let [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalCustomPrecomputed, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120)
-    // let [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalCustomPrecomputed, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120)
+    let predictedXAngle = null
+    let predictedXVariance = null
+    let predictedYAngle = null
+    let predictedYVariance = null
+
+
+    if (kernel === "SE") {
+        // SE Kernel
+        [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_x, params.length_scale_x, params.sigma_two_x, 120);
+        [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedSERegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalSEPrecomputed, eyeFeatsCurrent, params.sigma_one_y, params.length_scale_y, params.sigma_two_y, 120);
+    } else if (kernel === "RQ") {
+        // RQ Kernel
+        [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedRQRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalRQPrecomputed, eyeFeatsCurrent, params.sigma_one_RQ_x, params.length_scale_RQ_x, params.alpha_RQ_x, params.sigma_two_RQ_x, 120);
+        [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedRQRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalRQPrecomputed, eyeFeatsCurrent, params.sigma_one_RQ_y, params.length_scale_RQ_y, params.alpha_RQ_y, params.sigma_two_RQ_y, 120);
+    } else {
+        // Custom Kernel
+        [predictedXAngle, predictedXVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.horizontalAnglesPrecomputed, webgazer.KxxinverseHorizontalCustomPrecomputed, eyeFeatsCurrent, params.M_x, params.sigma_one_custom_x, params.sigma_two_custom_x, width_matrix_custom_x, height_matrix_custom_x, 120);
+        [predictedYAngle, predictedYVariance] = util_regression.GPPrecomputedCustomRegressor(webgazer.eyeFeaturesPrecomputed, webgazer.verticalAnglesPrecomputed, webgazer.KxxinverseVerticalCustomPrecomputed, eyeFeatsCurrent, params.M_y, params.sigma_one_custom_y, params.sigma_two_custom_y, width_matrix_custom_y, height_matrix_custom_y, 120);
+    }
 
     console.log("x and y angles", predictedXAngle, predictedYAngle)
     // Convert the predicted angles (in radians) to position
@@ -378,15 +387,15 @@ reg.RidgeReg.prototype.predictRotationGPPrecomputed = function (eyesObj) {
 };
 
 
-reg.RidgeReg.prototype.setData = util_regression.setData;
+reg.TotalReg.prototype.setData = util_regression.setData;
 
-reg.RidgeReg.prototype.setRotationData = util_regression.setRotationData;
+reg.TotalReg.prototype.setRotationData = util_regression.setRotationData;
 
 /**
  * Return the data
  * @returns {Array.<Object>|*}
  */
-reg.RidgeReg.prototype.getData = function () {
+reg.TotalReg.prototype.getData = function () {
     return this.dataClicks.data;
 }
 
@@ -394,14 +403,14 @@ reg.RidgeReg.prototype.getData = function () {
  * Return the rotation data
  * @returns {Array.<Object>|*}
  */
-reg.RidgeReg.prototype.getRotationData = function () {
+reg.TotalReg.prototype.getRotationData = function () {
     return this.dataRotationClicks.data;
 }
 
 /**
- * The RidgeReg object name
+ * The TotalReg object name
  * @type {string}
  */
-reg.RidgeReg.prototype.name = 'ridge';
+reg.TotalReg.prototype.name = 'ridge';
 
 export default reg;
