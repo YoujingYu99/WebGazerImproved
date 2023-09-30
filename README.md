@@ -5,6 +5,7 @@ WebGazer.js is an eye tracking library that uses common webcams to infer the eye
 * [Official website](https://webgazer.cs.brown.edu)
 * [API Docs](https://github.com/brownhci/WebGazer/wiki/Top-Level-API)
 
+
 ## Features
 
 * Real time gaze prediction on most major browsers
@@ -14,6 +15,18 @@ WebGazer.js is an eye tracking library that uses common webcams to infer the eye
 * Swappable components for eye detection
 * Multiple gaze prediction models
 * Useful video feedback to user
+
+
+## Improved Features
+
+* The original WebGazer implementation maps from eye images directly to x and y coordinates on the screen with a simple ridge regression algorithm. However, there are two shortcomings of this approach. Firstly, this does not take into consideration possible changes in the environmental variables such as the viewing distance (how far the user is sitting away from the screen). The gaze location on the screen is determined by two factors, the relative location of the user's eyes from the screen and the eye rotation angles. We argue that the only information that can possibly be gained from the eye images are the eye rotation angles, hence missing the information on the relative location of the eyes. If the user moves closer to the screen or further to the left of the screen, the eye images captured by the webcam stay the same (they have been cropped and rescaled) and hence the regression algorithm outputs the same gaze location, though in fact the user is looking at another location. To increase the robustness against changes in the position of the user, we take inspiration from human physiology where the human blindspot angle is invariant across the population ([virtual chinrest](https://www.nature.com/articles/s41598-019-57204-1)). Prior to the points calibration exercise in the original WebGazer, the user is asked to perform a simple blind spot calibration task which gauges the relative location of the user's eye from the screen. This information is dynamically kept track of through simple scaling.
+* Secondly, the linear regressor lacks in its ability to capture the inherent nonlinear relationship between the eye images and the rotation angles. Here we implement a simple Gaussian Processes (GP) regressor with four kernels available for choice, namely the squared exponential kernel, the rational quadratic kernel, and a novel separable smoothing kernel. Offline data analysis shows an improvement of 22% in error using the GP regressor over the linear regressor. A small-scale offline data collection was performed to train the GP regressor to determine the hyperparameters and cross-user applicability of the hyperparameters was validated. For more details please see the [project report](https://github.com/YoujingYu99/WebGazerImproved/Yu_final_report.pdf). An illustrative video is posted below:
+
+# cool-beans
+
+https://github.com/YoujingYu99/WebGazerImproved/Demo_SE.mp4
+
+
 
 ## Build the repository
 
