@@ -17,7 +17,7 @@ The original WebGazer implementation maps from eye images directly to x and y co
 To increase the robustness against changes in the position of the user, we take inspiration from human physiology where the human blindspot angle is invariant across the population (the idea is borrowed from this wonderful paper [virtual chinrest](https://www.nature.com/articles/s41598-019-57204-1)). The user is firstly asked to perform a card sliding exercise to determine the logical pixel density (i.e. how many pixels on the user screen maps to how many millimeters in real life), before performing a simple blind spot calibration task which gauges the relative location of the user's eye with respect to the screen. This information is dynamically kept track of through simple scaling. Finally, the user does the points clicking exercise as implemented in the original WebGazer to collect a set of user-specific data points. The flowchart is shown below.
 
 
-<img src="https://github.com/YoujingYu99/WebGazerImproved/blob/master/new_calibration_structure.png" width="300%">
+<img src="https://github.com/YoujingYu99/WebGazerImproved/blob/master/new_calibration_structure.png" width="50%">
 
 
 ### Improvement in Algorithm
