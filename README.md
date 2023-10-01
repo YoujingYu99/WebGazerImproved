@@ -1,23 +1,14 @@
 # [WebGazer.js](https://webgazer.cs.brown.edu)
 
+
+
 WebGazer.js is an eye tracking library that uses common webcams to infer the eye-gaze locations of web visitors on a page in real time. The eye tracking model it contains self-calibrates by watching web visitors interact with the web page and trains a mapping between the features of the eye and positions on the screen. WebGazer.js is written entirely in JavaScript and with only a few lines of code can be integrated in any website that wishes to better understand their visitors and transform their user experience. WebGazer.js runs entirely in the client browser, so no video data needs to be sent to a server. WebGazer.js can run only if the user consents in giving access to their webcam.
 
 * [Official website](https://webgazer.cs.brown.edu)
 * [API Docs](https://github.com/brownhci/WebGazer/wiki/Top-Level-API)
 
-
-## Features
-
-* Real time gaze prediction on most major browsers
-* No special hardware; WebGazer.js uses your webcam
-* Self-calibration from clicks and cursor movements
-* Easy to integrate with a few lines of JavaScript
-* Swappable components for eye detection
-* Multiple gaze prediction models
-* Useful video feedback to user
-
-
 ## Improved Features: What I have done in addition to WebGazer
+In this section I explain the changes I have made to WebGazer and how they change the performance. The rest of the documentation largely follows the original WebGazer documentation unless specifically stated otherwise. 
 
 ### Problems and Issues
 The original WebGazer implementation maps from eye images directly to x and y coordinates on the screen with a simple ridge regression algorithm. However, there are two shortcomings of this approach. Firstly, this does not take into consideration possible changes in the environmental variables such as the viewing distance (how far the user is sitting away from the screen). The gaze location on the screen is determined by two factors, the relative location of the user's eyes from the screen and the eye rotation angles. We argue that the only information that can possibly be gained from the eye images are the eye rotation angles, hence missing the information on the relative location of the eyes. If the user moves closer to the screen or further to the left of the screen, the eye images captured by the webcam stay the same (they have been cropped and rescaled) and hence the regression algorithm outputs the same gaze location, though in fact the user is looking at another location. 
@@ -31,6 +22,18 @@ To increase the robustness against changes in the position of the user, we take 
 
 ### Improvement in Algorithm
 The original WebGazer implements a linear regressor, which lacks in its ability to capture the inherent nonlinear relationship between the eye images and the rotation angles. Here we implement a simple Gaussian Processes (GP) regressor with four kernels available for choice, namely the squared exponential kernel, the rational quadratic kernel, and a novel separable smoothing kernel. Offline data analysis shows an improvement of 22% in error using the GP regressor over the linear regressor. A small-scale offline data collection was performed to train the GP regressor to determine the hyperparameters and cross-user applicability of the hyperparameters was validated. For more details please see the [project report](https://youjingyu99.github.io/files/Report_eyetracker.pdf). An illustrative video is posted here: https://youtu.be/93EK5VD4oQQ
+
+
+## Features
+
+* Real time gaze prediction on most major browsers
+* No special hardware; WebGazer.js uses your webcam
+* Self-calibration from clicks and cursor movements
+* Easy to integrate with a few lines of JavaScript
+* Swappable components for eye detection
+* Multiple gaze prediction models
+* Useful video feedback to user
+
 
 
 ## Build the repository
@@ -71,10 +74,14 @@ import webgazer from 'webgazer'
 
 ### How to run the Example HTML files
 
-Within the /www directory there are two example HTML files:
+Within the /web directory there are two example HTML files:
 
-  * `calibration.html`: This example includes additional user feedback, such as a 9-point calibration sequence, accuracy measurements and an informative help module.
-  * `collision.html`: This example contains a game where the user can move an orange ball with their eyes, which in turn collides with blue balls.
+  * `calibration_block_bspot_both.html`: This example incorporates the additional calibration and algorithmic changes I have made to WebGazer. Simply click on it for an illustration.
+
+To change the regressor type, use the `webgazer.setRegression` function in /web/js/main.js
+  * `totalRegression`: Currently only supported version; no threading is supported.
+  * `GP`: GP regression used as default. Other options include `original` (original implementation), `LR` (linear regression) and `GPPrecomputed` (GP with precomputed conditioning matrices). See [project report](https://youjingyu99.github.io/files/Report_eyetracker.pdf) for more details.
+  * `SE`: SE kernel used as default for GP regression. Other options include `RQ` and `SS`. If not using GP regression can set to any value.
 
 To run the example files as a server:
 
