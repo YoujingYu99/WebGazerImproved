@@ -38,10 +38,10 @@ The original WebGazer implements a linear regressor, which lacks in its ability 
 
 ## Build the repository
 
-If you want to build the repository from source follow these instructions:
+If you want to build my repository from source follow these instructions:
 
     # Ensure NodeJS is downloaded: https://nodejs.org/en/download/
-    git clone https://github.com/brownhci/WebGazer.git
+    git clone https://github.com/YoujingYu99/WebGazerImproved.git
     cd WebGazer
     #install the dependencies
     npm install
@@ -50,27 +50,6 @@ If you want to build the repository from source follow these instructions:
 
 <!-- To use the webgazer script in the head of an HTML file add the `async` tag to ensure the clmtrackr does not collapse to a slower version -->
 
-## Examples
-
-Examples of how WebGazer.js works can be found [here](https://webgazer.cs.brown.edu/#examples).
-
-### to use on any website
-
-```
-<script src="webgazer.js" type="text/javascript" >
-```
-
-### to use in any modern framework
-
-````  
-const webgazer = require('webgazer'); // npm package 'webgazer' is sync with this repository
-```` 
-
-or you can you do
-
-```` 
-import webgazer from 'webgazer'
-````
 
 ### How to run the HTML file for my improved version
 
