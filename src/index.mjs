@@ -1257,7 +1257,7 @@ webgazer.setTracker = function (name) {
 
 /**
  * Sets the regression module and clears any other regression modules
- * @param {String} name - The name of the regression module to use
+ * @param {String} name - The name of the regression module to use. Currently only totalRegression is supported.
  * @param {String} algorithmType - The type of algorithm; original, LR, GP, GPPrecomputed
  * @param {String} GPKernel - The name of the GP kernel to use
  * @return {webgazer} this

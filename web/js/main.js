@@ -6,9 +6,9 @@ window.onload = async function () {
   //start the webgazer tracker
   await webgazer
     .setRegression(
-      "totalRegression",
-      "GP",
-      "SE"
+      "totalRegression", // Currently only supported version
+      "GP",  // original, LR, GP, GPPrecomputed
+      "SE"  // SE, RQ, SS
     ) /* currently must set regression and tracker */
     //.setTracker('clmtrackr')
     .setGazeListener(function (data, clock) {
