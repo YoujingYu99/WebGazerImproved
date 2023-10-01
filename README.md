@@ -17,7 +17,7 @@ The original WebGazer implementation maps from eye images directly to x and y co
 To increase the robustness against changes in the position of the user, we take inspiration from human physiology where the human blindspot angle is invariant across the population (the idea is borrowed from this wonderful paper [virtual chinrest](https://www.nature.com/articles/s41598-019-57204-1)). The user is firstly asked to perform a card sliding exercise to determine the logical pixel density (i.e. how many pixels on the user screen maps to how many millimeters in real life), before performing a simple blind spot calibration task which gauges the relative location of the user's eye with respect to the screen. This information is dynamically kept track of through simple scaling. Finally, the user does the points clicking exercise as implemented in the original WebGazer to collect a set of user-specific data points. The flowchart is shown below.
 
 
-<img src="https://github.com/YoujingYu99/WebGazerImproved/blob/master/new_calibration_structure.png" width="500%">
+<img src="https://github.com/YoujingYu99/WebGazerImproved/blob/master/new_calibration_structure.png" width="300%">
 
 
 ### Improvement in Algorithm
@@ -72,11 +72,11 @@ or you can you do
 import webgazer from 'webgazer'
 ````
 
-### How to run the Example HTML files
+### How to run the HTML file for my improved version
 
-Within the /web directory there are two example HTML files:
+Within the /web directory there is the HTML file:
 
-  * `calibration_block_bspot_both.html`: This example incorporates the additional calibration and algorithmic changes I have made to WebGazer. Simply click on it for an illustration.
+  * `calibration_block_bspot_both.html`: This example incorporates the additional calibration and algorithmic changes I have made to WebGazer. Simply run it in your browser. 
 
 To change the regressor type, use the `webgazer.setRegression` function in /web/js/main.js
   * `totalRegression`: Currently only supported version; no threading is supported.
