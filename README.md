@@ -17,7 +17,7 @@ WebGazer.js is an eye tracking library that uses common webcams to infer the eye
 * Useful video feedback to user
 
 
-## Improved Features
+## Improved Features: What I have done in addition to WebGazer
 
 * The original WebGazer implementation maps from eye images directly to x and y coordinates on the screen with a simple ridge regression algorithm. However, there are two shortcomings of this approach. Firstly, this does not take into consideration possible changes in the environmental variables such as the viewing distance (how far the user is sitting away from the screen). The gaze location on the screen is determined by two factors, the relative location of the user's eyes from the screen and the eye rotation angles. We argue that the only information that can possibly be gained from the eye images are the eye rotation angles, hence missing the information on the relative location of the eyes. If the user moves closer to the screen or further to the left of the screen, the eye images captured by the webcam stay the same (they have been cropped and rescaled) and hence the regression algorithm outputs the same gaze location, though in fact the user is looking at another location. To increase the robustness against changes in the position of the user, we take inspiration from human physiology where the human blindspot angle is invariant across the population ([virtual chinrest](https://www.nature.com/articles/s41598-019-57204-1)). Prior to the points calibration exercise in the original WebGazer, the user is asked to perform a simple blind spot calibration task which gauges the relative location of the user's eye from the screen. This information is dynamically kept track of through simple scaling.
   
