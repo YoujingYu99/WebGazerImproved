@@ -46,6 +46,7 @@
     "file-saver": "^2.0.5",
     "file-system": "^2.2.2",
     "fs": "^0.0.1-security",
+    "http-server": "^14.1.1",
     "jquery": "^3.6.1",
     "json-loader": "^0.5.7",
     "jspsych": "^7.3.1",

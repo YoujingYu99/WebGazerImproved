@@ -2,10 +2,10 @@ var PointCalibrate = 0;
 var PointDataCollection = 0;
 var CalibrationPoints = {};
 var DataCollectionPoints = {};
-const numClickPerPoint = 1;
+const numClickPerPoint = 5;
 const numClickPerPointDataCollection = 3;
 const numDataPointsToCollect = 300;
-var buttonCount = 1;
+var buttonCount = 5;
 
 /**
  * Clear the canvas and the calibration button.
